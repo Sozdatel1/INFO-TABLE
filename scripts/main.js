@@ -66,37 +66,7 @@ function checkHoliday() {
 // Запускаем при загрузке страницы
 window.onload = checkHoliday;
 
-// const snowContainer = document.getElementById('snow');
 
-// function createSnowflake() {
-//   const snowflake = document.createElement('div');
-//   snowflake.className = 'snowflake';
-
-//   // Устанавливаем случайный начальный горизонтальный смещающий эффект
-//   const size = Math.random() * 4 + 4; // Размер снежинки
-//   snowflake.style.width = size + 'px';
-//   snowflake.style.height = size + 'px';
-
-//   //   // Начальная позиция по горизонтали
-//   snowflake.style.left = Math.random() * 100 + '%';
-
-//   //   // Продолжительность падения
-//   const duration = Math.random() * 10 + 10; // от 10 до 20 секунд
-//   snowflake.style.animationDuration = duration + 's';
-
-//   //   // Начальная задержка, чтобы снежинки не падали одновременно
-//   snowflake.style.animationDelay = Math.random() * 5 + 's';
-
-//   snowContainer.appendChild(snowflake);
-
-//   //   // Удаляем снежинку после окончания анимации
-//   setTimeout(() => {
-//     snowflake.remove();
-//   }, duration * 1000);
-// }
-
-// // // Создавать снежинки регулярно
-// setInterval(createSnowflake, 100);
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -208,90 +178,51 @@ function getNoun(number, one, two, five) {
   return five;
 }
 
-// Запускаем каждую секунду (1000 мс)
 setInterval(updateVacationCountdown, 1000);
 updateVacationCountdown();
 
-// Инициализация Swiper
-const sliderElement = document.querySelector('.my-slider');
-if (sliderElement) {
-  const swiper = new Swiper('.my-slider', {
 
-    slidesPerView: 1, // ВСЕГДА ПОКАЗЫВАТЬ ТОЛЬКО ОДИН
-    spaceBetween: 0,
-    loop: true,
-    speed: 900,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false,
-    },
-    pagination: {
-      el: '.swiper-pagination',
-      clickable: true,
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    // Настройки адаптивности
-    breakpoints: {
-      // Если экран шире 320px
-      100: {
-        slidesPerView: 1,
-        spaceBetween: 100
-      },
-      // Если экран шире 1024px
-      1020: {
-        slidesPerView: 1,
-        spaceBetween: 10
-      }
+function updateHoliday() {
+    const holidayElement = document.getElementById('holiday-text');
+    if (!holidayElement) return;
+
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth() + 1; // Месяцы в JS от 0 до 11
+
+    // 1. Твой список важных праздников (добавляй сюда свои!)
+    const specialHolidays = {
+        "1-1": "Новый год! 🎄",
+        "7-1": "Рождество 🌟",
+        "23-2": "День защитника Отечества 🛡️",
+        "8-3": "Международный женский день 💐",
+        "12-4": "День космонавтики 🚀",
+        "1-5": "Праздник Весны и Труда 🌱",
+        "9-5": "День Победы 🎖️",
+        "13-9": "День программиста (256-й день) 💻",
+        "31-12": "Новый год уже близко! 🥂"
+    };
+
+    const key = `${day}-${month}`;
+
+    // 2. Если сегодня есть праздник в списке - показываем
+    if (specialHolidays[key]) {
+        holidayElement.innerText = specialHolidays[key];
+    } else {
+        // 3. Если праздника нет - берем статус по дню недели (как мы делали)
+        const weekDay = now.getDay();
+        const dailyStatuses = [
+            "День планирования и отдыха 🧘‍♂️", // Вс
+            "Понедельник — время новых статей! 📝",
+            "Вторник — продуктивность на максимум 🚀",
+            "Среда — экватор недели на PRO-info 🌍",
+            "Четверг — день чистого кода 💻",
+            "Пятница — финалим задачи ⚡️",
+            "Суббота — время саморазвития 📚"
+        ];
+        holidayElement.innerText = dailyStatuses[weekDay];
     }
-  });
-} else {
-  console.log("Слайдера на этой странице нет, идем дальше...");
 }
 
-const newSlider = document.querySelector('.swiper-news');
-if (newSlider) {
-  new Swiper('.swiper-news', {
-     direction: 'vertical', 
-       effect: 'cube', // Включаем режим куба
-  grabCursor: true, // Курсор-ручка, чтобы «хватать» грань
- 
-  cubeEffect: {
-    shadow: true, // Тень под кубом (дает объем)
-    slideShadows: true, // Тени на боковых гранях при повороте
-    shadowOffset: 2000,
-    shadowScale: 0.94,
-   
-  },
-  // Чтобы всё работало плавно, добавь мышку
-  mousewheel: true, 
-    slidesPerView: 1,
-   spaceBetween: 0,
-    loop: true,
-    speed: 3000,
-        autoplay: {
-      delay: 2000,
-      disableOnInteraction: false,
-    },
-    
-    pagination: {
-      el: '.swiper-news .swiper-pagination',
-      clickable: true,
-
-    },
-    breakpoints: {
-      // Если экран шире 320px
-      100: {
-        slidesPerView: 1,
-        spaceBetween: 10
-      },
-      // Если экран шире 1024px
-      1020: {
-        slidesPerView: 1,
-        spaceBetween: 10
-      }
-    }
-  });
-}
+// Запускаем сразу при загрузке
+document.addEventListener('DOMContentLoaded', updateHoliday);

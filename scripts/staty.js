@@ -43,23 +43,38 @@ async function publishPost() {
 
 
 // ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ЗАГОЛОВОК И ИЗОБРАЖЕНИЕ КОТОРЫЕ БЫЛИ ПОЛУЧЕНЫ С СЕРВЕРА И ВСТАВЛЯЕТ ИХ В ТАБЛИЦУ СО СТАТЬЯМИ
+function getAutoCategory(title) {
+    if (!title) return 'Инфо';
+    const t = title.toLowerCase().trim();
 
-async function loadPosts() {
-    const grid = document.getElementById('dynamic-cards'); // Берем твоюсетку
+    // Добавляем новые ключевые слова:
+    if (t.includes('проб') || t.includes('пробная') || t.includes('html')) return 'Код';
+    if (t.includes('игр') || t.includes('roblox') || t.includes('steam')) return 'Игры';
+    if (t.includes('школ') || t.includes('жизнь') || t.includes('день')) return 'Жизнь';
+    if (t.includes('Капибары') || t.includes('животн') || t.includes('кот') || t.includes('пес')) return 'Природа';
+
+    return 'Инфо';
+}
+
+let allPostsData = []; 
+
+// async function loadPosts() {
+//     const grid = document.getElementById('dynamic-cards'); // Берем твоюсетку
+//     if (!grid) return;
+
+// 1. Функция-"рисовальщик" (она должна быть видна всем)
+function renderFilteredPosts(postsToRender) {
+    const grid = document.getElementById('dynamic-cards');
     if (!grid) return;
 
-    try {
-        const response = await fetch(`https://raw.githubusercontent.com/Sozdatel1/PRO-info/main/posts.json?v=${Date.now()}`);
-        const posts = await response.json();
-
-        // Очищаем сетку, если хочешь, чтобы статические карточки пропали, 
-        // ИЛИ не очищай, если хочешь, чтобы новые посты добавились сверху
-        // grid.innerHTML = ''; 
-
-        // Генерируем HTML для новых постов
-        const postsHtml = posts.map(post => `
+    grid.innerHTML = postsToRender.map(post => {
+        const category = getAutoCategory(post.title);
+        return `
+   
     <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">
         <div class="news-card">
+
+        <span class="auto-tag">#${category}</span>
             <div class="card-icon">
             ${post.image ? `<img src="${post.image}" alt="icon" style="margin-bottom: 10px;
      background: #ffe5e000;
@@ -88,19 +103,42 @@ async function loadPosts() {
             </p>
         </div>
     </a>
-`).join('');
+`}).join('');
+    }
+// 2. Функция загрузки (теперь она чистая и аккуратная)
+async function loadPosts() {
+    try {
+        const response = await fetch(`https://raw.githubusercontent.com/Sozdatel1/PRO-info/main/posts.json?v=${Date.now()}`);
+        allPostsData = await response.json(); 
 
-
-        // Вставляем новые посты в начало сетки
-        grid.insertAdjacentHTML('afterbegin', postsHtml);
+        // Рисуем всё сразу
+        renderFilteredPosts(allPostsData); 
+        renderTrending(allPostsData);
+        updateHubStats(allPostsData);
 
     } catch (err) {
         console.error("Ошибка загрузки:", err);
     }
 }
 
-// Вызываем при загрузке
+// 3. Функция фильтрации (вызывается при клике на кнопки в HTML)
+function filterByTag(tag, button) {
+    // Подсветка кнопок
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    // Логика фильтра
+    const filtered = (tag === 'Все') 
+        ? allPostsData 
+        : allPostsData.filter(post => getAutoCategory(post.title) === tag);
+
+    renderFilteredPosts(filtered);
+}
+
+// Запуск
 document.addEventListener('DOMContentLoaded', loadPosts);
+
+
 
 
 // ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ТЕКСТ, КАРТИНКУ И ЗАГОЛОВОК, ЛАЙКИ И ОТОБРАЖАЕТ ИХ НА СТАТЬЕ С СОБСТВЕННЫМ ID
@@ -119,9 +157,9 @@ async function loadFullArticle() {
         // Чтобы абзацы отображались корректно, заменяем переносы строк на <br>
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
         // --- ДОБАВЬ ЭТИ СТРОКИ НИЖЕ ---
-    setTimeout(() => {
-    if (window.updateScrollProgress) window.updateScrollProgress();
-}, 5000); // Половина секунды подождем, пока браузер отрисует текст
+        setTimeout(() => {
+            if (window.updateScrollProgress) window.updateScrollProgress();
+        }, 5000); // Половина секунды подождем, пока браузер отрисует текст
 
         const likeSpan = document.getElementById('artLikes');
         const likeBtn = document.getElementById('likeBtn');
@@ -199,3 +237,36 @@ async function likePost(id, event) {
 }
 
 // СНАЧАЛА МЫ ПОСЫЛАЕМ ДАННЫЕ НА СЕРВЕР, ОН ПОСЫЛЕТ ИХ В РЕПО ГИТХАБ С ПОМОЩЬЮ ТОКЕНА ГИТХАБ, А ПОТОМ МЫ ЗАПРАШИВАЕМ ДАННЫЕ ИЗ ФАЙЛА
+function renderTrending(posts) {
+    const trendingList = document.getElementById('trending-list');
+    if (!trendingList) return;
+
+    // Сортируем по лайкам и берем первые 3
+    const topPosts = [...posts]
+        .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+        .slice(0, 3);
+
+    trendingList.innerHTML = topPosts.map((post, index) => `
+        <a href="article.html?id=${post.id}" class="trending-item">
+            <div class="trending-info">
+                <span class="trending-title">${index === 0 ? '👑 ' : ''}${post.title}</span>
+                <span class="trending-likes">❤️ ${post.likes || 0}</span>
+            </div>
+        </a>
+    `).join('');
+}
+
+
+function filterByTag(tag, button) {
+    // 1. Подсвечиваем кнопку (визуал)
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    // 2. Логика выбора: если "Все" - берем всё, если нет - фильтруем по тегу
+    const filtered = (tag === 'Все') 
+        ? allPostsData 
+        : allPostsData.filter(post => getAutoCategory(post.title) === tag);
+
+    // 3. Просим "рисовальщика" показать результат
+    renderFilteredPosts(filtered);
+}

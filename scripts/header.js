@@ -20,21 +20,12 @@ if (header) {
             
             <li class="dropdown">
                 <div class="dropdown-link-wrapper">
-                    <a href="#">Меню</a>
-            
-                </div>
-                <ul class="dropdown-content">
-                    <li><a href="pogoda.html">Погода</a></li>
-                    <li><a href="new.html">Статьи</a></li>
-                    <!-- <li><a href="school.html">Расписание</a></li> -->
-                    <li><a href="carta.html">Карты</a></li>
                     
-                </ul>
+                </div>
+            
             </li>
 
-            <li><a href="holiday.html">Праздники</a></li>
-            <li><a href="fact.html">Факты</a></li>
-
+        
             <li class="dropdown">
                 <div class="dropdown-link-wrapper">
                     <a href="#">Разработчик</a>

@@ -1,0 +1,29 @@
+.fact-box {
+    text-align: center;
+    border-left: 4px solid #41cfff; /* Голубой акцент как у скролла */
+}
+
+#random-fact {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #444;
+    min-height: 60px; /* Чтобы карточка не прыгала при разной длине текста */
+    transition: opacity 0.3s ease;
+    margin: 15px 0;
+}
+
+.next-fact-btn {
+    background: none;
+    border: 1px solid #41cfff;
+    color: #41cfff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.3s;
+}
+
+.next-fact-btn:hover {
+    background: #41cfff;
+    color: white;
+}

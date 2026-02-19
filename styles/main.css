@@ -4,36 +4,50 @@
             --glass: rgba(255, 255, 255, 0.9);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
-            background: linear-gradient(135deg, #ffffff 0%, #c5c5c5 100%);
+            /* background: linear-gradient(135deg, #ffffff 0%, #c5c5c5 100%); */
+            background-image:
+                radial-gradient(at 0% 0%, rgba(65, 207, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 128, 0, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 255, 65, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(123, 97, 255, 0.12) 0px, transparent 50%);
+
+            background-attachment: fixed;
+            /* Чтобы фон не уезжал при скролле */
+
+
             margin: 0;
             font-family: 'Roboto', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
         }
+
         .header-content {
-  position: fixed;
-  display: flex;
-  top: 0;
-  left: 0;
-  align-items: center;
-  /* Выравнивает элементы по вертикали по центру */
-  gap: 10px;
-  /* Добавляет немного пространства между картинкой и текстом */
-  /* background-color: #fcfbbde1; */
-  /* background-color: hsla(0, 0%, 60%, .14); */
-  background-color: hsla(62, 100%, 50%, 0.1);
-  backdrop-filter: blur(10px);
-  width: 100%;
-  transition: transform 0.6s ease;
-  /* animation: hideHeader linear both;
+            position: fixed;
+            display: flex;
+            top: 0;
+            left: 0;
+            align-items: center;
+            /* Выравнивает элементы по вертикали по центру */
+            gap: 10px;
+            /* Добавляет немного пространства между картинкой и текстом */
+            /* background-color: #fcfbbde1; */
+            /* background-color: hsla(0, 0%, 60%, .14); */
+            background-color: hsla(62, 100%, 50%, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            transition: transform 0.6s ease;
+            /* animation: hideHeader linear both;
   animation-timeline: scroll();
   animation-range: 0px 20px; Анимация срабатывает на первых 200px скролла */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  z-index: 20000000000;
-}
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 20000000000;
+        }
+
         /* СЕТКА GRID */
         .main-grid {
             display: grid;
@@ -41,7 +55,7 @@
             gap: 20px;
             max-width: 1450px;
             margin: 90px 20px 20px 20px;
-            
+
             padding: 0 20px;
             align-items: start;
         }
@@ -52,8 +66,8 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 20px;
         }
 
@@ -64,12 +78,15 @@
             gap: 12px;
             margin-bottom: 30px;
         }
-        .admin-zone input, .admin-zone textarea {
+
+        .admin-zone input,
+        .admin-zone textarea {
             width: 100%;
             padding: 12px;
             border-radius: 10px;
             border: 1px solid #ddd;
         }
+
         .publish-btn {
             background: #7fffd4;
             border: none;
@@ -79,12 +96,16 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .publish-btn:hover { transform: scale(1.05); background: #66e0b8; }
+
+        .publish-btn:hover {
+            transform: scale(1.05);
+            background: #66e0b8;
+        }
 
         /* СЕТКА СТАТЕЙ (чтобы были ровными) */
         #dynamic-cards {
             display: grid;
-             grid-template-columns: repeat(2, 1fr); 
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             align-items: stretch;
         }
@@ -100,31 +121,54 @@
             border-radius: 12px;
             border: 1px solid #000;
             height: 100%;
-      
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none !important;
             color: inherit;
-            transition: 0.3s;
+           
+            
+            
+            transform: translateY(20px);
+
+            /* 2. ЕДИНЫЙ ТРАНЗИШН ДЛЯ ВСЕГО */
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.5s ease,
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+
         }
-        .news-card:hover { border-color: var(--accent); transform: translateY(-5px); }
-.card-icon {
-    width: 100%;
-    /* 1. Прямоугольник 2 к 1 (Ширина в два раза больше высоты) */
-    aspect-ratio: 2 / 1; 
-    flex-shrink: 0; 
-    overflow: hidden;
-    background-color: #eee; /* Тот самый серый фон */
-    border-radius: 8px 8px 0 0;
+
+       .news-card.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.card-icon img {
-    /* 2. ЗАСТАВЛЯЕМ КАРТИНКУ ЗАНЯТЬ ВЕСЬ СЕРЫЙ БЛОК */
-    width: 100% !important;
-    height: 100% !important; 
-    
-    /* 3. МАГИЯ: картинка не растягивается "соплей", а аккуратно обрезается */
-    object-fit: cover; 
-    display: block;
+/* ЭФФЕКТ ПРИ НАВЕДЕНИИ (Теперь он не будет конфликтовать) */
+.news-card.visible:hover {
+    border-color: var(--accent);
+    transform: translateY(-8px); /* Чуть выше при наведении */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
+
+        .card-icon {
+            width: 100%;
+            /* 1. Прямоугольник 2 к 1 (Ширина в два раза больше высоты) */
+            aspect-ratio: 2 / 1;
+            flex-shrink: 0;
+            overflow: hidden;
+            background-color: #eee;
+            /* Тот самый серый фон */
+            border-radius: 8px 8px 0 0;
+        }
+
+        .card-icon img {
+            /* 2. ЗАСТАВЛЯЕМ КАРТИНКУ ЗАНЯТЬ ВЕСЬ СЕРЫЙ БЛОК */
+            width: 100% !important;
+            height: 100% !important;
+
+            /* 3. МАГИЯ: картинка не растягивается "соплей", а аккуратно обрезается */
+            object-fit: cover;
+            display: block;
+        }
 
 
 
@@ -139,17 +183,81 @@
         }
 
         /* АДАПТИВНОСТЬ */
-        @media (max-width: 1000px) {
-            .main-grid { grid-template-columns: 1fr; }
-            .left-sidebar, .right-sidebar { display: none; }
-            .pogoda-mobile { display: block; text-align: center; margin-bottom: 20px; }
+        @media (max-width: 900px) {
+
+
+            .pogoda-mobile {
+                display: block;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media(max-width: 1150px) {
+
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+
+            }
+
+            .left-sidebar {
+                display: none;
+            }
+        }
+
+        @media(max-width: 870px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
         }
 
 
-        #snow { pointer-events: none; position: fixed; top: 0; z-index: 9999; }
-        @media(max-width: 1250px) {
-           #dynamic-cards {
-        grid-template-columns: 1fr;
-    }
+        #snow {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            z-index: 9999;
+        }
 
+        @media(max-width: 1250px) {
+            #dynamic-cards {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        /* 1. СТИЛЬ ТЕГА (Чтобы горел всегда) */
+        .auto-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #41cfff !important;
+            /* Твой неоновый голубой */
+            color: white !important;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 100;
+
+            /* ГЛАВНОЕ: Отключаем скрытие */
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+
+        .news-card {
+            position: relative;
+        }
+
+        /* 3. Если у тебя есть анимация появления ВСЕГО контента карточки, 
+   убедись, что тег в неё не попадает или перекрой её: */
+        .news-card a,
+        .news-card div,
+        .news-card p {
+            /* Если тут стоит opacity: 0, тег выше (auto-tag) всё равно будет виден из-за !important */
         }

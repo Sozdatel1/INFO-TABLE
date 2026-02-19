@@ -1,0 +1,52 @@
+/* КОНТЕЙНЕР ДЛЯ КНОПОК */
+.tag-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    padding: 15px !important;
+    overflow-x: auto; /* Скролл, если кнопок станет много */
+    scrollbar-width: none; /* Прячем некрасивый скролл в Firefox */
+}
+
+.tag-filters::-webkit-scrollbar { display: none; } /* Прячем скролл в Chrome/Safari */
+
+/* ОБЩИЙ СТИЛЬ КНОПОК */
+.filter-btn {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+/* ЭФФЕКТ ПРИ НАВЕДЕНИИ */
+.filter-btn:hover:not(.active) {
+    border-color: #41cfff;
+    color: #41cfff;
+    background: rgba(65, 207, 255, 0.05);
+}
+
+/* АКТИВНАЯ КНОПКА (Неоновый стиль) */
+.filter-btn.active {
+    background: #41cfff;
+    color: white;
+    border-color: #41cfff;
+    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4), 
+                0 0 5px rgba(0, 255, 65, 0.2); /* Легкий отсвет зеленого */
+    transform: translateY(-2px);
+}
+
+/* Чтобы на мобилках было удобно тыкать */
+@media (max-width: 600px) {
+    .filter-btn {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+}
+

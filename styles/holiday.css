@@ -1,0 +1,57 @@
+.holiday-widget {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid #ff4d4d; /* Красный акцент */
+    padding: 15px !important;
+}
+
+/* Иконка отрывного календаря */
+.calendar-leaf {
+    width: 60px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid #ddd;
+}
+
+.leaf-top {
+    background: #ff4d4d;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 0;
+    text-align: center;
+}
+
+.leaf-body {
+    font-size: 24px;
+    font-weight: 900;
+    text-align: center;
+    padding: 5px 0;
+    color: #333;
+}
+
+/* Текст праздника */
+.holiday-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.holiday-label {
+    font-size: 9px;
+    font-weight: 900;
+    opacity: 0.5;
+    letter-spacing: 1px;
+}
+
+.holiday-main {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #222;
+    margin-top: 2px;
+}
