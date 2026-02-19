@@ -1,0 +1,12 @@
+#scrollProgress {
+    position: fixed;
+   
+    left: 0;
+    bottom: 0;
+    width: 0%; /* Начинаем с нуля */
+    height: 4px;
+    background: #41cfff;
+    box-shadow: 0px 0px 0px 1px #00ff41, 0px 0px 20px #00ff41;
+    z-index: 1000; /* Самый высокий слой, выше всего */
+    transition: width 0.1s ease-out;
+}

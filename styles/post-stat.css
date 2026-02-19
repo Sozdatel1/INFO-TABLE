@@ -1,0 +1,15 @@
+.admin-zone {
+    display:grid;
+    background-color: aliceblue;
+    width: 50%;
+    margin: 10px auto;
+    text-align: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 30px;
+}
+@media(max-width:1100px) {
+    .admin-zone {
+        width: 90%;
+    }
+}

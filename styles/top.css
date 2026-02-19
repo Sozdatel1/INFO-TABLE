@@ -1,0 +1,37 @@
+#toTopBtn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 99;
+
+    /* Начальное состояние: невидима и опущена вниз */
+    opacity: 0;
+    transform: translateY(100px);
+    pointer-events: none;
+    /* Чтобы нельзя было нажать, пока она скрыта */
+
+    transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Эффект "пружины" */
+
+    border: 1px solid #00e1ff;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #00ff41;
+    cursor: pointer;
+    padding: 17px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+}
+
+/* Класс, который мы будем добавлять через JS */
+#toTopBtn.show {
+    opacity: 10;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#toTopBtn:hover {
+    background-color: #00d5ff;
+    color: #0d1117;
+    box-shadow: 0 0 25px #00e1ff;
+}

@@ -1,0 +1,430 @@
+html {
+  container-type: scroll-state;
+  /* scroll-timeline: --page-scroll block; */
+  height: 100%;
+}
+
+body {
+  background: linear-gradient(-4500000deg, #eeff00, #000000, #fff700, #76edff5f);
+  background-size: 700% 400%;
+
+  /* animation: gradientAnimation 15s ease infinite; */
+  background-attachment: fixed;
+  min-height: 100vh;
+  padding: 0px;
+  margin: 0;
+}
+
+/* a, button, .clickable,  img, .fireflies-containerr, td, th {
+    cursor: url('/img/cursor-perchatka.png') 0 0, pointer !important;
+} */
+
+
+/* 1. Общая ширина скроллбара */
+::-webkit-scrollbar {
+  width: 20px;
+  /* Увеличили в два раза */
+  background: #12121200;
+  /* Фон дорожки */
+
+}
+
+/* 2. Дорожка, по которой движется ползунок */
+::-webkit-scrollbar-track {
+  background: #ff000000;
+  border-left: 1px solid #33333300;
+  /* Тонкая разделительная линия для стиля */
+}
+
+/* 3. Широкий светящийся ползунок */
+::-webkit-scrollbar-thumb {
+  background: #00bbff;
+  /* Цвет цианового неона */
+  border-radius: 8px;
+  /* Скругление под стать ширине */
+  /* Мощное многослойное свечение */
+  box-shadow:
+    inset 0 0 10px #ffffff,
+    /* Внутренний блик для объема */
+    0 0 15px #00f2ff,
+    /* Основное свечение */
+    0 0 30px #00f2ff;
+  /* Дальнее рассеивание */
+
+  /* Отступы от краев дорожки, чтобы свечение "дышало" */
+  border: 3px solid #12121200;
+}
+
+/* 4. Состояние при наведении */
+::-webkit-scrollbar-thumb:hover {
+  background: #0011ff;
+  /* Переход в неоновый розовый */
+  box-shadow:
+    inset 0 0 10px #ffffff,
+    0 0 20px #0307ff,
+    0 0 40px #2c25ff;
+  cursor: pointer;
+}
+
+/* 5. Когда вы тянете скроллбар (активное состояние) */
+::-webkit-scrollbar-thumb:active {
+  background: #ffb300;
+  /* Ярко-зеленый неон при нажатии */
+  box-shadow:
+    inset 0 0 10px #ffffff,
+    /* Внутренний блик для объема */
+    0 0 15px #fbff00,
+    /* Основное свечение */
+    0 0 30px #fff700;
+  /* Дальнее рассеивание */
+}
+
+.new-year {
+  position: fixed;
+  /* display: flex; */
+  display: none;
+  padding: 71px 0px 0px 0px;
+  z-index: 1000000;
+}
+
+.header-content {
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  align-items: center;
+  /* Выравнивает элементы по вертикали по центру */
+  gap: 10px;
+  /* Добавляет немного пространства между картинкой и текстом */
+  /* background-color: #fcfbbde1; */
+  /* background-color: hsla(0, 0%, 60%, .14); */
+  background-color: hsla(62, 100%, 50%, 0.1);
+  backdrop-filter: blur(10px);
+  width: 100%;
+  transition: transform 0.6s ease;
+  /* animation: hideHeader linear both;
+  animation-timeline: scroll();
+  animation-range: 0px 20px; Анимация срабатывает на первых 200px скролла */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 20000000000;
+}
+
+/* @keyframes hideHeader-content {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); } */
+/* @container scroll-state(scroll-direction: down) {
+  .header-content {
+    transform: translateY(-100%);
+  }
+}
+
+@container scroll-state(scroll-direction: up) {
+  .header-content {
+    transform: translateY(110);
+  }
+} */
+/* .header--hidden {
+    transform: translateY(-109%);
+}   
+body.menu-open { 
+    overflow: hidden; 
+    touch-action: none; /* Предотвращает скролл на тачскринах */
+*/
+/* Стили бургера */
+
+
+
+.header-content h1,
+.header-content p {
+  margin: 0px;
+}
+
+
+/* Стили для обоих контейнеров контента */
+
+#text {
+  font-family: Verdana, Geneva, Tahoma, Times, serif, Arial, sans-serif;
+  font-family: "Rubik Gemstones", system-ui;
+  background-color: #ff020200;
+  color: #018ad9;
+  margin: 0;
+}
+
+#site {
+  background-color: #b254e400;
+  color: #00a6ff;
+}
+
+.ramka {
+  width: 90%;
+  /* Общая ширина блока */
+  background: #fff;
+  padding: 15px;
+  border-radius: 24px;
+  border: 2px solid #0000008f;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.258);
+  font-family: Arial, sans-serif;
+  margin: 0px !important;
+  text-decoration: none !important;
+}
+
+.logo {
+  transition: transform 0.9s ease;
+  position: relative;
+  /* Нужно для позиционирования подсказки */
+  display: inline-block;
+  background-color: #ffffff00;
+  margin: 0px;
+  padding: 5px;
+
+}
+
+.logo:hover {
+  background-color: #00e5ff70 !important;
+  transition: transform 0.3s ease;
+  transform: scale(1.05);
+  transition: transform 0.5s ease;
+  border-radius: 50px;
+  padding: 5px;
+  margin: 0px;
+}
+
+.notification {
+  display: none;
+  /* скрываем изначально */
+  position: fixed;
+  /* или absolute, если нужен внутри определёного блка */
+  z-index: 9999;
+  /* выше, чем у остального контента */
+  bottom: 0;
+  /* внизу */
+  right: 0;
+  background-color: rgba(68, 78, 114, 0.89);
+
+  border-radius: 15px 15px 2px 15px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 20px;
+  color: white;
+  font-family: Arial, sans-serif;
+  /* box-shadow: 0 0 10px rgba(0,0,0,0.5); */
+  box-shadow: 0 10px 30px rgb(0, 217, 255) !important;
+}
+
+.notification p {
+  margin-bottom: 10px;
+}
+
+.notification a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.accept-button {
+  /* background: linear-gradient(to bottom, rgba(55,182,0,1) 0%,rgba(55,182,0,1) 0%,rgba(34,144,0,1) 2%,rgba(64,202,0,1) 50%,rgba(55,182,0,1) 79%,rgba(55,182,0,1) 79%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background-color: #00ddff;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.accept-button:hover {
+  background-color: #00c6e4d6;
+  color: #ffffff;
+}
+
+.card {
+  padding: 0px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0);
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.fancy-table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.242);
+  border-radius: 1px;
+
+
+}
+
+.fancy-table th,
+.fancy-table td {
+  padding: 15px;
+  border: 2px solid #999999;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.fancy-table th {
+  background: linear-gradient(to bottom, rgb(0, 166, 255) 0%, rgba(113, 206, 239, 1) 50%, rgba(33, 181, 226, 0.741) 51%, rgba(183, 222, 237, 1) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  ;
+  color: white;
+}
+
+.fancy-table tbody tr:hover {
+  background: linear-gradient(to bottom, rgba(246, 248, 249, 1) 0%, rgb(219, 219, 219) 50%, rgba(215, 222, 227, 1) 51%, rgba(245, 247, 249, 1) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  ;
+}
+
+#snow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* чтобы снег не мешал взаимодействию с сайтом */
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.carta {
+  padding: 80px 0px 0px 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.snowflake {
+  position: absolute;
+  top: -10px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 1;
+  width: 1000px;
+  height: 1000px;
+  box-shadow: 0 0 6px rgb(255, 255, 255);
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Центрирует содержимое внутри flex-контейнера */
+  gap: 80px;
+
+  /* Исправление прокрутки: */
+  width: 100%;
+  box-sizing: border-box;
+  /* Включает границы (border) в общую ширину 100% */
+
+  background-color: #ffffffae;
+  color: #0400ff;
+  border: 1px solid #ccc;
+  margin: 0;
+  padding: 10px;
+}
+
+.footer a {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 18px !important;
+  text-decoration: none;
+  color: #ff0000;
+  background-color: #018ad900;
+
+
+}
+
+.footer a:hover {
+  background-color: #fefefe2d;
+}
+
+img {
+  max-width: 100%;
+}
+.pogoda-mobile {
+  display: none;
+}
+@media (max-width: 1020px) {
+  .container-glavnaya {
+   
+    overflow-x: hidden;
+    padding: 0;
+  }
+
+  img {
+    max-width: 100%;
+    /* изображение не будет шире контейнра */
+    height: auto;
+    /* сохранение пропорций изображения */
+
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .dropdown-menu {
+    margin: 0;
+  }
+
+  .light-bulbs {
+    padding: 73px 0px 0px 0px;
+  }
+
+  .new-year {
+    padding: 180px 0px 0px 0px;
+
+  }
+
+  .new-year img {
+    width: 300;
+    padding: 20px 0px 0px 0px;
+  }
+
+  #vacation-timer {
+    margin: 0px 0px 0px 0px;
+  }
+
+  .tema {
+    padding: 1px !important;
+  }
+}
+@media(max-width: 800px) {
+   .pogoda {
+    display: none;
+  }
+
+  .pogoda-mobile {
+    display: block;
+  }
+}
+.tema {
+
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  background-color: #ffffff00;
+  padding: 15px;
+  border-radius: 0px;
+  gap: 10px;
+
+  color: #000000;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-top: 0px solid black;
+  border-bottom: 0px solid black;
+  align-items: center;
+  margin-left: auto;
+  box-shadow: 0 10px 30px rgba(24, 24, 24, 0.363);
+}

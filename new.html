@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Статьи | PRO-info</title>
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC&display=swap" rel="stylesheet"> -->
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC&display=swap" rel="stylesheet"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/content.css" id="theme">
+  <link rel="stylesheet" href="styles/chats.css">
+  <link rel="stylesheet" href="/styles/checkbox.css">
+  <link rel="stylesheet" href="/styles/burger.css">
+  <link rel="stylesheet" href="/styles/slider.css">
+  <link rel="stylesheet" href="/styles/staty.css">
+  <link rel="stylesheet" href="/styles/post-stat.css">
+  <link rel="stylesheet" href="/styles/sweetalert2.min.css">
+  <link rel="icon" href="/img/Лого (1).png" type="image/png">
+
+
+  <script src="https://cdn.jsdelivr.net"></script>
+
+</head>
+
+
+<div id="snow"></div>
+
+<body>
+  <div id="header"></div>
+
+  <div class="new-year">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на первой позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на второй позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+    <img src="https://zdrav.mosreg.ru/garland.f3ba2c89d21567e6.svg" alt="Гирлянда на третьей позиции" width="150">
+  </div>
+  <div class="container-second">
+
+    <div class="content-second">
+      <div class="news-container">
+        <div class="news-title">
+          Статьи
+        </div>
+        <!-- Панель управления -->
+        <div class="admin-zone">
+          <h1>Напишите свою статью!</h1>
+          <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)..." style="padding: 10px; border-radius: 30px;">
+
+          <input type="text" id="postTitle" placeholder="Заголовок статьи" style="padding: 10px; border-radius: 30px;">
+
+          <textarea id="postInput" placeholder="Текст статьи..."
+            style="padding: 30px; border-radius: 10px;"></textarea>
+
+          <button onclick="publishPost()" style="padding: 10px; width: 30%; text-align: center; margin: 0 auto; border-radius: 20px; background-color: aquamarine;"><b>ОПУБЛИКОВАТЬ</b></button>
+          <!-- <div id="status">Система готова</div> -->
+          
+        </div>
+        <!-- Лента, где появятся стаьи -->
+        <div id="feed" style="display: flex; flex-direction: column; gap: 200px;"></div>
+
+
+        <div class="news-layout">
+          <!-- ЛЕВАЯ ПОЛОВИНА: Сетка карточек -->
+          <div class="card-grid" id="dynamic-cards">
+            <a href="stat1.html">
+              <div class="news-card">
+                <div class="card-icon">
+                  <img src="/img/лапша.jpg">
+                </div>
+                <p>
+                  Правда ли, что лапша быстрого приготовления вредит здоровью?
+                </p>
+              </div>
+            </a>
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="news-container">
+        <div class="news-title">
+          Вам может понравиться
+        </div>
+
+        <div class="news-layout">
+        
+          <div class="card-grid-like">
+            <a href="fact.html">
+              <div class="news-card">
+                <div class="card-icon">
+                  <img src="/img/трактор.jpg">
+                </div>
+                <p>
+                  Статья для сайта
+                </p>
+              </div>
+            </a>
+            
+                        <a href="fact.html">
+              <div class="news-card">
+                <div class="card-icon">
+                  <img src="/img/трактор.jpg">
+                </div>
+                <p>
+                  Статья для сайта
+                </p>
+              </div>
+            </a>
+            
+            
+            </div>
+            </div>
+            </div>
+          -->
+
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="scripts/main.js"></script>
+
+
+  <footer class="footer">
+    <p>
+      &copy; 2025 PRO-info.
+    </p>
+    <a href="https://github.com/Sozdatel1/Sozdatel1.github.io"><img src="/img/Без названия-Photoroom.png"
+        width="60"></a>
+  </footer>
+  <!-- <div class="fireflies-containerr">
+                    <img src="/img/christmas-lights-transparent-background-11-usagif.gif" />
+                  </div> -->
+  <script src="/scripts/error.js"></script>
+  <script src="/scripts/header.js"></script>
+  <script src="/scripts/staty.js"></script>
+  <script src="/scripts/sweetalert2.all.min.js"></script>
+  <script src="/scripts/theme.js"></script>
+</body>
+
+</html>

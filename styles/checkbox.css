@@ -1,0 +1,53 @@
+/* Контейнер */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+/* Прячем стандартный чекбокс */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Фон ползунка */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 24px;
+  border: solid 1px black;
+  box-shadow: 0 10px 30px  rgba(24, 24, 24, 0.26); 
+}
+
+/* Кружочек внутри */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 02px;
+  bottom: 2.5px;
+  background-color: white;
+  align-items: center !important;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.471);
+  border: solid 1px black;
+}
+
+/* Цвет фона при включении (Android Blue) */
+input:checked + .slider {
+  background-color: #2196F3;
+  
+}
+
+/* Смещение кружочка при включении */
+input:checked + .slider:before {
+  transform: translateX(25px);
+}

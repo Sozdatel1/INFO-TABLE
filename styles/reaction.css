@@ -1,0 +1,39 @@
+.reactions-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.active-reactions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.reaction-badge {
+    background: #f0f0f0;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+}
+
+.reaction-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.add-emo {
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.2s;
+    filter: grayscale(100%); /* Пока не нажали — серые */
+}
+
+.add-emo:hover {
+    transform: scale(1.3);
+    filter: grayscale(0%);
+}
+
+

@@ -1,0 +1,266 @@
+/* НАЧАЛО НАСТРОЕК ИКОНКИ КРЕСТИКА */
+
+.menu-toggle {
+    display: none;
+    /* Скрыт на ПК */
+    position: relative;
+    width: 60px;
+    height: 50px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+    /* Поднимаем выше меню */
+    padding: 0;
+    left: 0px;
+}
+
+.menu-toggle span,
+.menu-toggle span::before,
+.menu-toggle span::after {
+    content: "";
+    position: absolute;
+    width: 45px;
+    height: 4px;
+    /* Толщина увеличена */
+    background: #333;
+    transition: all 0.3s ease-in-out;
+    left: 2.5px;
+    /* Центрируем 45px внутри 50px */
+    border-radius: 2px;
+}
+
+/* Исправленная опечатка в селекторе и позиция центральной линии */
+.menu-toggle span {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%, -50%);
+}
+
+.menu-toggle span::before,
+.menu-toggle span::after {
+    left: 0;
+}
+
+/* Расстояние между палочками увеличено для больших размеров */
+.menu-toggle span::before {
+    top: -14px;
+}
+
+.menu-toggle span::after {
+    top: 14px;
+}
+
+/* Анимация в крестик (is-active) */
+.menu-toggle.is-active span {
+    background: transparent;
+}
+
+.menu-toggle.is-active span::before {
+    transform: rotate(45deg);
+    top: 0;
+}
+
+.menu-toggle.is-active span::after {
+    transform: rotate(-45deg);
+    top: 0;
+    /* Изменено с bottom: 0 для точности перекрестия */
+}
+
+/* КОНЕЦ НАСТРОЕК КРЕСТИКА */
+
+/* Адаптивность для мобильных */
+@media (max-width: 1020px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .dropdown-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        /* Используем vw для полной ширины */
+        height: 100dvh;
+        /* Dynamic VH для мобильных браузеров 2026 */
+        background: #fff;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 80px;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .dropdown-menu.is-open {
+        transform: translateX(0);
+    }
+
+    .dropdown-menu ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        margin: 0;
+        list-style: none;
+        text-align: center;
+    }
+
+    /* Раскрытие подразделов */
+    .dropdown-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.1s ease-out;
+        background: #f9f9f9;
+        left: 80px;
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .dropdown.is-expanded .dropdown-content {
+        max-height: 500px;
+        /* Увеличено, чтобы контент не обрезался */
+    }
+
+    .dropdown-link-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    /* Треугольник убран по вашему запросу */
+    .submenu-arrow::after {
+        content: none;
+    }
+
+    .submenu-arrow {
+        background: none;
+        border: none;
+        padding: 10px;
+        transition: 0.3s;
+    }
+}
+
+.header--hidden {
+    transform: translateY(-97%);
+}
+
+body.menu-open {
+    overflow: hidden;
+    touch-action: none;
+    /* Предотвращает скролл на тачскринах */
+}
+
+
+
+/* НАЧАЛО ОБЫЧНЫХ СТИЛЕЙ ДЛЯ МЕНЮ */
+
+.dropdown-menu ul {
+    list-style-type: none;
+    /* Убираем маркеры списка */
+    margin: 0;
+    padding: 0px;
+    background-color: #ffffff00;
+    overflow: hidden;
+    /* font-family: "Rubik Gemstones", system-ui; */
+    /* font-family: "Kosugi Maru", sans-serif; */
+    /* font-family: "Pacifico", cursive; */
+    /* font-family: "LXGW WenKai TC", cursive; */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings: "wdth" 300;
+    padding: 0px 0px 0px 0px;
+    box-shadow: #0400ff;
+
+}
+
+.dropdown-menu li {
+    float: left;
+    /* Размещаем пункты меню горизонтально */
+    background-color: #f45c5c00;
+    color: #000000;
+    /* font-family: "LXGW WenKai Mono TC", monospace; */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings: "wdth" 300;
+    transition: transform 0.3s ease;
+
+}
+
+.dropdown-menu li a {
+    display: flex;
+    align-items: center;
+    color: rgb(0, 0, 0);
+    text-align: center;
+    padding: 24px 16px;
+    margin: 0px 0px 0px 0px;
+    text-decoration: none;
+    /* Убираем подчеркивание сылок */
+
+    /* font-family: "LXGW WenKai TC" cursive; */
+    /* font-family: "LXGW WenKai Mono TC", monospace;
+   font-weight: 8; */
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings: "wdth" 300;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-menu li a:hover:not(.active) {
+    background-color: #fcfa86;
+    border-radius: 50px;
+    /* transform: scale(1.0);
+    transition: transform 0.3s ease;
+    transform: scale(1.0);
+     */
+
+}
+
+/* Стили для выпадающего меню */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #7be9ff !important;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgb(0, 234, 255);
+    z-index: 1;
+    color: #000;
+    border-color: #000;
+
+}
+
+.dropdown-content li {
+    float: none;
+    /* Размещаем элементы выпадающего списка вертикально */
+    color: rgb(177, 9, 255);
+    padding: 0px 6px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+
+
+}
+
+.dropdown-content li a {
+    color: rgb(0, 38, 255);
+    padding: 12px;
+    text-align: left;
+    min-width: 100px;
+}
+
+.dropdown-content li a:hover {
+    background-color: #fffb00a5 !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* КОНЕЦ ОБЫЧНЫХ СТИЛЕЙ МЕНЮ */

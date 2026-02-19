@@ -1,0 +1,16 @@
+.weather-pro {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 22px;
+  width: 140px;
+  color: #fff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.city-label { font-size: 10px; opacity: 0.5; letter-spacing: 2px; font-weight: 700; }
+.temp-display { font-size: 46px; font-weight: 200; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.status-label { font-size: 9px; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; }

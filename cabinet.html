@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="/styles/dev.css">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/chats.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/styles/sweetalert2.min.css">
+</head>
+
+<body>
+    <header class="header-content">
+        <div class="logo">
+            <a href="index.html">
+                <img src="img/Логотип.png" alt="PRO-info" width="250">
+            </a>
+        </div>
+
+        <!-- Кнопка бургер (появится на моилах) -->
+        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+            <span></span>
+        </button>
+
+        <nav class="dropdown-menu" id="headerNav">
+            <ul>
+                <li><a href="index.html"><img src="/img/images (1)-Photoroom.png" width="21"></a></li>
+
+                <li class="dropdown">
+                    <div class="dropdown-link-wrapper">
+                        <a href="#">Меню</a>
+
+                    </div>
+                    <ul class="dropdown-content">
+                        <li><a href="two page.html">Погода</a></li>
+                        <li><a href="second.html">Про новый год</a></li>
+                        <!-- <li><a href="school.html">Расписание</a></li> -->
+                        <li><a href="carta.html">Карты</a></li>
+                        <li><a href="news.html">Ошибка</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="holiday.html">Праздники</a></li>
+                <li><a href="fact.html">Факты</a></li>
+
+                <li class="dropdown">
+                    <div class="dropdown-link-wrapper">
+                        <a href="#">Разработчик</a>
+
+                    </div>
+                    <ul class="dropdown-content">
+
+                        <li><a href="https://github.com/Sozdatel1">Github</a></li>
+                        <li><a href="https://github.com/Sozdatel1/Sozdatel1.github.io">Исходный код</a></li>
+                    </ul>
+                </li>
+                <li><a href="why.html">О сайте</a></li>
+            </ul>
+        </nav>
+
+        <button onclick="logout()" style="padding: 25px;
+background-color: rgba(255, 245, 245, 0);
+border-left: 2px solid black;
+border-top: 0px;
+border-bottom: 0px;
+border-right: 0px;
+margin-left: auto;">Выйти</button>
+    </header>
+
+
+    <div id="content" style="display:none;">
+        <h1 id="secretData" style="margin-bottom: 60px;"></h1>
+
+        <div style=" padding: 10px; background-color: #f8f8f827; 
+        border-radius: 30px; 
+        border: 1px solid black;
+        margin-bottom: 70px;">
+            <h2>Данные сайта:</h2>
+            <div class="info">
+
+                <div style="padding: 30px; 
+    background-color: rgba(68, 78, 114, 0.89);
+    border-radius: 15px 15px 2px 15px;
+    right: 0px !important;
+    max-width: 600px;
+    /* margin: 0px; */
+    color: white;
+    font-family: Arial, sans-serif;
+    /* box-shadow: 0 0 10px rgba(0,0,0,0.5); */
+    box-shadow: 0 10px 30px rgba(123, 123, 123, 0.392) !important;
+    background: #f8f8f8;
+    color: rgb(0, 0, 0); 
+    border-radius: 20px; 
+    font-family: Arial, Helvetica, sans-serif;">
+                    Текущий онлайн: <span id="online-counter">
+                        <span class="spinner"></span>
+                    </span> человек(а)
+                </div>
+            </div>
+        </div>
+        <h2>Управление доступностью</h2>
+        <div style="padding: 10px; background-color: #f8f8f827; 
+        border-radius: 30px; 
+        border: 1px solid black;
+        margin-bottom: 70px;
+        ">
+
+            <!-- 
+<button onclick="togglePage('global', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;"><h2>ВЫКЛЮЧИТЬ ВЕСЬ САЙТ</h2></button>
+<button onclick="togglePage('global', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;"><h2>Включить весь сайт</h2></button>
+<hr>
+<p style="text-align: center; margin-right: auto;">Главная:</p>
+<button onclick="togglePage('/index.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Главная"</button>
+<button onclick="togglePage('/index.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Главная"</button>
+<hr>
+<p>Погода</p>
+<button onclick="togglePage('/two page.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Погода"</button>
+<button onclick="togglePage('/two page.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Погода"</button>
+<hr>
+<p>Статьи</p>
+<button onclick="togglePage('/second.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Статьи"</button>
+<button onclick="togglePage('/second.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Статьи"</button>
+<hr>
+<p>Карты</p>
+<button onclick="togglePage('/carta.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Карты"</button>
+<button onclick="togglePage('/carta.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Карты"</button>
+<hr>
+<p>Факты</p>
+<button onclick="togglePage('/fact.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Факты"</button>
+<button onclick="togglePage('/fact.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Факты"</button>
+<hr>
+<p>Праздники</p>
+<button onclick="togglePage('/holiday.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "Праздники"</button>
+<button onclick="togglePage('/holiday.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "Праздники"</button>
+<hr>
+<p>О сайте</p>
+<button onclick="togglePage('/why.html', true)" style="padding: 15px;
+border-radius: 30px; background-color: red;">Выключить "О сайте"</button>
+<button onclick="togglePage('/why.html', false)" style="padding: 15px;
+border-radius: 30px; background-color: greenyellow;">Включить "О сайте"</button> -->
+
+            <div id="pagesControl" style="max-width: 600px; margin: 20px auto; font-family: sans-serif;">
+                <div id="pagesList">Загрузка статусов...</div>
+            </div>
+
+            <script>
+                // Список твоих 8 страниц
+                const myPages = [
+                    { name: "Главная", path: "/index.html" },
+                    { name: "Погода", path: "/two page.html" },
+                    { name: "Статьи", path: "/second.html" },
+                    { name: "Карты", path: "/carta.html" },
+                    { name: "Праздники", path: "/holiday.html" },
+                    { name: "Факты", path: "/fact.html" },
+                    { name: "О сайте", path: "/why.html" },
+                ];
+
+                async function updateDashboard() {
+                    try {
+                        const res = await fetch('https://pro-info-api.onrender.com/api/public/status');
+                        const statuses = await res.json();
+
+                        const container = document.getElementById('pagesList');
+                        container.innerHTML = '';
+
+                        myPages.forEach(page => {
+                            const isOff = statuses[page.path];
+                            container.innerHTML += `
+                <div style="margin: 10px 0; padding: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; background: white;">
+                    <div><strong>${page.name}</strong></div>
+                    <div style="display: flex; align-items: center;">
+                        <span style="color: ${isOff ? '#ff4757' : '#2ed573'}; font-weight: bold; margin-right: 15px;">
+                            ${isOff ? '● ВЫКЛЮЧЕНА' : '● РАБОТАЕТ'}
+                        </span>
+                        <button onclick="togglePage('${page.path}', ${!isOff})" 
+                                style="background: ${isOff ? '#2ed573' : '#ff4757'}; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100px;">
+                            ${isOff ? 'Включить' : 'Выключить'}
+                        </button>
+                    </div>
+                </div>`;
+                        });
+                    } catch (e) { console.error("Ошибка загрузки статусов"); }
+                }
+
+                async function togglePage(path, status) {
+                    const res = await fetch('https://pro-info-api.onrender.com/api/admin/toggle-page', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ path, status }),
+                        credentials: 'include'
+                    });
+
+                    if (res.ok) {
+                        // ВАЖНО: вызываем обновление списка сразу после успеха
+                        updateDashboard(); // Запуск при загрузке
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: status ? 'Выключено' : 'Включено', // статус true = включили
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Ошибка',
+                            text: 'Не удалось изменить статус'
+                        });
+                    }
+                }
+                updateDashboard();
+
+            </script>
+        </div>
+
+        <div id="admin-chat-section-why">
+            <div class="chat-header">Чат администраторов</div>
+
+            <!-- Вход -->
+            <div id="login-ui">
+                <input type="text" id="name-input" placeholder="Ваш предпочитаемый ник">
+                <div class="pass-wrapper">
+                    <input type="password" id="pass-input" placeholder="Пароль администратора">
+                    <span id="toggle-pass" onclick="togglePass()">👁️</span>
+                </div>
+                <!-- <input type="password" id="pass-input" placeholder="Пароль администратора"> -->
+                <button class="login-btn" onclick="login()">Войти в чат администраторов</button>
+            </div>
+
+            <!-- Чат -->
+            <div id="chat-ui" style="display: none;">
+                <div id="msg-box"></div>
+                <div class="input-area">
+                    <input type="text" id="msg-input" placeholder="Ваше сообщение...">
+                    <button class="send-btn" onclick="send()">➤</button>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <a href="#" onclick="localStorage.clear(); location.reload()" style="color: #000000; font-size: 17px; 
+            text-decoration: none; 
+            background-color: #ff0000; 
+            padding: 10px;
+            border-radius: 20px;
+            margin: 100px ;
+            border: 2px solid black;">Выйти из чата</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
+    <script src="/scripts/main.js"></script>
+    <script src="/scripts/sweetalert2.all.min.js"></script>
+    <script src="/scripts/checkAccess.js"></script>
+    <script src="/scripts/online.js"></script>
+</body>
+
+</html>
