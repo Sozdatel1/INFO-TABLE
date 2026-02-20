@@ -288,7 +288,7 @@ async function likePost(id, event) {
     try {
             console.log("Нажали лайк, пускаем салют..."); // Проверка в консоли
         
-        // ВЫЗЫВАЕМ САЛЮТ СРАЗУ (МГНОВЕННО!)
+        // ВЫЗЫВАЕМ САЛЮТ СРАЗУ (МГНОВЕНО!)
         if (typeof confetti === 'function') {
 confetti({
      particleCount: 2000,    // 5000 — это перебор, 2000 — идеально густо
