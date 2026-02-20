@@ -32,28 +32,49 @@
     margin: 0 15px;
 }
 
-
-.logo a {
- 
+.logo {
+    display: flex;
+    
+}
+.logo-icon {
+    width: 30px;         /* Подбери размер под высоту текста */
+    height: 30px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(65, 207, 255, 0.5)); /* Легкое неоновое свечение */
 }
 .logo span {
     color: #41cfff; /* Твой фирменный неон */
     text-shadow: 0 0 10px rgba(65, 207, 255, 0.3);
     font-size: 20px;
+    align-items: center; 
+    
+}
 
+.logo-text {
+    display: flex; /* Чтобы INFO и TABLE стояли в ряд внутри */
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: -1px; /* Сближаем буквы, если нужно */
 }
 .logo a {
+    display: flex;
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
     letter-spacing: -1px; /* Сближаем буквы для стиля */
     text-decoration: none;
-    font-size: 19px;
+    font-size: 30px;
+      align-items: center; 
+      gap: 5px;
 }
 
 .logo-neon {
    color: #41cfff; /* Твой фирменный неон */
     text-shadow: 0 0 10px rgba(65, 207, 255, 0.3);
-    font-size: 20px;
+    font-size: 30px !important;
+      align-items: center;
+     
 }
 
 

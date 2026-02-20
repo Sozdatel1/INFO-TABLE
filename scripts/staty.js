@@ -172,6 +172,9 @@ async function loadPosts() {
         // Рисуем всё сразу
         renderFilteredPosts(allPostsData); 
         renderTrending(allPostsData);
+         if (typeof updateHubStats === 'function') {
+            updateHubStats(allPostsData);
+        }
       
 
     } catch (err) {
@@ -192,6 +195,7 @@ function filterByTag(tag, button) {
         : allPostsData.filter(post => getAutoCategory(post.title) === tag);
 
     renderFilteredPosts(filtered);
+    updateHubStats(allPostsData);
 }
 
 // Запуск

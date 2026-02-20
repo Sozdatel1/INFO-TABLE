@@ -4,9 +4,17 @@ if (header) {
 
 <header class="header-content">
 
+
 <div class="logo">
-    <a href="index.html"><span class="logo-neon">INFO</span>TABLE</a>
+    <a href="index.html">
+        <img src="/img/IT.png?v=777" class="logo-icon">
+        <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
+            <span class="logo-neon">INFO</span>TABLE
+        </div>
+    </a>
 </div>
+
+
 
 
  <div class="nav-divider"></div> <!-- ВОТ ОНА -->
