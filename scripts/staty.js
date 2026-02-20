@@ -42,16 +42,26 @@ async function publishPost() {
 }
 
 
-// ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ЗАГОЛОВОК И ИЗОБРАЖЕНИЕ КОТОРЫЕ БЫЛИ ПОЛУЧЕНЫ С СЕРВЕРА И ВСТАВЛЯЕТ ИХ В ТАБЛИЦУ СО СТАТЬЯМИ
-function getAutoCategory(title) {
-    if (!title) return 'Инфо';
-    const t = title.toLowerCase().trim();
 
-    // Добавляем новые ключевые слова:
-    if (t.includes('проб') || t.includes('пробная') || t.includes('html')) return 'Код';
-    if (t.includes('игр') || t.includes('roblox') || t.includes('steam')) return 'Игры';
-    if (t.includes('школ') || t.includes('жизнь') || t.includes('день')) return 'Жизнь';
-    if (t.includes('Капибары') || t.includes('животн') || t.includes('кот') || t.includes('пес')) return 'Природа';
+function getAutoCategory(title, content ='') {
+     const source = (title + ' ' + content).toLowerCase().trim();
+    if (!source) return 'Инфо';
+
+     const keywordsMap = {
+        'Код': ['код', 'js', 'html', 'css', 'скрипт', 'прогр', 'dev', 'api', 'сайт', 'проб', 'язык'],
+        'Технолоии': ['техн', 'соверш', 'steam', 'гейм', 'minecraft', 'cs', 'dota', 'xbox', 'пс5', 'плей'],
+        'Природа': ['капибар', 'животн', 'кот', 'пес', 'лес', 'природ', 'море', 'птиц', 'эко', 'океан'],
+        'Жизнь': ['школ', 'жизнь', 'день', 'учеба', 'хобби', 'отдых', 'мысли', 'совет', 'урок'],
+        'Еда': ['гот', 'пригот', 'ед', 'печен', 'рецепт', 'кухня', 'пицца', 'бургер', 'вкусн', 'завтрак'],
+        'Нейро': ['нейро', 'ai', 'ии', 'gpt', 'бот', 'чат', 'midjourney', 'генерация']
+    };
+
+    // 3. ПОИСК: Проверяем супер-строку по всем ключевым словам
+    for (let category in keywordsMap) {
+        if (keywordsMap[category].some(word => source.includes(word))) {
+            return category;
+        }
+    }
 
     return 'Инфо';
 }
@@ -75,7 +85,9 @@ function renderFilteredPosts(postsToRender , append = false) {
     //     const category = getAutoCategory(post.title);
     //     return `
     const postsHtml = dataToDraw.map(post => {
-        const category = getAutoCategory(post.title);
+        
+const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
+
         return `
    
     <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">

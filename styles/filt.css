@@ -4,6 +4,7 @@
     gap: 12px;
     margin-bottom: 30px;
     padding: 15px !important;
+    flex-wrap: wrap; 
     overflow-x: auto; /* Скролл, если кнопок станет много */
     scrollbar-width: none; /* Прячем некрасивый скролл в Firefox */
 }
@@ -20,6 +21,8 @@
     font-size: 13px;
     font-weight: 700;
     color: #555;
+ 
+    flex-shrink: 0;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;

@@ -355,3 +355,35 @@
     background: #00ff41; /* При наведении станет зеленой как неон! */
     box-shadow: 0 6px 20px rgba(0, 255, 65, 0.4);
 }
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Центрирует содержимое внутри flex-контейнера */
+  gap: 80px;
+
+  /* Исправление прокрутки: */
+  width: 100%;
+  box-sizing: border-box;
+  /* Включает границы (border) в общую ширину 100% */
+
+  background-color: #ffffffae;
+  color: #0400ff;
+  border: 1px solid #ccc;
+  margin: 0;
+  padding: 10px;
+}
+
+.footer a {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 18px !important;
+  text-decoration: none;
+  color: #ff0000;
+  background-color: #018ad900;
+
+
+}
+
+.footer a:hover {
+  background-color: #fefefe2d;
+}
