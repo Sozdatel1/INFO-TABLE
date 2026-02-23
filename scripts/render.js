@@ -25,6 +25,9 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
         const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
 
+        // вызываем счетчик времени чтения
+        const readingTime = calculateReadingTimeForCard(post.text);
+        
         return `
    
     <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">
@@ -97,12 +100,29 @@ export function renderFilteredPosts(postsToRender, append = false) {
     }
 
     // ШАГ 3: Управление кнопкой
+    // if (loadMoreContainer) {
+    //     // ЕСЛИ ПОКАЗАНЫ ВСЕ КАРТОЧКИ, КНОПКА ПОКАЗАТЬ ЕЩЕ УБИРАЕТСЯ, ЕСЛИ ЕЩЕ МОЖНО ПОКАЗАТЬ, ТО ОНА ОСТАЁТСЯ
+
+    //     loadMoreContainer.style.display = (displayedCount >= (window.currentFilteredCount || postsToRender.length)) ? 'none' : '';
+    // }
     if (loadMoreContainer) {
-        // ЕСЛИ ПОКАЗАНЫ ВСЕ КАРТОЧКИ, КНОПКА ПОКАЗАТЬ ЕЩЕ УБИРАЕТСЯ, ЕСЛИ ЕЩЕ МОЖНО ПОКАЗАТЬ, ТО ОНА ОСТАЁТСЯ
+        // 1. УЗНАЕМ РЕАЛЬНОЕ КОЛИЧЕСТВО:
+        // Если мы фильтруем, берем длину отфильтрованного списка (postsToRender)
+        // Если это общая лента, тоже берем длину того, что пришло в функцию
+        const totalAvailable = postsToRender.length;
 
-        loadMoreContainer.style.display = (displayedCount >= (window.currentFilteredCount || postsToRender.length)) ? 'none' : 'block';
+        // 2. СРАВНИВАЕМ:
+        // Если мы уже показали (window.displayedCount) столько же или больше, 
+        // чем есть всего в этом списке — ПРЯЧЕМ кнопку.
+        if (window.displayedCount >= totalAvailable && !append) {
+            loadMoreContainer.style.display = 'none';
+        } else if (append && postsToRender.length < 8) {
+            // Если мы нажали "еще", но пришло меньше 8 новых постов — ПРЯЧЕМ
+            loadMoreContainer.style.display = 'none';
+        } else {
+            loadMoreContainer.style.display = 'block';
+        }
     }
-
 
     // Ищем ТОЛЬКО ТЕ карточки, которые МЫ ТОЛЬКО ЧТО ДОБАВИЛИ КНОПКОЙ ПОКАЗАТЬ ЕЩЕ, ДЕЛАЕМ ИМ АНИМАЦИЮ ПОЯВЛЕНИЯ
     const newCards = grid.querySelectorAll('.news-card:not(.visible)');
@@ -131,9 +151,6 @@ export async function loadPosts() {
         renderTrending(allPostsData);
         if (typeof updateHubStats === 'function') {
             updateHubStats(allPostsData);
-        }
-        if (typeof calculateReadingTimeForCard === 'function') {
-            calculateReadingTimeForCard();
         }
 
     } catch (err) {
@@ -225,4 +242,4 @@ export async function publishPost() {
         alert("Ошибка сервера: " + response.status);
     }
 }
-// ------------------------
+window.publishPost = publishPost;

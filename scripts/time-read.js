@@ -1,4 +1,4 @@
-function calculateReadingTime() {
+export function calculateReadingTimeStat() {
     const article = document.getElementById('artText'); // <--- Обновили здесь
     const display = document.getElementById('read-time');
 

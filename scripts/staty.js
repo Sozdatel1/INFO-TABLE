@@ -93,6 +93,7 @@ export async function likePost(id, event) {
     }
 }
 
+window.likePost = likePost;
 
 // --------------------------------------------------------
 
@@ -102,6 +103,7 @@ export async function likePost(id, event) {
 // А ПОТОМ МЫ ЗАПРАШИВАЕМ ДАННЫЕ ИЗ ФАЙЛА
 
 // ------------------------------------------------------------
+
 
 
 
@@ -128,30 +130,6 @@ export function renderTrending(posts) {
 
 
 
-// ФУНКЦИЯ КОТОРАЯ СОРТИРУЕТ СТАТЬИ ПО ТЭГАМ КОГДА КЛИКАЮТ НА ФИЛЬТР ОПРЕДЕЛЕННОГО ТЭГА ТО ОТОБРАЖАЮТСЯ СТАТЬИ С ЭТИМ ТЭГОМ
 
 
- function filterByTag(tag, button) {
-    // 1. Сбрасываем счетчик, чтобы снова видеть первые 9 постов
-    displayedCount = 9;
 
-
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-
-    // Очищаем пришедший тег от решетки (на всякий случай)
-    const target = tag.replace('#', '').trim();
-
-    // 3. Логика выбора: передаем И заголовок, И текст
-    const filtered = (target === 'Все')
-        ? allPostsData
-        : allPostsData.filter(post => {
-            // ВАЖНО: передаем два аргумента в getAutoCategory
-            const category = getAutoCategory(post.title, post.text).trim();
-            return category === target;
-        });
-
-    // 4. Отрисовываем результат (false - чтобы стереть старое и нарисовать новое)
-    renderFilteredPosts(filtered, false);
-}
-window.filterByTag = filterByTag;
