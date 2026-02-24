@@ -9,6 +9,7 @@ window.allPostsData = [];
 window.displayedCount = 8;
 
 // ПРОСТО ВЫЗОВ
+// ЕСЛИ НА СТРАНИЦЕ ЕСТЬ АЙДИ АРТ ТЕКСТ (СТАТЬЯ)
 if (document.getElementById('artText')) {
 
     await loadFullArticle();

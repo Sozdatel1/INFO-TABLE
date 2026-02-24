@@ -15,19 +15,38 @@ export function renderFilteredPosts(postsToRender, append = false) {
     const loadMoreContainer = document.getElementById('load-more-container');
     if (!grid) return;
 
-    const dataToDraw = append ? postsToRender : postsToRender.slice(0, displayedCount);
-    // const partToRender = postsToRender.slice(0, displayedCount);
+        if (postsToRender.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <span style="font-size: 50px;">🏜️</span>
+                <h3 style="margin-top: 20px; color: #555;">В этой категории пока пусто</h3>
+                <p style="opacity: 0.6;">Статей с таким тегом еще не написали...</p>
+            </div>
+        `;
+        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+        return; // Останавливаем функцию, чтобы не рисовать пустой список
+    }
 
-    // grid.innerHTML =  partToRender.map(post => {
-    //     const category = getAutoCategory(post.title);
-    //     return `
+    const dataToDraw = append ? postsToRender : postsToRender.slice(0, displayedCount);
+
+
+// ----------------------------------------------------------------------------
+
+// ВОТ ТУТ СОЗДАЕТСЯ ВРЕМЕННАЯ ПЕРЕМЕННАЯ post ОТ КОТОРОЙ МОЖНО ПЕРЕХОДИТЬ В КОНКРЕТНОЙ КАРТОЧКЕ
+//                                  \\//  
+//                                   ||
     const postsHtml = dataToDraw.map(post => {
+
+// КОГДА МЫ УПОМИНАЕМ post.text МЫ УПОМИНАЕМ ЭТУ ПЕРЕМЕННУЮ И ПУНКТ ТЕКСТ В МАССИВЕ КАРТОЧКИ И СТАТЬИ (на гитхаб файл постс джсон) ПРОСТО ЗДЕСЬ ОТРИСОВЫВАЕТСЯ ТОЛЬКО ЗАГОЛОВОК СТАТЬИ В КАРТОЧКЕ, А НА САМОМ ДЕЛЕ ОБРАТИТЬСЯ К ПЕРЕМЕННОЙ post МОЖНО И ЗА ТЕКСТОМ СТАТЬИ (post.text) КАК ЭТО ДЕЛАЕТ ФУНКЦИЯ ПЕРЕСЧЕТА СЛОВ calculateReadingTimeForCard
+
+// ------------------------------------------------------------------------------------------
+
 
         const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
 
         // вызываем счетчик времени чтения
         const readingTime = calculateReadingTimeForCard(post.text);
-        
+
         return `
    
     <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">
@@ -161,6 +180,7 @@ export async function loadPosts() {
 
 
 // ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ТЕКСТ, КАРТИНКУ И ЗАГОЛОВОК, ЛАЙКИ И ОТОБРАЖАЕТ ИХ НА СТАТЬЕ С СОБСТВЕННЫМ ID
+// ВЫЗЫВАЕТСЯ ТОЛЬКО НА СТРАНИЦЕ СТАТЬИ (СМ START-API.JS)
 
 export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
@@ -168,17 +188,20 @@ export async function loadFullArticle() {
 
     const res = await fetch(`https://raw.githubusercontent.com/Sozdatel1/PRO-info/main/posts.json?v=${Date.now()}`);
     const posts = await res.json();
-
+// ТУТ СОЗДАЕМ ВРЕМЕННУЮ ПЕРЕМЕННУЮ ДЛЯ ВСЕХ ПОСТОВ ЧТОБЫ УЗНАВАТЬ ИХ ПО АЙДИ
     const article = posts.find(p => p.id == id); // Ищем статью по ID
 
     if (article) {
+        // НАХОДИМ НА СТРАНИЦЕ АЙДИ И ВСТАВЛЯЕМ ИЗ ДЖСОН ВНИХ СООТВЕТСТВУЮЩИЕ ЯРЛЫКИ
         document.getElementById('artTitle').innerText = article.title;
         // Чтобы абзацы отображались корректно, заменяем переносы строк на <br>
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
-        // --- ДОБАВЬ ЭТИ СТРОКИ НИЖЕ ---
+        
+
         setTimeout(() => {
             if (window.updateScrollProgress) window.updateScrollProgress();
         }, 5000); // Половина секунды подождем, пока браузер отрисует текст
+
 
         const likeSpan = document.getElementById('artLikes');
         const likeBtn = document.getElementById('likeBtn');
@@ -210,6 +233,7 @@ export async function publishPost() {
 
     // Простая проверка перед отправкой
     if (!title || !text) return Swal.fire({
+        // ТУТ МЫ ДАЕМ ИМЯ ЯРЛЫКАМ В ДЖСОН КОТОРЫЕЕ МЫ ОТПРАВИМ, КАРТИНКЕ ИМАЖЕ И ТД
         icon: "error",
         title: "Ошибка!",
         text: "Заполните все поля!",
