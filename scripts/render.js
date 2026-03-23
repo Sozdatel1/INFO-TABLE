@@ -161,17 +161,19 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
 export async function loadPosts() {
     try {
-        const response = await fetch(`https://raw.githubusercontent.com/Sozdatel1/PRO-info/main/posts.json?v=${Date.now()}`);
-        allPostsData = await response.json();
-
+        const response = await fetch(`https://pro-info-api.com/loadPosts`);
+        const allPostsData = await response.json();
 
         // Рисуем всё сразу
-        renderFilteredPosts(allPostsData);
-        renderTrending(allPostsData);
+        if (typeof renderFilteredPosts === 'function') {
+            renderFilteredPosts(allPostsData);
+        }
+        if (typeof renderTrending === 'function') {
+            renderTrending(allPostsData);
+        }
         if (typeof updateHubStats === 'function') {
             updateHubStats(allPostsData);
         }
-
     } catch (err) {
         console.error("Ошибка загрузки:", err);
     }
@@ -186,38 +188,44 @@ export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id'); // Получаем ID из ссылки
 
-    const res = await fetch(`https://raw.githubusercontent.com/Sozdatel1/PRO-info/main/posts.json?v=${Date.now()}`);
-    const posts = await res.json();
-// ТУТ СОЗДАЕМ ВРЕМЕННУЮ ПЕРЕМЕННУЮ ДЛЯ ВСЕХ ПОСТОВ ЧТОБЫ УЗНАВАТЬ ИХ ПО АЙДИ
-    const article = posts.find(p => p.id == id); // Ищем статью по ID
+    if (!id) {
+        console.error("ID статьи не передан");
+        return;
+    }
 
-    if (article) {
-        // НАХОДИМ НА СТРАНИЦЕ АЙДИ И ВСТАВЛЯЕМ ИЗ ДЖСОН ВНИХ СООТВЕТСТВУЮЩИЕ ЯРЛЫКИ
-        document.getElementById('artTitle').innerText = article.title;
-        // Чтобы абзацы отображались корректно, заменяем переносы строк на <br>
-        document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
-        
-
-        setTimeout(() => {
-            if (window.updateScrollProgress) window.updateScrollProgress();
-        }, 5000); // Половина секунды подождем, пока браузер отрисует текст
-
-
-        const likeSpan = document.getElementById('artLikes');
-        const likeBtn = document.getElementById('likeBtn');
-
-        if (likeSpan) likeSpan.innerText = article.likes || 0;
-
-        // Привязываем функцию лайка к кнопке
-        if (likeBtn) {
-            likeBtn.onclick = (event) => likePost(id, event);
+    try {
+        const response = await fetch(`https://pro-info-api.com/loadFullArticle?id=${encodeURIComponent(id)}`);
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
         }
-        const imgTag = document.getElementById('artImage'); // Твой ID из HTML
-        if (article.image && imgTag) {
-            imgTag.src = article.image;
-            imgTag.style.display = 'block'; // Показываем картинку, если она есть
-        }
+        const article = await response.json();
 
+        if (article) {
+            // Вставляем данные в DOM
+            document.getElementById('artTitle').innerText = article.title;
+            document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
+
+            setTimeout(() => {
+                if (window.updateScrollProgress) window.updateScrollProgress();
+            }, 5000);
+
+            const likeSpan = document.getElementById('artLikes');
+            const likeBtn = document.getElementById('likeBtn');
+
+            if (likeSpan) likeSpan.innerText = article.likes || 0;
+
+            if (likeBtn) {
+                likeBtn.onclick = () => likePost(article.id);
+            }
+
+            const imgTag = document.getElementById('artImage');
+            if (article.image && imgTag) {
+                imgTag.src = article.image;
+                imgTag.style.display = 'block';
+            }
+        }
+    } catch (err) {
+        console.error('Ошибка загрузки статьи:', err);
     }
 }
 
@@ -226,44 +234,49 @@ export async function loadFullArticle() {
 // ФУНКИЦЯ КОТОРАЯ ОТПРАВЛЯЕТ НА СЕРВЕР ТЕКСТ, КАРТИНКУ, И ЗАГОЛОВОГ СТАТЬИ
 
 export async function publishPost() {
-    // 1. Собираем данные из ВСЕХ инпутов
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
-    const image = document.getElementById('postImage').value; // Ссылка на фото
+    const image = document.getElementById('postImage').value;
 
-    // Простая проверка перед отправкой
-    if (!title || !text) return Swal.fire({
-        // ТУТ МЫ ДАЕМ ИМЯ ЯРЛЫКАМ В ДЖСОН КОТОРЫЕЕ МЫ ОТПРАВИМ, КАРТИНКЕ ИМАЖЕ И ТД
-        icon: "error",
-        title: "Ошибка!",
-        text: "Заполните все поля!",
-
-    });
-
-    const response = await fetch('https://pro-info-api.onrender.com/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // 2. Отправляем полный объект, который ждет сервер
-        body: JSON.stringify({
-            title: title,
-            text: text,
-            image: image
-        })
-    });
-
-    if (response.ok) {
-        // alert("Статья успешно опубликована!");
-        Swal.fire({
-            title: "Опубликовано!",
-            text: "Ваша статья появится в ленте через 5 минут",
-            icon: "success"
+    if (!title || !text) {
+        return Swal.fire({
+            icon: "error",
+            title: "Ошибка!",
+            text: "Заполните все поля!"
         });
-        // Очищаем поля
-        document.getElementById('postTitle').value = "";
-        document.getElementById('postInput').value = "";
-        document.getElementById('postImage').value = "";
-    } else {
-        alert("Ошибка сервера: " + response.status);
+    }
+
+    try {
+        const response = await fetch(`https://pro-info-api.com/publish`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, text, image })
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: "Опубликовано!",
+                text: "Ваша статья появится в ленте через некоторое время",
+                icon: "success"
+            });
+
+            // Очистка полей
+            document.getElementById('postTitle').value = "";
+            document.getElementById('postInput').value = "";
+            document.getElementById('postImage').value = "";
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Ошибка сервера",
+                text: `Код: ${response.status}`
+            });
+        }
+    } catch (err) {
+        Swal.fire({
+            icon: "error",
+            title: "Ошибка",
+            text: err.message
+        });
     }
 }
 window.publishPost = publishPost;
