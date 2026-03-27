@@ -161,7 +161,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
 export async function loadPosts() {
     try {
-        const response = await fetch(`https://pro-info-api.com/loadPosts`);
+        const response = await fetch(`https://pro-info-api.onrender.com/loadPosts`);
         const allPostsData = await response.json();
 
         // Рисуем всё сразу
@@ -194,7 +194,7 @@ export async function loadFullArticle() {
     }
 
     try {
-        const response = await fetch(`https://pro-info-api.com/loadFullArticle?id=${encodeURIComponent(id)}`);
+        const response = await fetch(`https://pro-info-api.onrender.com/loadFullArticle?id=${encodeURIComponent(id)}`);
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
@@ -247,7 +247,7 @@ export async function publishPost() {
     }
 
     try {
-        const response = await fetch(`https://pro-info-api.com/publish`, {
+        const response = await fetch(`https://pro-info-api.onrender.com/publish`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title, text, image })
