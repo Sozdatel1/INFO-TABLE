@@ -5,8 +5,8 @@ import { renderFilteredPosts } from './render.js';
 
 // ФУНКЦИЯ КОТОРАЯ СОДЕРЖИТ СЛОВА ПО КОТОРЫМ РАСПРЕДЕЛЯЮТСЯ СТАТЬИ ПО ТЭГАМ
 
-export function getAutoCategory(title, content = '') {
-    const source = (title + ' ' + content).toLowerCase().trim();
+export function getAutoCategory(title, text = '') {
+    const source = (title + ' ' + text).toLowerCase().trim();
     if (!source) return 'Инфо';
 
     const keywordsMap = {
