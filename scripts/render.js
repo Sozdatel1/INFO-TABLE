@@ -52,7 +52,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
     <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">
         <div class="news-card">
 
-        <span class="auto-tag">#${category}</span>
+        <span class="auto-tag">• ${category} •</span>
         <span id="reading-time-${post.id}" style=" position: absolute;
             top: 10px;
             left: 10px;
@@ -71,7 +71,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
             display: block !important;
             text-transform: uppercase;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
-            ⏳ ${calculateReadingTimeForCard(post.text)}
+            🕜 ${calculateReadingTimeForCard(post.text)}
             </span>
             <div class="card-icon">
             ${post.image ? `<img src="${post.image}" alt="icon" style="margin-bottom: 10px;
@@ -162,7 +162,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
 export async function loadPosts() {
     try {
         const response = await fetch(`https://pro-info-api.onrender.com/loadPosts`);
-        const allPostsData = await response.json();
+        allPostsData = await response.json();
 
         // Рисуем всё сразу
         if (typeof renderFilteredPosts === 'function') {
@@ -259,6 +259,15 @@ export async function publishPost() {
                 text: "Ваша статья появится в ленте через некоторое время",
                 icon: "success"
             });
+            Swal.fire({
+                imageUrl: "https://i.ibb.co/SX9WRrBQ/egrnonline.png",
+                imageHeight: 200,
+                title: "Опубликовано!",
+                showConfirmButton: false,
+                imageAlt: "A tall image",
+                padding: '0px 0px 30px 0px',
+                timer: 1500
+});
 
             // Очистка полей
             document.getElementById('postTitle').value = "";
