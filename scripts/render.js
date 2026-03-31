@@ -15,7 +15,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
     const loadMoreContainer = document.getElementById('load-more-container');
     if (!grid) return;
 
-        if (postsToRender.length === 0) {
+    if (postsToRender.length === 0) {
         grid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
                 <span style="font-size: 50px;">🏜️</span>
@@ -30,16 +30,16 @@ export function renderFilteredPosts(postsToRender, append = false) {
     const dataToDraw = append ? postsToRender : postsToRender.slice(0, displayedCount);
 
 
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
-// ВОТ ТУТ СОЗДАЕТСЯ ВРЕМЕННАЯ ПЕРЕМЕННАЯ post ОТ КОТОРОЙ МОЖНО ПЕРЕХОДИТЬ В КОНКРЕТНОЙ КАРТОЧКЕ
-//                                  \\//  
-//                                   ||
+    // ВОТ ТУТ СОЗДАЕТСЯ ВРЕМЕННАЯ ПЕРЕМЕННАЯ post ОТ КОТОРОЙ МОЖНО ПЕРЕХОДИТЬ В КОНКРЕТНОЙ КАРТОЧКЕ
+    //                                  \\//  
+    //                                   ||
     const postsHtml = dataToDraw.map(post => {
 
-// КОГДА МЫ УПОМИНАЕМ post.text МЫ УПОМИНАЕМ ЭТУ ПЕРЕМЕННУЮ И ПУНКТ ТЕКСТ В МАССИВЕ КАРТОЧКИ И СТАТЬИ (на гитхаб файл постс джсон) ПРОСТО ЗДЕСЬ ОТРИСОВЫВАЕТСЯ ТОЛЬКО ЗАГОЛОВОК СТАТЬИ В КАРТОЧКЕ, А НА САМОМ ДЕЛЕ ОБРАТИТЬСЯ К ПЕРЕМЕННОЙ post МОЖНО И ЗА ТЕКСТОМ СТАТЬИ (post.text) КАК ЭТО ДЕЛАЕТ ФУНКЦИЯ ПЕРЕСЧЕТА СЛОВ calculateReadingTimeForCard
+        // КОГДА МЫ УПОМИНАЕМ post.text МЫ УПОМИНАЕМ ЭТУ ПЕРЕМЕННУЮ И ПУНКТ ТЕКСТ В МАССИВЕ КАРТОЧКИ И СТАТЬИ (на гитхаб файл постс джсон) ПРОСТО ЗДЕСЬ ОТРИСОВЫВАЕТСЯ ТОЛЬКО ЗАГОЛОВОК СТАТЬИ В КАРТОЧКЕ, А НА САМОМ ДЕЛЕ ОБРАТИТЬСЯ К ПЕРЕМЕННОЙ post МОЖНО И ЗА ТЕКСТОМ СТАТЬИ (post.text) КАК ЭТО ДЕЛАЕТ ФУНКЦИЯ ПЕРЕСЧЕТА СЛОВ calculateReadingTimeForCard
 
-// ------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------
 
 
         const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
@@ -156,136 +156,120 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
 
 
+import { createClient } from '@supabase/supabase-js'
 
-// ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ГИТХАБ ТЕКСТ, ЗАГОЛОВОК, КАРТИНКУ, ЛАЙКИ СОХРАНЯЕТ ИХ В МАССИВ АЛЛ ПОСТ ДАТА И ВСТАВЛЯЕТ ИХ НА СТРАНИЦУ С ПОМОЩЬЮ ФУНКЦИИ renderFilteredPosts 
+// 1. НАСТРОЙКА (Вставь свои данные из Settings -> API)
+const supabase = createClient('PROJECT_URL', 'ANON_KEY')
 
+// --- АВТОРИЗАЦИЯ (НИК + ПАРОЛЬ) ---
+
+export async function authUser(username, password, isSignUp = false) {
+    const email = `${username.toLowerCase()}@app.local`;
+    const { data, error } = isSignUp 
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) return Swal.fire("Ошибка", error.message, "error");
+    location.reload(); 
+}
+
+// --- СТАТЬИ (ЗАМЕНЯЮТ ТВОИ СТАРЫЕ ФУНКЦИИ) ---
+
+// 1. ЗАГРУЗКА ВСЕХ ПОСТОВ (Для ленты)
 export async function loadPosts() {
     try {
-        const response = await fetch(`https://pro-info-api.onrender.com/loadPosts`);
-        allPostsData = await response.json();
+        const { data, error } = await supabase
+            .from('articles')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-        // Рисуем всё сразу
-        if (typeof renderFilteredPosts === 'function') {
-            renderFilteredPosts(allPostsData);
-        }
-        if (typeof renderTrending === 'function') {
-            renderTrending(allPostsData);
-        }
-        if (typeof updateHubStats === 'function') {
-            updateHubStats(allPostsData);
-        }
+        if (error) throw error;
+
+        // Передаем данные в твои родные функции отрисовки
+        if (typeof renderFilteredPosts === 'function') renderFilteredPosts(data);
+        if (typeof renderTrending === 'function') renderTrending(data);
+        if (typeof updateHubStats === 'function') updateHubStats(data);
+        
     } catch (err) {
-        console.error("Ошибка загрузки:", err);
+        console.error("Ошибка загрузки:", err.message);
     }
 }
 
+// 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА (Индивидуально)
+export async function loadMyArticles() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
+    const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('user_id', user.id) // Фильтр только по своим статьям
+        .order('created_at', { ascending: false });
 
-// ФУНКЦИЯ КОТОРАЯ БЕРЕТ ИЗ ФАЙЛА ТЕКСТ, КАРТИНКУ И ЗАГОЛОВОК, ЛАЙКИ И ОТОБРАЖАЕТ ИХ НА СТАТЬЕ С СОБСТВЕННЫМ ID
-// ВЫЗЫВАЕТСЯ ТОЛЬКО НА СТРАНИЦЕ СТАТЬИ (СМ START-API.JS)
+    if (data) renderFilteredPosts(data);
+}
 
+// 3. ЗАГРУЗКА ПОЛНОЙ СТАТЬИ (Для article.html)
 export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id'); // Получаем ID из ссылки
-
-    if (!id) {
-        console.error("ID статьи не передан");
-        return;
-    }
+    const id = params.get('id');
+    if (!id) return;
 
     try {
-        const response = await fetch(`https://pro-info-api.onrender.com/loadFullArticle?id=${encodeURIComponent(id)}`);
-        if (!response.ok) {
-            throw new Error(`Ошибка: ${response.status}`);
-        }
-        const article = await response.json();
+        const { data: article, error } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-        if (article) {
-            // Вставляем данные в DOM
-            document.getElementById('artTitle').innerText = article.title;
-            document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
+        if (error) throw error;
 
-            setTimeout(() => {
-                if (window.updateScrollProgress) window.updateScrollProgress();
-            }, 5000);
-
-            const likeSpan = document.getElementById('artLikes');
-            const likeBtn = document.getElementById('likeBtn');
-
-            if (likeSpan) likeSpan.innerText = article.likes || 0;
-
-            if (likeBtn) {
-                likeBtn.onclick = () => likePost(article.id);
-            }
-
-            const imgTag = document.getElementById('artImage');
-            if (article.image && imgTag) {
-                imgTag.src = article.image;
-                imgTag.style.display = 'block';
-            }
+        // Твои переменные из старого кода
+        document.getElementById('artTitle').innerText = article.title;
+        document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
+        
+        const imgTag = document.getElementById('artImage');
+        if (article.image && imgTag) {
+            imgTag.src = article.image;
+            imgTag.style.display = 'block';
         }
     } catch (err) {
-        console.error('Ошибка загрузки статьи:', err);
+        console.error('Ошибка:', err.message);
     }
 }
 
-
-
-// ФУНКИЦЯ КОТОРАЯ ОТПРАВЛЯЕТ НА СЕРВЕР ТЕКСТ, КАРТИНКУ, И ЗАГОЛОВОГ СТАТЬИ
-
+// 4. ПУБЛИКАЦИЯ (С твоими переменными)
 export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
 
-    if (!title || !text) {
-        return Swal.fire({
-            icon: "error",
-            title: "Ошибка!",
-            text: "Заполните все поля!"
-        });
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return Swal.fire("Ошибка", "Войди в аккаунт!", "error");
 
-    try {
-        const response = await fetch(`https://pro-info-api.onrender.com/publish`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, text, image })
-        });
+    const { error } = await supabase.from('articles').insert([{ 
+        title, 
+        text, 
+        image: image || "/img/staty/газета.png",
+        user_id: user.id 
+    }]);
 
-        if (response.ok) {
-            Swal.fire({
-                title: "Опубликовано!",
-                text: "Ваша статья появится в ленте через некоторое время",
-                icon: "success"
-            });
-            Swal.fire({
-                imageUrl: "https://i.ibb.co/SX9WRrBQ/egrnonline.png",
-                imageHeight: 200,
-                title: "Опубликовано!",
-                showConfirmButton: false,
-                imageAlt: "A tall image",
-                padding: '0px 0px 30px 0px',
-                timer: 1500
-});
-
-            // Очистка полей
-            document.getElementById('postTitle').value = "";
-            document.getElementById('postInput').value = "";
-            document.getElementById('postImage').value = "";
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Ошибка сервера",
-                text: `Код: ${response.status}`
-            });
-        }
-    } catch (err) {
-        Swal.fire({
-            icon: "error",
-            title: "Ошибка",
-            text: err.message
-        });
+    if (error) {
+        Swal.fire("Ошибка", error.message, "error");
+    } else {
+        Swal.fire("Опубликовано!", "", "success");
+        // Твоя очистка полей
+        document.getElementById('postTitle').value = "";
+        document.getElementById('postInput').value = "";
     }
 }
-window.publishPost = publishPost;
+
+// 5. ЛАЙКИ
+export async function likePost(id) {
+    const { data } = await supabase.from('articles').select('likes').eq('id', id).single();
+    const newLikes = (data.likes || 0) + 1;
+    await supabase.from('articles').update({ likes: newLikes }).eq('id', id);
+    
+    const likeSpan = document.getElementById('artLikes');
+    if (likeSpan) likeSpan.innerText = newLikes;
+}
