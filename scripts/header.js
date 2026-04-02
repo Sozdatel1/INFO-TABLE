@@ -54,6 +54,12 @@ if (header) {
     </nav>
 
 
+<!-- Кнопка "Войти" (по умолчанию видна) -->
+<button id="login-btn" onclick="openAuthModal()">Войти</button>
+
+<!-- Кнопка "Профиль" (по умолчанию скрыта) -->
+<button id="profile-btn" style="display: none;" onclick="goToProfile()">Профиль</button>
+
 
 
 

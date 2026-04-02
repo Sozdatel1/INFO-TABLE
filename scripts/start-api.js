@@ -3,7 +3,9 @@ import { loadPosts } from './render.js';
 import { loadFullArticle } from './render.js';
 import { loadMore } from './utils.js';
 import { calculateReadingTimeStat } from './time-read.js';
-
+import { loginUser } from './render.js';
+window.publishPost = publishPost;
+window.loadMore = loadMore;
 // Инициализируем глобальные данные
 window.allPostsData = [];
 window.displayedCount = 8;

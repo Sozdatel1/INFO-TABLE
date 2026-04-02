@@ -1,6 +1,6 @@
 import { getAutoCategory, calculateReadingTimeForCard } from './utils.js';
 import { renderTrending } from './staty.js';
-import { likePost } from './staty.js';
+// import { likePost } from './staty.js';
 
 
 
@@ -156,24 +156,34 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
 
 
-import { createClient } from '@supabase/supabase-js'
+const { createClient } = window.supabase; 
 
 // 1. НАСТРОЙКА (Вставь свои данные из Settings -> API)
-const supabase = createClient('PROJECT_URL', 'ANON_KEY')
+const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co', 'sb_publishable_U38NKz2Gg_btgccNGzIDCA_ynTC9x7q')
 
 // --- АВТОРИЗАЦИЯ (НИК + ПАРОЛЬ) ---
 
-export async function authUser(username, password, isSignUp = false) {
+export async function loginUser(username, password) {
     const email = `${username.toLowerCase()}@app.local`;
-    const { data, error } = isSignUp 
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) return Swal.fire("Ошибка", error.message, "error");
+    if (error) return Swal.fire("Ошибка", "Неверный ник или пароль", "error");
+    
+    Swal.fire("Успех!", "Вы вошли в аккаунт", "success");
     location.reload(); 
 }
 
-// --- СТАТЬИ (ЗАМЕНЯЮТ ТВОИ СТАРЫЕ ФУНКЦИИ) ---
+// --- РЕГИСТРАЦИЯ (ТОЛЬКО НИК И ПАРОЛЬ) ---
+export async function registerUser(username, password) {
+    const email = `${username.toLowerCase()}@app.local`;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) return Swal.fire("Ошибка", error.message, "error");
+    
+    Swal.fire("Готово!", `Аккаунт ${username} создан`, "success");
+    location.reload(); 
+    updateAuthUI();
+}
 
 // 1. ЗАГРУЗКА ВСЕХ ПОСТОВ (Для ленты)
 export async function loadPosts() {
@@ -273,3 +283,118 @@ export async function likePost(id) {
     const likeSpan = document.getElementById('artLikes');
     if (likeSpan) likeSpan.innerText = newLikes;
 }
+
+
+let isRegMode = false;
+
+// Открыть модальное окно
+window.openAuthModal = function() {
+    document.getElementById('auth-modal').style.display = 'flex';
+};
+
+// Закрыть модальное окно
+window.closeAuthModal = function() {
+    document.getElementById('auth-modal').style.display = 'none';
+};
+
+// Переключение между Входом и Регистрацией
+window.toggleModalMode = function() {
+    isRegMode = !isRegMode;
+    
+    const title = document.getElementById('modal-title');
+    const btn = document.getElementById('modal-btn');
+    const switchText = document.getElementById('modal-switch-text');
+    const switchLink = document.getElementById('modal-switch-link');
+    
+    if (isRegMode) {
+        title.innerText = "Регистрация";
+        btn.innerText = "Создать аккаунт";
+        switchText.innerText = "Уже есть аккаунт?";
+        switchLink.innerText = "Войти";
+    } else {
+        title.innerText = "Вход в аккаунт";
+        btn.innerText = "Войти";
+        switchText.innerText = "Еще нет аккаунта?";
+        switchLink.innerText = "Создать аккаунт";
+    }
+};
+
+// Срабатывает при нажатии на большую кнопку
+window.handleModalAction = function() {
+    const user = document.getElementById('user').value;
+    const pass = document.getElementById('pass').value;
+    
+    if (!user || !pass) {
+        return Swal.fire("Ошибка", "Заполните все поля!", "error");
+    }
+    
+    if (isRegMode) {
+        registerUser(user, pass);
+    } else {
+        loginUser(user, pass);
+    }
+};
+
+// Закрытие при клике вне карточки
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('auth-modal');
+    if (e.target === modal) {
+        closeAuthModal();
+    }
+});
+// Функция, которая проверяет статус входа и меняет кнопки
+async function updateAuthUI() {
+    const loginBtn = document.getElementById('login-btn');
+    const profileBtn = document.getElementById('profile-btn');
+
+    // Если кнопок нет на текущей странице, прерываем функцию
+    if (!loginBtn && !profileBtn) return;
+
+    // Спрашиваем у Supabase текущего пользователя
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+        // Пользователь ВОШЕЛ: прячем "Войти", показываем "Профиль"
+        loginBtn.style.display = 'none';
+        profileBtn.style.display = 'block';
+    } else {
+        // Пользователь НЕ вошел: показываем "Войти", прячем "Профиль"
+        loginBtn.style.display = 'block';
+        profileBtn.style.display = 'none';
+    }
+}
+
+// Запускаем проверку сразу при загрузке страницы
+document.addEventListener('DOMContentLoaded', updateAuthUI);
+
+// Функция для кнопки "Профиль" (перенаправление в личный кабинет)
+window.goToProfile = function() {
+    window.location.href = 'profile.html'; // Укажите вашу страницу профиля
+};
+async function checkUserProfile() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    // Если не вошел — отправляем на главную
+    if (!user || error) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Показываем ник в шапке (отрезаем домен)
+    const username = user.email.split('@')[0];
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) {
+        usernameDisplay.innerText = username;
+    }
+
+    // Загружаем только статьи этого пользователя
+    loadMyArticles(user.id);
+}
+window.logoutUser = async function() {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+};
+document.addEventListener('DOMContentLoaded', checkUserProfile);
+window.publishPost = publishPost;
+window.loginUser = loginUser;
+window.registerUser = registerUser;

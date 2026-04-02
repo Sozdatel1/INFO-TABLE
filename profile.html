@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    
+    <!-- <link rel="stylesheet" href="style.css"> Твой файл стилей -->
+</head>
+<body>
+
+    <!-- Шапка профиля -->
+    <header style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd;">
+        <div>
+            <h1>Личный кабинет</h1>
+            <p>Привет, <span id="username-display" style="font-weight: bold; color: #0044ff;">...</span>!</p>
+        </div>
+        <div>
+            <a href="index.html" style="text-decoration: none; margin-right: 15px; color: #555;">На главную</a>
+            <button onclick="logoutUser()" style="padding: 10px 15px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer;">Выйти</button>
+        </div>
+    </header>
+
+    <main style="max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+        
+        <!-- КОЛОНКА 1: Создание статьи -->
+        <section style="background: #f9f9f9; padding: 20px; border-radius: 10px; height: fit-content;">
+            <h3>Написать новую статью</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                <input type="text" id="postTitle" placeholder="Заголовок статьи" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <textarea id="postInput" placeholder="Текст статьи..." rows="8" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit;"></textarea>
+                <input type="text" id="postImage" placeholder="Ссылка на картинку (необязательно)" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <button onclick="publishPost()" style="padding: 12px; background: #0044ff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Опубликовать</button>
+            </div>
+        </section>
+
+        <!-- КОЛОНКА 2: Список моих статей -->
+        <section>
+            <h3>Мои статьи</h3>
+            <div id="my-articles-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+                <!-- Сюда будут рендериться статьи из базы -->
+                <p id="empty-state" style="color: #999;">Вы еще не написали ни одной статьи...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Подключаем твою логику (модуль) -->
+    
+    <script src="/scripts/sweetalert2.all.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script type="module" src="scripts/render.js"></script>
+</body>
+</html>
