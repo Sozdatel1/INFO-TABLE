@@ -32,6 +32,9 @@
     box-shadow: 0 0 20px rgb(0, 106, 255);">
 
         </p>
+        <button onclick="deletePost('$post_id')" style="color: red; border: none; background: none; cursor: pointer;">
+    Удалить
+</button>
 
         <hr>
         <p id="artText" style="font-size: 20px;
@@ -68,6 +71,7 @@ margin-right: 30px; background-color: #ff8000;">
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script type="module" src="/scripts/time-read.js"></script>
+    <script src="/scripts/sweetalert2.all.min.js"></script>
     <script type="module" src="/scripts/staty.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="/scripts/main.js"></script>

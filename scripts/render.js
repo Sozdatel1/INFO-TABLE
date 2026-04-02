@@ -73,6 +73,10 @@ export function renderFilteredPosts(postsToRender, append = false) {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
             🕜 ${calculateReadingTimeForCard(post.text)}
             </span>
+        <button onclick="deletePost('${post.id}')" style="color: red; border: none; background: none; cursor: pointer;">
+    Удалить
+</button>
+
             <div class="card-icon">
             ${post.image ? `<img src="${post.image}" alt="icon" style="margin-bottom: 10px;
      background: #ffe5e000;
@@ -207,16 +211,35 @@ export async function loadPosts() {
 
 // 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА (Индивидуально)
 export async function loadMyArticles() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    // 1. Сначала проверяем, есть ли сессия в браузере вообще
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        console.log("Сессия не найдена. Пользователь не вошел.");
+        return;
+    }
 
+    // 2. Берем пользователя из сессии
+    const user = session.user;
+
+    // 3. Делаем запрос в базу
     const { data, error } = await supabase
         .from('articles')
         .select('*')
-        .eq('user_id', user.id) // Фильтр только по своим статьям
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-    if (data) renderFilteredPosts(data);
+    if (error) {
+        console.error("Ошибка при получении статей:", error.message);
+        return;
+    }
+
+    console.log("Статьи успешно получены из базы:", data);
+    window.displayedCount = data.length; // Даем функции отрисовщика количество постов
+    window.allPostsData = data;  
+    // 4. Отправляем в твою функцию отрисовки
+    if (data && typeof renderFilteredPosts === 'function') {
+        renderFilteredPosts(data);
+    }
 }
 
 // 3. ЗАГРУЗКА ПОЛНОЙ СТАТЬИ (Для article.html)
@@ -342,7 +365,8 @@ window.addEventListener('click', (e) => {
         closeAuthModal();
     }
 });
-// Функция, которая проверяет статус входа и меняет кнопки
+
+// Функция, которая проверяет статус входа и меняет кнопки (ДЛЯ ГЛАВНОЙ)
 async function updateAuthUI() {
     const loginBtn = document.getElementById('login-btn');
     const profileBtn = document.getElementById('profile-btn');
@@ -350,33 +374,24 @@ async function updateAuthUI() {
     // Если кнопок нет на текущей странице, прерываем функцию
     if (!loginBtn && !profileBtn) return;
 
-    // Спрашиваем у Supabase текущего пользователя
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-        // Пользователь ВОШЕЛ: прячем "Войти", показываем "Профиль"
         loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
     } else {
-        // Пользователь НЕ вошел: показываем "Войти", прячем "Профиль"
         loginBtn.style.display = 'block';
         profileBtn.style.display = 'none';
     }
 }
 
-// Запускаем проверку сразу при загрузке страницы
-document.addEventListener('DOMContentLoaded', updateAuthUI);
-
-// Функция для кнопки "Профиль" (перенаправление в личный кабинет)
-window.goToProfile = function() {
-    window.location.href = 'profile.html'; // Укажите вашу страницу профиля
-};
+// Функция защиты роута (ДЛЯ ПРОФИЛЯ)
 async function checkUserProfile() {
     const { data: { user }, error } = await supabase.auth.getUser();
 
-    // Если не вошел — отправляем на главную
+    // Если не вошел — отправляем на главную БЕЗ сохранения в истории переходов
     if (!user || error) {
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
         return;
     }
 
@@ -388,13 +403,164 @@ async function checkUserProfile() {
     }
 
     // Загружаем только статьи этого пользователя
-    loadMyArticles(user.id);
+    if (typeof loadMyArticles === 'function') {
+        loadMyArticles(user.id);
+    }
 }
+
+// Функция для кнопки "Профиль"
+window.goToProfile = function() {
+    window.location.href = 'profile.html';
+};
+
+// Функция выхода
 window.logoutUser = async function() {
     await supabase.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.replace('index.html'); // replace спасает от зацикливания
 };
-document.addEventListener('DOMContentLoaded', checkUserProfile);
+
+// --- ГЛАВНОЕ ИСПРАВЛЕНИЕ: Разделение запуска по страницам ---
+document.addEventListener('DOMContentLoaded', () => {
+    const isProfilePage = window.location.pathname.includes('profile.html');
+    
+    if (isProfilePage) {
+        // На странице профиля проверяем сессию и редиректим если не залогинен
+        checkUserProfile();
+    } else {
+        // На остальных страницах (главной) просто переключаем кнопки Войти/Профиль
+        updateAuthUI();
+    }
+});
+
+
+
+
+window.deleteMyAccount = async function() {
+    // 1. Показываем всплывающее окно с предупреждением
+    const result = await Swal.fire({
+        title: "Вы уверены?",
+        text: "Ваш профиль и ВСЕ ваши статьи будут удалены навсегда!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ff4d4d",
+        cancelButtonColor: "#aaa",
+        confirmButtonText: "Да, удалить всё",
+        cancelButtonText: "Отмена"
+    });
+
+    // 2. Если пользователь нажал "Да, удалить всё"
+    if (result.isConfirmed) {
+        try {
+            // Получаем ID текущего авторизованного пользователя
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                return Swal.fire("Ошибка", "Пользователь не найден", "error");
+            }
+
+            // Показываем индикатор загрузки
+            Swal.fire({
+                title: 'Удаление...',
+                text: 'Пожалуйста, подождите',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // 3. Отправляем запрос на ваш бэкенд на Render
+            const response = await fetch('https://pro-info-api.onrender.com/api/delete-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: user.id })
+            });
+
+            const resData = await response.json();
+
+            // Если сервер вернул ошибку
+            if (!response.ok || resData.error) {
+                throw new Error(resData.error || "Не удалось удалить аккаунт");
+            }
+
+            // 4. Уведомляем об успехе
+            await Swal.fire({
+                title: "Удалено!",
+                text: "Ваш аккаунт был успешно стерт.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            // Выходим из сессии в браузере и редиректим на главную
+            await supabase.auth.signOut();
+            window.location.replace('index.html');
+
+        } catch (err) {
+            // Если что-то пошло не так (например, сервер Render спит)
+            Swal.fire("Ошибка", err.message, "error");
+            console.error("Ошибка удаления:", err);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+window.deletePost = async function(postId) {
+    // 1. Проверяем, что ID вообще пришел
+    console.log("Пытаемся удалить статью с ID:", postId);
+
+    if (!postId || postId === "undefined" || postId === "null") {
+        console.error("Ошибка: ID статьи пустой или некорректный!");
+        return Swal.fire("Ошибка", "Не удалось определить ID статьи для удаления", "error");
+    }
+
+    const result = await Swal.fire({
+        title: "Вы уверены?",
+        text: "Статью нельзя будет восстановить!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ff4d4d",
+        cancelButtonColor: "#aaa",
+        confirmButtonText: "Да, удалить!",
+        cancelButtonText: "Отмена"
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // 2. Делаем запрос на удаление
+            const { error } = await supabase
+                .from('articles')
+                .delete()
+                .eq('id', postId);
+
+            if (error) throw error;
+
+            await Swal.fire({
+                title: "Удалено!",
+                text: "Статья успешно удалена.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            location.reload(); 
+
+        } catch (err) {
+            Swal.fire("Ошибка", err.message || "Ошибка на стороне базы данных", "error");
+            console.error("Ошибка удаления статьи:", err);
+        }
+    }
+}
+
+
 window.publishPost = publishPost;
 window.loginUser = loginUser;
 window.registerUser = registerUser;
