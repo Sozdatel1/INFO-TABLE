@@ -73,9 +73,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
             🕜 ${calculateReadingTimeForCard(post.text)}
             </span>
-        <button onclick="deletePost('${post.id}')" style="color: red; border: none; background: none; cursor: pointer;">
-    Удалить
-</button>
+        
 
             <div class="card-icon">
             ${post.image ? `<img src="${post.image}" alt="icon" style="margin-bottom: 10px;
@@ -160,7 +158,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
 
 
 
-const { createClient } = window.supabase; 
+const { createClient } = window.supabase;
 
 // 1. НАСТРОЙКА (Вставь свои данные из Settings -> API)
 const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co', 'sb_publishable_U38NKz2Gg_btgccNGzIDCA_ynTC9x7q')
@@ -172,9 +170,9 @@ export async function loginUser(username, password) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) return Swal.fire("Ошибка", "Неверный ник или пароль", "error");
-    
+
     Swal.fire("Успех!", "Вы вошли в аккаунт", "success");
-    location.reload(); 
+    location.reload();
 }
 
 // --- РЕГИСТРАЦИЯ (ТОЛЬКО НИК И ПАРОЛЬ) ---
@@ -183,9 +181,9 @@ export async function registerUser(username, password) {
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) return Swal.fire("Ошибка", error.message, "error");
-    
+
     Swal.fire("Готово!", `Аккаунт ${username} создан`, "success");
-    location.reload(); 
+    location.reload();
     updateAuthUI();
 }
 
@@ -203,7 +201,7 @@ export async function loadPosts() {
         if (typeof renderFilteredPosts === 'function') renderFilteredPosts(data);
         if (typeof renderTrending === 'function') renderTrending(data);
         if (typeof updateHubStats === 'function') updateHubStats(data);
-        
+
     } catch (err) {
         console.error("Ошибка загрузки:", err.message);
     }
@@ -235,7 +233,7 @@ export async function loadMyArticles() {
 
     console.log("Статьи успешно получены из базы:", data);
     window.displayedCount = data.length; // Даем функции отрисовщика количество постов
-    window.allPostsData = data;  
+    window.allPostsData = data;
     // 4. Отправляем в твою функцию отрисовки
     if (data && typeof renderFilteredPosts === 'function') {
         renderFilteredPosts(data);
@@ -260,11 +258,24 @@ export async function loadFullArticle() {
         // Твои переменные из старого кода
         document.getElementById('artTitle').innerText = article.title;
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
-        
+
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
             imgTag.src = article.image;
             imgTag.style.display = 'block';
+        }
+
+
+        const delArt = document.getElementById('delete-art');
+        if (delArt) {
+            // Передаем переменную 'id', которую получили выше из URL
+            delArt.innerHTML = `
+            <button onclick="location.href='create-article.html?edit=${id}'" style="color: blue; border: none; background: none; cursor: pointer;    margin-right: 10px;">
+                Редактировать
+            </button>
+                <button onclick="deletePost('${id}')" style="color: red; border: none; background: none; cursor: pointer; font-size: 14px;">
+                    Удалить статью
+                </button>`;
         }
     } catch (err) {
         console.error('Ошибка:', err.message);
@@ -279,12 +290,30 @@ export async function publishPost() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return Swal.fire("Ошибка", "Войди в аккаунт!", "error");
-
-    const { error } = await supabase.from('articles').insert([{ 
-        title, 
-        text, 
+    if (window.currentEditId) {
+        // --- РЕЖИМ ОБНОВЛЕНИЯ ---
+        result = await supabase
+            .from('articles')
+            .update({
+                title,
+                text,
+                image: image || "/img/staty/газета.png"
+            })
+            .eq('id', window.currentEditId);
+    } else {
+        // --- РЕЖИМ СОЗДАНИЯ ---
+        result = await supabase.from('articles').insert([{
+            title,
+            text,
+            image: image || "/img/staty/газета.png",
+            user_id: user.id
+        }]);
+    }
+    const { error } = await supabase.from('articles').insert([{
+        title,
+        text,
         image: image || "/img/staty/газета.png",
-        user_id: user.id 
+        user_id: user.id
     }]);
 
     if (error) {
@@ -302,7 +331,7 @@ export async function likePost(id) {
     const { data } = await supabase.from('articles').select('likes').eq('id', id).single();
     const newLikes = (data.likes || 0) + 1;
     await supabase.from('articles').update({ likes: newLikes }).eq('id', id);
-    
+
     const likeSpan = document.getElementById('artLikes');
     if (likeSpan) likeSpan.innerText = newLikes;
 }
@@ -311,24 +340,24 @@ export async function likePost(id) {
 let isRegMode = false;
 
 // Открыть модальное окно
-window.openAuthModal = function() {
+window.openAuthModal = function () {
     document.getElementById('auth-modal').style.display = 'flex';
 };
 
 // Закрыть модальное окно
-window.closeAuthModal = function() {
+window.closeAuthModal = function () {
     document.getElementById('auth-modal').style.display = 'none';
 };
 
 // Переключение между Входом и Регистрацией
-window.toggleModalMode = function() {
+window.toggleModalMode = function () {
     isRegMode = !isRegMode;
-    
+
     const title = document.getElementById('modal-title');
     const btn = document.getElementById('modal-btn');
     const switchText = document.getElementById('modal-switch-text');
     const switchLink = document.getElementById('modal-switch-link');
-    
+
     if (isRegMode) {
         title.innerText = "Регистрация";
         btn.innerText = "Создать аккаунт";
@@ -343,14 +372,14 @@ window.toggleModalMode = function() {
 };
 
 // Срабатывает при нажатии на большую кнопку
-window.handleModalAction = function() {
+window.handleModalAction = function () {
     const user = document.getElementById('user').value;
     const pass = document.getElementById('pass').value;
-    
+
     if (!user || !pass) {
         return Swal.fire("Ошибка", "Заполните все поля!", "error");
     }
-    
+
     if (isRegMode) {
         registerUser(user, pass);
     } else {
@@ -409,12 +438,12 @@ async function checkUserProfile() {
 }
 
 // Функция для кнопки "Профиль"
-window.goToProfile = function() {
+window.goToProfile = function () {
     window.location.href = 'profile.html';
 };
 
 // Функция выхода
-window.logoutUser = async function() {
+window.logoutUser = async function () {
     await supabase.auth.signOut();
     window.location.replace('index.html'); // replace спасает от зацикливания
 };
@@ -422,7 +451,7 @@ window.logoutUser = async function() {
 // --- ГЛАВНОЕ ИСПРАВЛЕНИЕ: Разделение запуска по страницам ---
 document.addEventListener('DOMContentLoaded', () => {
     const isProfilePage = window.location.pathname.includes('profile.html');
-    
+
     if (isProfilePage) {
         // На странице профиля проверяем сессию и редиректим если не залогинен
         checkUserProfile();
@@ -434,8 +463,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-window.deleteMyAccount = async function() {
+// const delArt = document.getElementById('delete-art')
+// if (delArt) {
+//     delArt.innerHTML = `
+//       <button onclick="deletePost('${postId}')" style="color: red; border: none; background: none; cursor: pointer;">
+//         Удалить
+//     </button>`}
+window.deleteMyAccount = async function () {
     // 1. Показываем всплывающее окно с предупреждением
     const result = await Swal.fire({
         title: "Вы уверены?",
@@ -453,7 +487,7 @@ window.deleteMyAccount = async function() {
         try {
             // Получаем ID текущего авторизованного пользователя
             const { data: { user } } = await supabase.auth.getUser();
-            
+
             if (!user) {
                 return Swal.fire("Ошибка", "Пользователь не найден", "error");
             }
@@ -513,7 +547,7 @@ window.deleteMyAccount = async function() {
 
 
 
-window.deletePost = async function(postId) {
+window.deletePost = async function (postId) {
     // 1. Проверяем, что ID вообще пришел
     console.log("Пытаемся удалить статью с ID:", postId);
 
@@ -551,8 +585,12 @@ window.deletePost = async function(postId) {
                 showConfirmButton: false
             });
 
-            location.reload(); 
-
+            if (window.location.pathname.includes('article.html')) {
+                window.location.replace('index.html');
+            } else {
+                // Если мы в профиле, просто обновляем страницу, чтобы статья исчезла из списка
+                location.reload();
+            }
         } catch (err) {
             Swal.fire("Ошибка", err.message || "Ошибка на стороне базы данных", "error");
             console.error("Ошибка удаления статьи:", err);

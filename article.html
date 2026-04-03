@@ -32,9 +32,9 @@
     box-shadow: 0 0 20px rgb(0, 106, 255);">
 
         </p>
-        <button onclick="deletePost('$post_id')" style="color: red; border: none; background: none; cursor: pointer;">
-    Удалить
-</button>
+        <span id="username-display" style="font-weight: bold; color: #0044ff;">...</span>
+        
+        <div id="delete-art"></div>
 
         <hr>
         <p id="artText" style="font-size: 20px;
@@ -68,13 +68,14 @@ margin-right: 30px; background-color: #ff8000;">
     <button id="toTopBtn" onclick="scrollToTop()">
         <img src="/img/img_stylez/keyboard_double_arrow_up_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg">
     </button>
-
+    <script type="module" src="scripts/render.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script type="module" src="/scripts/time-read.js"></script>
     <script src="/scripts/sweetalert2.all.min.js"></script>
     <script type="module" src="/scripts/staty.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="/scripts/main.js"></script>
+    
     <script src="/scripts/topButton.js"></script>
     <script src="/scripts/header.js"></script>
     <script src="/scripts/scroll.js"></script>
