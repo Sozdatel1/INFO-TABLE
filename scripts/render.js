@@ -264,19 +264,38 @@ export async function loadFullArticle() {
             imgTag.src = article.image;
             imgTag.style.display = 'block';
         }
+        if (document.getElementById('avtor')) {
+    document.getElementById('avtor').innerText = article.author_name || "Аноним";
+}
 
-
+        // const delArt = document.getElementById('delete-art');
+        // if (delArt) {
+        //     // Передаем переменную 'id', которую получили выше из URL
+        //     delArt.innerHTML = `
+        //     <button onclick="location.href='create-article.html?edit=${id}'" style="color: blue; border: none; background: none; cursor: pointer;    margin-right: 10px;">
+        //         Редактировать
+        //     </button>
+        //         <button onclick="deletePost('${id}')" style="color: red; border: none; background: none; cursor: pointer; font-size: 14px;">
+        //             Удалить статью
+        //         </button>`;
+        // }
+        const { data: { user } } = await supabase.auth.getUser();
         const delArt = document.getElementById('delete-art');
-        if (delArt) {
-            // Передаем переменную 'id', которую получили выше из URL
+
+        // Показываем кнопки ТОЛЬКО если пользователь залогинен И он автор статьи
+        if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
-            <button onclick="location.href='create-article.html?edit=${id}'" style="color: blue; border: none; background: none; cursor: pointer;    margin-right: 10px;">
-                Редактировать
-            </button>
-                <button onclick="deletePost('${id}')" style="color: red; border: none; background: none; cursor: pointer; font-size: 14px;">
+                <button onclick="openEditModal ('${id}')" style="color: blue;  cursor: pointer; margin-right: 10px;">
+                    Редактировать
+                </button>
+                <button onclick="deletePost('${id}')" style="color: red; cursor: pointer; font-size: 14px;">
                     Удалить статью
                 </button>`;
+        } else if (delArt) {
+            // Если не автор — очищаем контейнер (на всякий случай)
+            delArt.innerHTML = '';
         }
+
     } catch (err) {
         console.error('Ошибка:', err.message);
     }
@@ -290,9 +309,13 @@ export async function publishPost() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return Swal.fire("Ошибка", "Войди в аккаунт!", "error");
+    const generatedName = user.email.split('@')[0];
+
+    let response; // Создаем переменную для результата
+
     if (window.currentEditId) {
         // --- РЕЖИМ ОБНОВЛЕНИЯ ---
-        result = await supabase
+        response = await supabase
             .from('articles')
             .update({
                 title,
@@ -302,29 +325,35 @@ export async function publishPost() {
             .eq('id', window.currentEditId);
     } else {
         // --- РЕЖИМ СОЗДАНИЯ ---
-        result = await supabase.from('articles').insert([{
+        response = await supabase.from('articles').insert([{
             title,
             text,
             image: image || "/img/staty/газета.png",
-            user_id: user.id
+            user_id: user.id,
+            author_name: generatedName
         }]);
     }
-    const { error } = await supabase.from('articles').insert([{
-        title,
-        text,
-        image: image || "/img/staty/газета.png",
-        user_id: user.id
-    }]);
+
+    const { error } = response; // Достаем ошибку из результата нужного действия
 
     if (error) {
         Swal.fire("Ошибка", error.message, "error");
     } else {
-        Swal.fire("Опубликовано!", "", "success");
-        // Твоя очистка полей
-        document.getElementById('postTitle').value = "";
-        document.getElementById('postInput').value = "";
+        const isEdit = !!window.currentEditId;
+        await Swal.fire(isEdit ? "Обновлено!" : "Опубликовано!", "", "success");
+
+        if (isEdit) {
+            // Если редактировали — возвращаемся к статье
+            window.location.href = `article.html?id=${window.currentEditId}`;
+        } else {
+            // Если создавали — чистим поля
+            document.getElementById('postTitle').value = "";
+            document.getElementById('postInput').value = "";
+            document.getElementById('postImage').value = "";
+        }
     }
 }
+
 
 // 5. ЛАЙКИ
 export async function likePost(id) {
@@ -427,10 +456,13 @@ async function checkUserProfile() {
     // Показываем ник в шапке (отрезаем домен)
     const username = user.email.split('@')[0];
     const usernameDisplay = document.getElementById('username-display');
+    // const avtor = document.getElementById('avtor');
     if (usernameDisplay) {
         usernameDisplay.innerText = username;
     }
-
+    // if (avtor) {
+    //     avtor.innerText = username;
+    // }
     // Загружаем только статьи этого пользователя
     if (typeof loadMyArticles === 'function') {
         loadMyArticles(user.id);
@@ -586,7 +618,7 @@ window.deletePost = async function (postId) {
             });
 
             if (window.location.pathname.includes('article.html')) {
-                window.location.replace('index.html');
+                window.location.replace('profile.html');
             } else {
                 // Если мы в профиле, просто обновляем страницу, чтобы статья исчезла из списка
                 location.reload();
@@ -598,6 +630,67 @@ window.deletePost = async function (postId) {
     }
 }
 
+// 2. ФУНКЦИИ МОДАЛЬНОГО ОКНА
+window.openEditModal = async function(id) {
+    window.currentEditId = id;
+    
+    // Загружаем актуальные данные перед открытием
+    const { data: article } = await supabase.from('articles').select('*').eq('id', id).single();
+    
+    if (article) {
+        document.getElementById('editTitle').value = article.title;
+        document.getElementById('editText').value = article.text;
+        document.getElementById('edit-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Запрещаем скролл страницы
+    }
+};
+
+window.closeEditModal = function() {
+    document.getElementById('edit-modal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Возвращаем скролл
+};
+
+window.saveChanges = async function() {
+    const newTitle = document.getElementById('editTitle').value;
+    const newText = document.getElementById('editText').value;
+
+    // 1. Проверяем наличие ID
+    if (!window.currentEditId) {
+        return Swal.fire("Ошибка", "ID статьи не найден", "error");
+    }
+
+    if (!newTitle || !newText) {
+        return Swal.fire("Ошибка", "Поля не могут быть пустыми", "warning");
+    }
+
+    try {
+        // 2. Добавляем .select(), чтобы проверить, обновилось ли что-то реально
+        const { data, error } = await supabase
+            .from('articles')
+            .update({ title: newTitle, text: newText })
+            .eq('id', window.currentEditId)
+            .select(); 
+
+        if (error) throw error;
+
+        // 3. Если data пустая — значит RLS заблокировал обновление
+        if (!data || data.length === 0) {
+            return Swal.fire("Доступ запрещен", "У вас нет прав на редактирование этой статьи в Supabase (проверьте RLS Policies)", "error");
+        }
+
+        await Swal.fire({
+            title: "Обновлено!",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false
+        });
+        
+        location.reload(); 
+    } catch (err) {
+        Swal.fire("Ошибка", err.message, "error");
+        console.error("Ошибка при сохранении:", err);
+    }
+};
 
 window.publishPost = publishPost;
 window.loginUser = loginUser;
