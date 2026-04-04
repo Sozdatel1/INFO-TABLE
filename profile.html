@@ -1,125 +1,155 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
     <link rel="stylesheet" href="/styles/main.css">
-  <link rel="stylesheet" href="/styles/staty.css">
-  <link rel="stylesheet" href="/styles/burger.css">
-  <link rel="stylesheet" href="/styles/popul.css">
-  <link rel="stylesheet" href="/styles/fact.css">
-  <link rel="stylesheet" href="/styles/logis.css">
-  <link rel="stylesheet" href="/styles/holiday.css">
-  <link rel="stylesheet" href="/styles/filt.css">
-  <link rel="stylesheet" href="/styles/sign_in.css">
-  <link rel="icon" type="image/png" href="/img/IT.png?v=777">
-    
+    <link rel="stylesheet" href="/styles/staty.css">
+    <link rel="stylesheet" href="/styles/burger.css">
+    <link rel="stylesheet" href="/styles/popul.css">
+    <link rel="stylesheet" href="/styles/fact.css">
+    <link rel="stylesheet" href="/styles/logis.css">
+    <link rel="stylesheet" href="/styles/holiday.css">
+    <link rel="stylesheet" href="/styles/filt.css">
+    <link rel="stylesheet" href="/styles/sign_in.css">
+    <link rel="icon" type="image/png" href="/img/IT.png?v=777">
+
     <!-- <link rel="stylesheet" href="style.css"> Твой файл стилей -->
 </head>
+
 <body>
     <header class="header-content">
 
 
-<div class="logo">
-    <a href="index.html">
-        <img src="/img/IT.png?v=777" class="logo-icon">
-        <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
-            <span class="logo-neon">INFO</span>TABLE
-        </div>
-    </a>
-</div>
-
-
-
-
- <div class="nav-divider"></div> <!-- ВОТ ОНА -->
-
-    <!-- Кнопка бургер (появится на моилах) -->
-    <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
-        <span></span>
-    </button>
-
-    <nav class="dropdown-menu" id="headerNav">
-        <ul>
-            <li><a href="index.html"><img src="/img/images (1)-Photoroom.png" width="21"></a></li>
-            
-            <li class="dropdown">
-                <div class="dropdown-link-wrapper">
-                    
+        <div class="logo">
+            <a href="index.html">
+                <img src="/img/IT.png?v=777" class="logo-icon">
+                <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
+                    <span class="logo-neon">INFO</span>TABLE
                 </div>
-            
-            </li>
-
-        
-            <li class="dropdown">
-                <div class="dropdown-link-wrapper">
-                    <a href="#">Разработчик</a>
-                    
-                </div>
-                <ul class="dropdown-content">
-                    
-                    <li><a href="https://github.com/Sozdatel1">Github</a></li>
-                    <li><a href="https://github.com/Sozdatel1/Sozdatel1.github.io">Исходный код</a></li>
-                </ul>
-            </li>
-            
-        </ul>
-       
-
-    </nav>
-
-
-            <button onclick="logoutUser()" style="padding: 10px 15px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer;">Выйти</button>
+            </a>
         </div>
-        <button onclick="deleteMyAccount()" style="padding: 10px 15px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-    Удалить аккаунт навсегда
-</button>
-<p>Привет, <span id="username-display" style="font-weight: bold; color: #0044ff;">...</span>!</p>
 
 
-<div id="scrollProgress"></div>
-</header>
 
 
-    <main style="max-width: 1300px; margin: 90px auto 20px auto; padding: 0px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-        
+        <div class="nav-divider"></div> <!-- ВОТ ОНА -->
+
+        <!-- Кнопка бургер (появится на моилах) -->
+        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+            <span></span>
+        </button>
+
+
+        <nav class="dropdown-menu" id="headerNav">
+            <!-- Все элементы должны быть ВНУТРИ одного ul, чтобы работал flex и отступы -->
+            <ul style="display: flex; align-items: center; width: 100%; list-style: none; padding: 0; margin: 0;">
+
+                <!-- 1. Логотип -->
+                <li><a href="index.html"><img src="/img/images (1)-Photoroom.png" width="21"></a></li>
+
+                <!-- 2. Разработчик -->
+                <li class="dropdown" style="position: relative; margin-left: 20px;">
+                    <div class="dropdown-link-wrapper">
+                        <a href="#">Разработчик</a>
+                    </div>
+                    <ul class="dropdown-content">
+                        <li><a href="https://github.com/Sozdatel1">Github</a></li>
+                        <li><a href="https://github.com/Sozdatel1/Sozdatel1.github.io">Исходный код</a></li>
+                    </ul>
+                </li>
+                <!-- Замени div на li, чтобы flex-grow сработал корректно -->
+                <li style="flex-grow: 1;"></li>
+
+
+            </ul>
+        </nav>
+        <!-- 3. Профиль (ТЕПЕРЬ ОН ВНУТРИ UL И ПРИЖАТ ВПРАВО) -->
+        <li class="profile-dropdown"
+            style="margin-left: auto !important; position: relative; list-style: none; background: #41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 30px;">
+            <a href="#" id="profile-trigger"
+                style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
+                <span id="username-display" style="margin-left: auto !important; font-size: 22px;">Загрузка...</span>
+                <!-- Ник будет здесь -->
+            </a>
+
+            <!-- Выпадающее меню -->
+            <ul id="profile-menu"
+                style="display: none; position: absolute; top: 100%; left: 0; background: #7be9ff; min-width: 220px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; z-index: 1000; list-style: none;">
+                <li style="margin-bottom: 20px;">
+                    <a href="profile.html" style="color: #0026ff; text-decoration: none;  background-color: #41cfff; padding: 10px; font-weight: bold;">👤Профиль</a>
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <button onclick="logoutUser()"
+                        style="width: 90%; background: #ff4d4d; color: white; border: none; padding: 10px;  font-size: 15px; border-radius: 4px; cursor: pointer;">Выйти</button>
+                </li>
+                <li>
+                    <button onclick="deleteMyAccount()"
+                        style="width: 100%; background: #990000; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Удалить
+                        аккаунт навсегда</button>
+                </li>
+            </ul>
+        </li>
+
+
+
+        <!-- <button onclick="logoutUser()"
+            style="padding: 10px 15px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer;">Выйти</button>
+        </div>
+        <button onclick="deleteMyAccount()"
+            style="padding: 10px 15px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            Удалить аккаунт навсегда
+        </button>
+        <p>Привет, <span id="username-display" style="font-weight: bold; color: #0044ff;">...</span>!</p> -->
+
+
+        <div id="scrollProgress"></div>
+    </header>
+
+
+    <main
+        style="max-width: 1300px; margin: 90px auto 20px auto; padding: 0px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
         <!-- КОЛОНКА 1: Создание статьи -->
         <div class="glass-card admin-zone" style="height: 300px;">
-        <h2 style="margin: 0;">Напишите свою статью на Info-Table!</h2>
-        <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)...">
-        <input type="text" id="postTitle" placeholder="Заголовок статьи...">
-        <textarea id="postInput" placeholder="Текст статьи..." rows="4"></textarea>
-        <button class="publish-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
-      </div>
+            <h2 style="margin: 0;">Напишите свою статью на Info-Table!</h2>
+            <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)...">
+            <input type="text" id="postTitle" placeholder="Заголовок статьи...">
+            <textarea id="postInput" placeholder="Текст статьи..." rows="4"></textarea>
+            <button class="publish-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
+        </div>
 
         <!-- КОЛОНКА 2: Список моих статей -->
         <section>
             <h1>Мои статьи</h1>
             <div class="tag-filters glass-card">
-        <span
-          style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
-        <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
-        <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
-        <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
-        <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
-        <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+                <span
+                    style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+                <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+                <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+                <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+                <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+                <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
 
-      </div>
-            <div id="dynamic-cards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+            </div>
+            <div id="dynamic-cards"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
                 <!-- Сюда будут рендериться статьи из базы -->
                 <p id="empty-state" style="color: #999;">Вы еще не написали ни одной статьи...</p>
             </div>
         </section>
 
     </main>
-    
+
 
     <!-- Подключаем твою логику (модуль) -->
-    
+
     <script src="/scripts/sweetalert2.all.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script type="module" src="scripts/render.js"></script>
-    <script  src="scripts/header.js"></script>
+    <script src="scripts/header.js"></script>
 </body>
+
 </html>

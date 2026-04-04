@@ -95,3 +95,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+document.addEventListener('click', (e) => {
+    const trigger = document.getElementById('profile-trigger');
+    const menu = document.getElementById('profile-menu');
+
+    // 1. Если нажали на ник — переключаем меню
+    if (e.target === trigger || trigger.contains(e.target)) {
+        e.preventDefault();
+        const isHidden = menu.style.display === 'none' || menu.style.display === '';
+        menu.style.display = isHidden ? 'block' : 'none';
+    } 
+    // 2. Если нажали в любое другое место — закрываем меню
+    else if (menu && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+    }
+});
+
+

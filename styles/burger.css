@@ -166,8 +166,9 @@ body.menu-open {
     /* Убираем маркеры списка */
     margin: 0;
     padding: 0px;
+    display: flex;
     background-color: #ffffff00;
-    overflow: hidden;
+    width: 100%;
     /* font-family: "Rubik Gemstones", system-ui; */
     /* font-family: "Kosugi Maru", sans-serif; */
     /* font-family: "Pacifico", cursive; */
@@ -179,11 +180,12 @@ body.menu-open {
     font-variation-settings: "wdth" 300;
     padding: 0px 0px 0px 0px;
     box-shadow: #0400ff;
+    justify-content: space-between;
 
 }
 
 .dropdown-menu li {
-    float: left;
+    position: relative;
     /* Размещаем пункты меню горизонтально */
     background-color: #f45c5c00;
     color: #000000;
@@ -198,7 +200,7 @@ body.menu-open {
 }
 
 .dropdown-menu li a {
-    display: flex;
+    display: block;
     align-items: center;
     color: rgb(0, 0, 0);
     text-align: center;
@@ -230,13 +232,14 @@ body.menu-open {
 
 /* Стили для выпадающего меню */
 .dropdown-content {
-    display: none;
+    display: none !important;
     position: absolute;
     background-color: #7be9ff !important;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgb(0, 234, 255);
     z-index: 1;
     color: #000;
+    flex-direction: column !important; 
     border-color: #000;
 
 }
@@ -265,7 +268,7 @@ body.menu-open {
 }
 
 .dropdown:hover .dropdown-content {
-    display: block;
+    display: block !important;
 }
 
 /* КОНЕЦ ОБЫЧНЫХ СТИЛЕЙ МЕНЮ */
