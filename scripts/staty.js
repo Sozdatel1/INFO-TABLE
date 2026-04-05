@@ -1,8 +1,51 @@
 
+import { supabase } from './render.js'; // или путь к файлу, где лежит конфиг Supabase
 
 // --------------------------------------------------
 
 // ФАЙЛ В КОТОРОМ ЛОГИКА ЛАЙКОВ И ТОП 3 СТАТЕЙ
+
+window.likePost = async function() {
+    // 1. Получаем ID из URL
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    // Проверка: если ID нет, выходим из функции
+    if (!id || id === "undefined") {
+        console.error("ID статьи не найден в URL!");
+        return;
+    }
+
+    try {
+        // 2. Запрашиваем лайки (используем наш проверенный ID)
+        const { data: article, error: getError } = await supabase
+            .from('articles')
+            .select('likes')
+            .eq('id', id) // Здесь теперь точно будет UUID, а не undefined
+            .single();
+
+        if (getError) throw getError;
+
+        const currentLikes = article.likes || 0;
+
+        // 3. Обновляем
+        const { error: updateError } = await supabase
+            .from('articles')
+            .update({ likes: currentLikes + 1 })
+            .eq('id', id);
+
+        if (updateError) throw updateError;
+
+        // 4. Обновляем интерфейс
+        const likesSpan = document.getElementById('artLikes');
+        if (likesSpan) {
+            likesSpan.innerText = currentLikes + 1;
+        }
+
+    } catch (err) {
+        console.error("Ошибка при лайке:", err.message);
+    }
+};
 
 
 

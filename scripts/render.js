@@ -161,7 +161,7 @@ export function renderFilteredPosts(postsToRender, append = false) {
 const { createClient } = window.supabase;
 
 // 1. НАСТРОЙКА (Вставь свои данные из Settings -> API)
-const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co', 'sb_publishable_U38NKz2Gg_btgccNGzIDCA_ynTC9x7q')
+export const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co', 'sb_publishable_U38NKz2Gg_btgccNGzIDCA_ynTC9x7q')
 
 // --- АВТОРИЗАЦИЯ (НИК + ПАРОЛЬ) ---
 
@@ -196,11 +196,12 @@ export async function loadPosts() {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-
+        window.allPostsData = data; 
         // Передаем данные в твои родные функции отрисовки
         if (typeof renderFilteredPosts === 'function') renderFilteredPosts(data);
         if (typeof renderTrending === 'function') renderTrending(data);
         if (typeof updateHubStats === 'function') updateHubStats(data);
+        
 
     } catch (err) {
         console.error("Ошибка загрузки:", err.message);
@@ -258,15 +259,19 @@ export async function loadFullArticle() {
         // Твои переменные из старого кода
         document.getElementById('artTitle').innerText = article.title;
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
-
+        const likesSpan = document.getElementById('artLikes');
+        if (likesSpan) {
+            // Если в базе 0 или NULL, показываем 0
+            likesSpan.innerText = article.likes || 0; 
+        }
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
             imgTag.src = article.image;
             imgTag.style.display = 'block';
         }
         if (document.getElementById('avtor')) {
-    document.getElementById('avtor').innerText = article.author_name || "Аноним";
-}
+            document.getElementById('avtor').innerText = article.author_name || "Аноним";
+        }
 
         // const delArt = document.getElementById('delete-art');
         // if (delArt) {
@@ -306,9 +311,18 @@ export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
-
+    if (!title || !text) {
+        return Swal.fire({
+            title: "Заполни поля!",
+            text: "Статья не может быть без заголовка или текста.",
+            icon: "warning",
+            confirmButtonColor: "#ff8000"
+        });
+    }
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return Swal.fire("Ошибка", "Войди в аккаунт!", "error");
+    if (!user) {
+        openAuthModal()
+    };
     const generatedName = user.email.split('@')[0];
 
     let response; // Создаем переменную для результата
@@ -355,15 +369,15 @@ export async function publishPost() {
 }
 
 
-// 5. ЛАЙКИ
-export async function likePost(id) {
-    const { data } = await supabase.from('articles').select('likes').eq('id', id).single();
-    const newLikes = (data.likes || 0) + 1;
-    await supabase.from('articles').update({ likes: newLikes }).eq('id', id);
+// // 5. ЛАЙКИ
+// export async function likePost(id) {
+//     const { data } = await supabase.from('articles').select('likes').eq('id', id).single();
+//     const newLikes = (data.likes || 0) + 1;
+//     await supabase.from('articles').update({ likes: newLikes }).eq('id', id);
 
-    const likeSpan = document.getElementById('artLikes');
-    if (likeSpan) likeSpan.innerText = newLikes;
-}
+//     const likeSpan = document.getElementById('artLikes');
+//     if (likeSpan) likeSpan.innerText = newLikes;
+// }
 
 
 let isRegMode = false;
@@ -428,13 +442,17 @@ window.addEventListener('click', (e) => {
 async function updateAuthUI() {
     const loginBtn = document.getElementById('login-btn');
     const profileBtn = document.getElementById('profile-btn');
-
+    const usernameDisplay = document.getElementById('username-display');
     // Если кнопок нет на текущей странице, прерываем функцию
     if (!loginBtn && !profileBtn) return;
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
+
+        if (usernameDisplay) {
+            usernameDisplay.innerText = user.email.split('@')[0];
+        }
         loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
     } else {
@@ -631,12 +649,12 @@ window.deletePost = async function (postId) {
 }
 
 // 2. ФУНКЦИИ МОДАЛЬНОГО ОКНА
-window.openEditModal = async function(id) {
+window.openEditModal = async function (id) {
     window.currentEditId = id;
-    
+
     // Загружаем актуальные данные перед открытием
     const { data: article } = await supabase.from('articles').select('*').eq('id', id).single();
-    
+
     if (article) {
         document.getElementById('editTitle').value = article.title;
         document.getElementById('editText').value = article.text;
@@ -645,12 +663,12 @@ window.openEditModal = async function(id) {
     }
 };
 
-window.closeEditModal = function() {
+window.closeEditModal = function () {
     document.getElementById('edit-modal').style.display = 'none';
     document.body.style.overflow = 'auto'; // Возвращаем скролл
 };
 
-window.saveChanges = async function() {
+window.saveChanges = async function () {
     const newTitle = document.getElementById('editTitle').value;
     const newText = document.getElementById('editText').value;
 
@@ -669,13 +687,13 @@ window.saveChanges = async function() {
             .from('articles')
             .update({ title: newTitle, text: newText })
             .eq('id', window.currentEditId)
-            .select(); 
+            .select();
 
         if (error) throw error;
 
         // 3. Если data пустая — значит RLS заблокировал обновление
         if (!data || data.length === 0) {
-            return Swal.fire("Доступ запрещен", "У вас нет прав на редактирование этой статьи в Supabase (проверьте RLS Policies)", "error");
+            return Swal.fire("Доступ запрещен", "У вас нет прав на редактирование этой статьи.", "error");
         }
 
         await Swal.fire({
@@ -684,8 +702,8 @@ window.saveChanges = async function() {
             timer: 1500,
             showConfirmButton: false
         });
-        
-        location.reload(); 
+
+        location.reload();
     } catch (err) {
         Swal.fire("Ошибка", err.message, "error");
         console.error("Ошибка при сохранении:", err);

@@ -24,4 +24,5 @@ if (document.getElementById('dynamic-cards')) {
     console.log("Загружаем ленту постов...");
     await loadPosts();
 
+
 }

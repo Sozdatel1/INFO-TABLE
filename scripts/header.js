@@ -36,17 +36,7 @@ if (header) {
             </li>
 
         
-            <li class="dropdown">
-                <div class="dropdown-link-wrapper">
-                    <a href="#">Разработчик</a>
-                    
-                </div>
-                <ul class="dropdown-content">
-                    
-                    <li><a href="https://github.com/Sozdatel1">Github</a></li>
-                    <li><a href="https://github.com/Sozdatel1/Sozdatel1.github.io">Исходный код</a></li>
-                </ul>
-            </li>
+            
             
         </ul>
        
@@ -58,10 +48,38 @@ if (header) {
 <button id="login-btn" onclick="openAuthModal()">Войти</button>
 
 <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
-<button id="profile-btn" style="display: none;" onclick="goToProfile()">Профиль</button>
+<button id="profile-btn" style="display: none; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a href="profile.html"
+                            style="color: #000000; text-decoration: none;  background-color: #41d0ff00;"  onclick="goToProfile()">Профиль</button>
 
 
+<li class="profile-bth"
+            style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 30px; display: none;">
+            <a href="#" id="profile-trigger"
+                style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
+                <span id="username-display" style="margin-left: auto !important; font-size: 22px;">Загрузка...</span>
+                <!-- Ник будет здесь -->
+            </a>
 
+            <!-- Выпадающее меню -->
+            <ul id="profile-menu"
+                style="display: none; position: absolute; top: 100%; left: 0; background: #ffffff; min-width: 220px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; z-index: 1000; list-style: none;">
+                <li style="margin-bottom: 1px;">
+                    <button style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a href="profile.html"
+                            style="color: #000000; text-decoration: none;  background-color: #41d0ff00;">Профиль</a></button>
+                </li>
+                <hr>
+                <li style="margin-bottom: 1px;">
+                    <button onclick="logoutUser()"
+                        style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;">Выйти</button>
+                </li>
+                <hr>
+                <li>
+                    <button onclick="deleteMyAccount()"
+                        style="width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;">Удалить
+                        аккаунт</button>
+                </li>
+            </ul>
+        </li>
 
 
 <div id="scrollProgress"></div>
@@ -69,6 +87,8 @@ if (header) {
 
 `
 }
+
+
 document.addEventListener('DOMContentLoaded', () => {
     let lastScrollTop = 0;
     const header = document.querySelector('.header-content');
