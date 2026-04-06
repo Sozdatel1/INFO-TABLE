@@ -16,8 +16,95 @@
 
 <body>
 
-    <div id="header"></div>
-    <div id="scrollProgress"></div>
+    <header class="header-content">
+
+
+        <div class="logo">
+            <a href="index.html">
+                <img src="/img/IT.png?v=777" class="logo-icon">
+                <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
+                    <span class="logo-neon">Kapi</span>TABLE
+                </div>
+            </a>
+        </div>
+
+
+
+
+        <div class="nav-divider"></div> <!-- ВОТ ОНА -->
+
+        <!-- Кнопка бургер (появится на моилах) -->
+        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+            <span></span>
+        </button>
+
+        <nav class="dropdown-menu" id="headerNav">
+            <ul>
+                <li><a href="index.html"><img src="/img/images (1)-Photoroom.png" width="21"></a></li>
+
+                <li class="dropdown">
+                    <div class="dropdown-link-wrapper">
+
+                    </div>
+
+                </li>
+
+
+
+
+            </ul>
+
+
+        </nav>
+
+
+        <!-- Кнопка "Войти" (по умолчанию видна) -->
+        <button id="login-btn"
+            style="padding: 11px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); border-radius: 30px; display: none; border: none; font-size: 17px; color: #ffffff; font-weight: bold; cursor: pointer;"
+            onclick="openAuthModal()">Войти</button>
+
+        <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
+        <!-- <button id="profile-btn"
+      style="display: none; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
+        href="profile.html" style="color: #000000; text-decoration: none;  background-color: #41d0ff00;"
+        onclick="goToProfile()">Профиль</button> -->
+
+
+        <li class="profile-menu" id="profile-btn"
+            style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 30px; display: none;">
+            <a href="#" id="profile-trigger"
+                style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
+                <span id="username-display" style="margin-left: auto !important; font-size: 22px;">Загрузка...</span>
+                <!-- Ник будет здесь -->
+            </a>
+
+            <!-- Выпадающее меню -->
+            <ul id="profile-menu"
+                style="display: none; position: absolute; top: 100%; left: 0; background: #ffffff; min-width: 220px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; z-index: 1000; list-style: none;">
+                <li style="margin-bottom: 1px;">
+                    <button
+                        style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
+                            href="profile.html"
+                            style="color: #000000; text-decoration: none;  background-color: #41d0ff00;">Профиль</a></button>
+                </li>
+                <hr>
+                <li style="margin-bottom: 1px;">
+                    <button onclick="logoutUser()"
+                        style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;">Выйти</button>
+                </li>
+                <hr>
+                <li>
+                    <button onclick="deleteMyAccount()"
+                        style="width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;">Удалить
+                        аккаунт</button>
+                </li>
+            </ul>
+        </li>
+
+
+          <div id="scrollProgress"></div>
+    </header>
+  
 
     <div class="content-stat">
 
@@ -45,7 +132,7 @@
             <!-- Сюда попадет текст из JSON -->
         </p>
         <hr>
-        <div id="likeBtn" onclick="likePost()"style="cursor: pointer; 
+        <div id="likeBtn" onclick="likePost()" style="cursor: pointer; 
 color: #ff8000; 
 font-weight: bold; 
 font-size: 30px;
@@ -62,6 +149,28 @@ margin-right: 30px; background-color: #ff8000;">
                 <img src="/img/staty/thumb_up_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"></span>
             <span id="artLikes">0</span>
         </div>
+
+
+
+        <div id="comments-section" style="margin-top: 50px; border-top: 2px solid #eee; padding-top: 20px;">
+            <h3>💬 Комментарии</h3>
+
+            <!-- Поле ввода -->
+            <div style="margin-bottom: 20px;">
+                <textarea id="commentInput" placeholder="Напишите, что вы думаете о капибарах..."
+                    style="width: 100%; height: 80px; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-family: inherit;"></textarea>
+                <button onclick="sendComment()"
+                    style="margin-top: 10px; background: #007bff; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    Отправить
+                </button>
+            </div>
+
+            <!-- Список комментариев -->
+            <div id="comments-list">
+                <p style="color: gray;">Загрузка обсуждения...</p>
+            </div>
+        </div>
+
 
     </div>
     <div id="edit-modal"

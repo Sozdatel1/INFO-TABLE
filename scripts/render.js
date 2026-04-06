@@ -290,7 +290,7 @@ export async function loadFullArticle() {
         // Показываем кнопки ТОЛЬКО если пользователь залогинен И он автор статьи
         if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
-                <button onclick="openEditModal ('${id}')" style="color: blue;  cursor: pointer; margin-right: 10px;">
+                <button onclick="openEditModal ('${id}')" style="color: blue;  cursor: pointer; margin: 10px; padding: 11px; border: none; border-radius: 20px">
                     Редактировать
                 </button>
                 <button onclick="deletePost('${id}')" style="color: red; cursor: pointer; font-size: 14px;">
@@ -304,6 +304,8 @@ export async function loadFullArticle() {
     } catch (err) {
         console.error('Ошибка:', err.message);
     }
+    loadComments(); // Чтобы комменты подгружались вместе со статьей
+
 }
 
 // 4. ПУБЛИКАЦИЯ (С твоими переменными)
