@@ -296,7 +296,7 @@ window.isClean = function (text) {
 // }
 
 // Делаем функцию доступной для HTML
-window.handleSearch = handleSearch;
+
 
 
 // Функция самой фильтрации
