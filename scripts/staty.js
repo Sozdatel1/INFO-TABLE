@@ -268,32 +268,32 @@ window.isClean = function (text) {
 };
 
 
-export function handleSearch(event) {
-    const term = event.target.value.toLowerCase().trim();
+// export function handleSearch(event) {
+//     const term = event.target.value.toLowerCase().trim();
 
-    // 1. Проверяем, есть ли данные для поиска
-    if (!window.allPostsData) {
-        console.warn("Данные еще не загружены!");
-        return;
-    }
+//     // 1. Проверяем, есть ли данные для поиска
+//     if (!window.allPostsData) {
+//         console.warn("Данные еще не загружены!");
+//         return;
+//     }
 
-    // 2. Фильтруем массив по заголовку и тексту
-    const filtered = window.allPostsData.filter(post =>
-        post.title.toLowerCase().includes(term) ||
-        post.text.toLowerCase().includes(term)
-    );
+//     // 2. Фильтруем массив по заголовку и тексту
+//     const filtered = window.allPostsData.filter(post =>
+//         post.title.toLowerCase().includes(term) ||
+//         post.text.toLowerCase().includes(term)
+//     );
 
-    // 3. Вызываем твою функцию отрисовки
-    if (typeof window.renderFilteredPosts === 'function') {
-        window.renderFilteredPosts(filtered, false);
-    }
+//     // 3. Вызываем твою функцию отрисовки
+//     if (typeof window.renderFilteredPosts === 'function') {
+//         window.renderFilteredPosts(filtered, false);
+//     }
 
-    // 4. Если пусто — пишем сообщение
-    const container = document.getElementById('articles-container');
-    if (filtered.length === 0 && container) {
-        container.innerHTML = `<p style="color: #00d4ff; text-align: center; padding: 20px;">Ничего не найдено... 🔍</p>`;
-    }
-}
+//     // 4. Если пусто — пишем сообщение
+//     const container = document.getElementById('articles-container');
+//     if (filtered.length === 0 && container) {
+//         container.innerHTML = `<p style="color: #00d4ff; text-align: center; padding: 20px;">Ничего не найдено... 🔍</p>`;
+//     }
+// }
 
 // Делаем функцию доступной для HTML
 window.handleSearch = handleSearch;

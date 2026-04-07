@@ -165,37 +165,57 @@ export const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co',
 
 // --- АВТОРИЗАЦИЯ (НИК + ПАРОЛЬ) ---
 
+// --- ВХОД ---
 export async function loginUser(username, password) {
-    const email = `${username.toLowerCase()}@app.local`;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const errorDisplay = document.getElementById('auth-error-msg');
+    if (errorDisplay) errorDisplay.innerText = ""; 
 
+    // Сначала проверяем поля, чтобы не слать пустой запрос (избегаем ошибки 400)
     if (!username.trim() || !password.trim()) {
         if (errorDisplay) errorDisplay.innerText = "⚠️ Заполни все поля!";
         return;
     }
+
+    const email = `${username.toLowerCase()}@app.local`;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
     if (error) {
-        if (errorDisplay) {
-            // Если пароль неверный или юзера нет
-            errorDisplay.innerText = "❌ Неверный ник или пароль";
-        }
+        if (errorDisplay) errorDisplay.innerText = "❌ Неверный ник или пароль";
         return;
     }
 
+    location.reload();
+}
+
+// --- РЕГИСТРАЦИЯ ---
+export async function registerUser(username, password) {
+    const regErrorDisplay = document.getElementById('reg-error-msg'); // Сделай отдельный ID для модалки регистрации
+    if (regErrorDisplay) regErrorDisplay.innerText = "";
+
+    if (!username.trim() || !password.trim()) {
+        if (regErrorDisplay) regErrorDisplay.innerText = "⚠️ Заполни все поля!";
+        return;
+    }
+
+    const email = `${username.toLowerCase()}@app.local`;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+        if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${error.message}`;
+        return;
+    }
+
+    // Если всё ок, можно оставить SweetAlert для красоты
+    await Swal.fire({
+        title: "Готово!",
+        text: `Аккаунт ${username} создан`,
+        icon: "success",
+        confirmButtonColor: "#00d4ff"
+    });
     
     location.reload();
 }
 
-// --- РЕГИСТРАЦИЯ (ТОЛЬКО НИК И ПАРОЛЬ) ---
-export async function registerUser(username, password) {
-    const email = `${username.toLowerCase()}@app.local`;
-    const { data, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) return Swal.fire("Ошибка", error.message, "error");
-
-    Swal.fire("Готово!", `Аккаунт ${username} создан`, "success");
-    location.reload();
-    updateAuthUI();
-}
 function handleSearch(event) {
     const term = event.target.value.toLowerCase().trim();
     console.log("Печатаю:", event.target.value); 
@@ -506,11 +526,14 @@ window.toggleModalMode = function () {
 window.handleModalAction = function () {
     const user = document.getElementById('user').value;
     const pass = document.getElementById('pass').value;
-
+    const errorDisplay = document.getElementById('auth-error-msg');
     if (!user || !pass) {
-        return Swal.fire("Ошибка", "Заполните все поля!", "error");
+        if (errorDisplay) {
+            errorDisplay.innerText = "⚠️ Заполните все поля!";
+        }
+        return; 
     }
-
+    if (errorDisplay) errorDisplay.innerText = "";
     if (isRegMode) {
         registerUser(user, pass);
     } else {

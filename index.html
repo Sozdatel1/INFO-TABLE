@@ -244,12 +244,13 @@
       <!-- Поля (используем единые ID для входа и регистрации) -->
       <input type="text" id="user" placeholder="Ваш ник">
       <input type="password" id="pass" placeholder="Пароль">
-      <div id="auth-error-msg" style="color: #ff4141; font-size: 14px; margin-top: 10px; height: 20px; text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);"></div>
+      <div id="auth-error-msg" style="color: #ff4141; font-size: 14px; margin: 10px; height: 25px; text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);"></div>
+      <div id="reg-error-msg"></div>
       <button id="modal-btn" onclick="handleModalAction()">Войти</button>
 
       <p class="modal-switch">
         <span id="modal-switch-text">Еще нет аккаунта?</span>
-        <div id="reg-error-msg"></div>
+        
         <span id="modal-switch-link" onclick="toggleModalMode()">Создать аккаунт</span>
       </p>
     </div>
