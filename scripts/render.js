@@ -169,9 +169,19 @@ export async function loginUser(username, password) {
     const email = `${username.toLowerCase()}@app.local`;
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) return Swal.fire("Ошибка", "Неверный ник или пароль", "error");
+    if (!username.trim() || !password.trim()) {
+        if (errorDisplay) errorDisplay.innerText = "⚠️ Заполни все поля!";
+        return;
+    }
+    if (error) {
+        if (errorDisplay) {
+            // Если пароль неверный или юзера нет
+            errorDisplay.innerText = "❌ Неверный ник или пароль";
+        }
+        return;
+    }
 
-    Swal.fire("Успех!", "Вы вошли в аккаунт", "success");
+    
     location.reload();
 }
 
@@ -186,25 +196,71 @@ export async function registerUser(username, password) {
     location.reload();
     updateAuthUI();
 }
+function handleSearch(event) {
+    const term = event.target.value.toLowerCase().trim();
+    console.log("Печатаю:", event.target.value); 
+    if (!window.allPostsData) return console.warn("Нет данных!");
+
+    // 1. Проверяем, есть ли данные для поиска
+    if (!window.allPostsData) {
+        console.warn("Данные еще не загружены!");
+        return;
+    }
+
+    // 2. Фильтруем массив по заголовку и тексту
+    const filtered = window.allPostsData.filter(post => 
+        post.title.toLowerCase().includes(term) || 
+        post.text.toLowerCase().includes(term)
+    );
+     console.log("Найдено статей:", filtered.length); // Проверка в консоли
+    // 3. Вызываем твою функцию отрисовки
+    if (typeof window.renderFilteredPosts === 'function') {
+        window.renderFilteredPosts(filtered, false);
+    }
+
+    // 4. Если пусто — пишем сообщение
+    const container = document.getElementById('articles-container');
+    if (filtered.length === 0 && container) {
+        container.innerHTML = `<p style="color: #00d4ff; text-align: center; padding: 20px;">Ничего не найдено... 🔍</p>`;
+    }
+}
+
+// Делаем функцию доступной для HTML
+window.handleSearch = handleSearch;
+
 
 // 1. ЗАГРУЗКА ВСЕХ ПОСТОВ (Для ленты)
 export async function loadPosts() {
     try {
+        // Запрашиваем статьи и сразу подтягиваем ID всех связанных комментариев
         const { data, error } = await supabase
             .from('articles')
-            .select('*')
+            .select(`
+                *,
+                comments(id)
+            `)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        window.allPostsData = data; 
-        // Передаем данные в твои родные функции отрисовки
-        if (typeof renderFilteredPosts === 'function') renderFilteredPosts(data);
-        if (typeof renderTrending === 'function') renderTrending(data);
-        if (typeof updateHubStats === 'function') updateHubStats(data);
-        
 
+        // Превращаем массив комментариев в простое число (количество)
+        const processedData = data.map(post => ({
+            ...post,
+            commentCount: post.comments ? post.comments.length : 0
+        }));
+
+        // Сохраняем в глобальную переменную для фильтров
+        window.allPostsData = processedData;
+
+        // Запускаем отрисовку всех блоков на главной
+        if (typeof renderFilteredPosts === 'function') renderFilteredPosts(processedData);
+        if (typeof renderTrending === 'function') renderTrending(processedData);
+        if (typeof updateHubStats === 'function') updateHubStats(processedData);
+        window.allPostsData = data; // СОХРАНЯЕМ ДАННЫЕ В ПАМЯТЬ
+        
+    
     } catch (err) {
-        console.error("Ошибка загрузки:", err.message);
+        console.error("Ошибка загрузки iPosters:", err.message);
     }
 }
 
@@ -262,7 +318,7 @@ export async function loadFullArticle() {
         const likesSpan = document.getElementById('artLikes');
         if (likesSpan) {
             // Если в базе 0 или NULL, показываем 0
-            likesSpan.innerText = article.likes || 0; 
+            likesSpan.innerText = article.likes || 0;
         }
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
@@ -290,15 +346,37 @@ export async function loadFullArticle() {
         // Показываем кнопки ТОЛЬКО если пользователь залогинен И он автор статьи
         if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
-                <button onclick="openEditModal ('${id}')" style="color: blue;  cursor: pointer; margin: 10px; padding: 11px; border: none; border-radius: 20px">
+            <div class="panel" style="display: flex;">
+                <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
+    color: white;
+    border-color: #41cfff;
+    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
                     Редактировать
                 </button>
-                <button onclick="deletePost('${id}')" style="color: red; cursor: pointer; font-size: 14px;">
+
+                <p id="read-time" style="padding: 11px; background: #0019fc;
+    color: white;
+    border-color: #ff4141;
+    box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+        0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px">
+
+        </p>
+                <button onclick="deletePost('${id}')" style="  cursor: pointer; padding: 11px; background: #fc2a00;
+    color: white;
+    border-color: #ff4141;
+    box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
                     Удалить статью
-                </button>`;
+                </button></div>`;
         } else if (delArt) {
             // Если не автор — очищаем контейнер (на всякий случай)
-            delArt.innerHTML = '';
+            delArt.innerHTML = `
+            <p id="read-time" style="padding: 11px; background: #0019fc;
+    color: white;
+    border-color: #ff4141;
+    box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+        0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px"></p>`;
         }
 
     } catch (err) {
@@ -313,6 +391,14 @@ export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
+    if (!window.isClean(title) || !window.isClean(text)) {
+    return Swal.fire({
+        title: "🔒 Цензура iPosters",
+        text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
+        icon: "error",
+        confirmButtonColor: "#00d4ff" // Твой голубой неон
+    });
+}
     if (!title || !text) {
         return Swal.fire({
             title: "Заполни поля!",
@@ -715,3 +801,4 @@ window.saveChanges = async function () {
 window.publishPost = publishPost;
 window.loginUser = loginUser;
 window.registerUser = registerUser;
+window.renderFilteredPosts = renderFilteredPosts;

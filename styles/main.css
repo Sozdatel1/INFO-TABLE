@@ -107,7 +107,7 @@
             left: 50%;
             transform: translateX(-50%);
             align-items: center;
-            border-radius: 50px;
+            border-radius: 30px;
             /* Выравнивает элементы по вертикали по центру */
             gap: 10px;
             /* Добавляет немного пространства между картинкой и текстом */
@@ -177,20 +177,24 @@
         }
 
         .publish-btn {
-            background: #7ffffd;
+            background: #50d3ff;
             border: none;
+            color: white;
+    border-color: #41cfff;
+    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2);
             padding: 15px;
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            width: 80%;
+            width: 70%;
             margin: 0 auto;
         }
 
         .publish-btn:hover {
             transform: scale(1.05);
-            background: #66e0e0;
+            background: #3df27c;
             box-shadow: 0 0 20px rgba(0, 255, 200, 0.5)
         }
 

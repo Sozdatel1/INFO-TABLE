@@ -27,7 +27,7 @@
             <a href="index.html">
                 <img src="/img/IT.png?v=777" class="logo-icon">
                 <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
-                    <span class="logo-neon">INFO</span>TABLE
+                    <span class="logo-neon">i</span>Posters
                 </div>
             </a>
         </div>
@@ -76,12 +76,23 @@
 
             </ul>
         </nav>
+
+
+        <div class="search-container" style=" max-width: 600px; display: flex; gap: 10px; padding: 0 20px;">
+    <input type="text" id="searchInput" placeholder="Поиск на iPosters..." 
+        style="flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; background: transparent; color: #00d4ff;">
+    
+    <button id="searchBtn" style="background: #41cfff; border-color: #41cfff; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;  box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2);">
+        Найти
+    </button>
+</div>
         <!-- 3. Профиль (ТЕПЕРЬ ОН ВНУТРИ UL И ПРИЖАТ ВПРАВО) -->
         <li class="profile-dropdown"
             style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 30px;">
             <a href="#" id="profile-trigger"
                 style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
-                <span id="username-display" style="margin-left: auto !important; font-size: 22px;">Загрузка...</span>
+                <span id="username-display" style="margin-left: auto !important; font-size: 21px;">Загрузка...</span>
                 <!-- Ник будет здесь -->
             </a>
 
@@ -129,7 +140,7 @@
 
         <!-- КОЛОНКА 1: Создание статьи -->
         <div class="glass-card admin-zone" style="height: 300px;">
-            <h2 style="margin: 0;">Напишите свою статью на Info-Table!</h2>
+            <h2 style="margin: 0;">Напишите свою статью на iPosters!</h2>
             <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)...">
             <input type="text" id="postTitle" placeholder="Заголовок статьи...">
             <textarea id="postInput" placeholder="Текст статьи..." rows="4"></textarea>
