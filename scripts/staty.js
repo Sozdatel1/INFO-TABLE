@@ -247,39 +247,39 @@ export function renderTrending(posts) {
     `).join('');
 }
 
-window.isClean = function (text) {
-    if (!text) return true;
+// window.isClean = function (text) {
+//     if (!text) return true;
 
-    // 1. ЖЕСТКИЕ КОРНИ (Ищем везде)
-    const heavyRoots = ['хуй', 'хуя', 'хуе', 'пизд', 'еба', 'бля'];
+//     // 1. ЖЕСТКИЕ КОРНИ (Ищем везде)
+//     const heavyRoots = ['хуй', 'хуя', 'хуе', 'пизд', 'еба', 'бля'];
     
-    // 2. ОБЫЧНЫЕ ОСКОРБЛЕНИЯ (Ищем только как отдельные слова!)
-    const badWords = ['дебил', 'дибил', 'пидор', 'лох', 'чмо', 'ублюдок', 'сука'];
+//     // 2. ОБЫЧНЫЕ ОСКОРБЛЕНИЯ (Ищем только как отдельные слова!)
+//     const badWords = ['дебил', 'дибил', 'пидор', 'лох', 'чмо', 'ублюдок', 'сука'];
 
-    const lowerText = text.toLowerCase();
+//     const lowerText = text.toLowerCase();
     
-    // Проверка 1: Склейка (для мата)
-    const compressed = lowerText.replace(/[^а-яёa-z]/g, '');
+//     // Проверка 1: Склейка (для мата)
+//     const compressed = lowerText.replace(/[^а-яёa-z]/g, '');
     
-    // Исключение для латыни Hydrochoerus (чтобы не путать с "хуе")
-    if (compressed.includes('hydrochoer')) {
-        // Пропускаем проверку тяжелых корней для этого научного термена
-    } else {
-        if (heavyRoots.some(root => compressed.includes(root))) return false;
-    }
+//     // Исключение для латыни Hydrochoerus (чтобы не путать с "хуе")
+//     if (compressed.includes('hydrochoer')) {
+//         // Пропускаем проверку тяжелых корней для этого научного термена
+//     } else {
+//         if (heavyRoots.some(root => compressed.includes(root))) return false;
+//     }
 
-    // Проверка 2: По словам (чтобы "лохматой" и "присущих" прошли)
-    const words = lowerText.replace(/[^а-яёa-z\s]/g, ' ').split(/\s+/);
+//     // Проверка 2: По словам (чтобы "лохматой" и "присущих" прошли)
+//     const words = lowerText.replace(/[^а-яёa-z\s]/g, ' ').split(/\s+/);
     
-    const hasBadWord = words.some(word => {
-        // Проверяем, не является ли всё слово целиком оскорблением
-        return badWords.includes(word);
-    });
+//     const hasBadWord = words.some(word => {
+//         // Проверяем, не является ли всё слово целиком оскорблением
+//         return badWords.includes(word);
+//     });
 
-    if (hasBadWord) return false;
+//     if (hasBadWord) return false;
 
-    return true;
-};
+//     return true;
+// };
 
 
 
