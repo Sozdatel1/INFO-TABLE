@@ -411,14 +411,14 @@ export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
-    if (!window.isClean(title) || !window.isClean(text)) {
-    return Swal.fire({
-        title: "🔒 Цензура iPosters",
-        text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
-        icon: "error",
-        confirmButtonColor: "#00d4ff" // Твой голубой неон
-    });
-}
+//     if (!window.isClean(title) || !window.isClean(text)) {
+//     return Swal.fire({
+//         title: "🔒 Цензура iPosters",
+//         text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
+//         icon: "error",
+//         confirmButtonColor: "#00d4ff" // Твой голубой неон
+//     });
+// }
     if (!title || !text) {
         return Swal.fire({
             title: "Заполни поля!",
