@@ -247,25 +247,42 @@ export function renderTrending(posts) {
     `).join('');
 }
 
-
 window.isClean = function (text) {
     if (!text) return true;
 
-    // 1. Просто добавь новые корни в этот список:
-    const forbiddenRoots = [
-        'хуй', 'хуя', 'пизд', 'еба', 'бля', 'суч',
-        'дебил', 'дибил', 'пидор', 'хер', 'херн',
-        'гавн', 'лох', 'чмо', 'туп', 'сук', 'порн', 'хер', 'убл', 'убь', 'уби', 'хю', 'хир','сос','сас','hyi','porn' // Вот сюда дописывай новые через запятую
-    ];
+    // 1. ЖЕСТКИЕ КОРНИ (Ищем везде)
+    const heavyRoots = ['хуй', 'хуя', 'хуе', 'пизд', 'еба', 'бля'];
+    
+    // 2. ОБЫЧНЫЕ ОСКОРБЛЕНИЯ (Ищем только как отдельные слова!)
+    const badWords = ['дебил', 'дибил', 'пидор', 'лох', 'чмо', 'ублюдок', 'сука'];
 
-    // 2. Склеиваем текст для проверки (убираем пробелы и точки)
-    const cleanText = text.toLowerCase().replace(/[^а-яёa-z]/g, '');
+    const lowerText = text.toLowerCase();
+    
+    // Проверка 1: Склейка (для мата)
+    const compressed = lowerText.replace(/[^а-яёa-z]/g, '');
+    
+    // Исключение для латыни Hydrochoerus (чтобы не путать с "хуе")
+    if (compressed.includes('hydrochoer')) {
+        // Пропускаем проверку тяжелых корней для этого научного термена
+    } else {
+        if (heavyRoots.some(root => compressed.includes(root))) return false;
+    }
 
-    // 3. Проверяем, есть ли хоть один корень в тексте
-    const hasBadWord = forbiddenRoots.some(root => cleanText.includes(root));
+    // Проверка 2: По словам (чтобы "лохматой" и "присущих" прошли)
+    const words = lowerText.replace(/[^а-яёa-z\s]/g, ' ').split(/\s+/);
+    
+    const hasBadWord = words.some(word => {
+        // Проверяем, не является ли всё слово целиком оскорблением
+        return badWords.includes(word);
+    });
 
-    return !hasBadWord;
+    if (hasBadWord) return false;
+
+    return true;
 };
+
+
+
 
 
 // export function handleSearch(event) {
@@ -332,7 +349,7 @@ function runSearch() {
     if (window.renderFilteredPosts) {
         // Передаем TRUE, чтобы функция НЕ обрезала список до 8 штук (displayedCount)
         window.renderFilteredPosts(filtered, true);
-        
+
         // ШАГ 3: Скрываем кнопку "Показать еще", если мы в режиме поиска
         if (loadMoreContainer) {
             loadMoreContainer.style.display = term === "" ? "block" : "none";
