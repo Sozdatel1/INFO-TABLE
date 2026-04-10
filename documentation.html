@@ -7,7 +7,7 @@
   <title>iPosters | Статьи по миру</title>
 
   <link rel="stylesheet" href="/styles/main.css">
-  <link rel="stylesheet" href="/styles/staty.css">
+  <link rel="stylesheet" href="/styles/documentashion.css">
   <link rel="stylesheet" href="/styles/burger.css">
   <link rel="stylesheet" href="/styles/popul.css">
   <link rel="stylesheet" href="/styles/fact.css">
@@ -33,7 +33,7 @@
       <a href="index.html">
         <img src="/img/IT.png?v=777" class="logo-icon">
         <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
-          <span class="logo-neon">i</span>Posters
+          <span class="logo-neon">i</span>Posters | документация
         </div>
       </a>
     </div>
@@ -66,15 +66,7 @@
 
 
     </nav>
-<div class="search-container" style=" max-width: 600px; display: flex; gap: 10px; padding: 0 20px;">
-    <input type="text" id="searchInput" placeholder="Поиск на iPosters..." 
-        style="flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; background: transparent; color: #00d4ff;">
-    
-    <button id="searchBtn" style="background: #41cfff; border-color: #41cfff; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;  box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2);">
-        Найти
-    </button>
-</div>
+
 
 
 
@@ -91,8 +83,7 @@
         onclick="goToProfile()">Профиль</button> -->
 
 
-    <li class="profile-menu" id="profile-btn"
-      style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+    <li class="profile-menu" id="profile-btn" style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
         0 0 5px rgba(0, 255, 65, 0.2); padding: 1px; border-radius: 20px; display: none;">
       <a href="#" id="profile-trigger"
         style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
@@ -124,110 +115,44 @@
     </li>
 
 
-  
+
   </header>
   <!-- <div id="scrollProgress"></div> -->
-  <div id="snow"></div>
-  <div class="main-grid">
+  <!-- <div id="snow"></div> -->
+
+
+  <div class="main-doc">
+
     <!-- ЛЕВАЯ КОЛОНКА -->
-    <aside class="left-sidebar">
-      <div class="glass-card" style="padding: 0px;">
+    <aside class="left-doc">
+      <div class="doc-card admin-zone">
+        <button class="doc-btn" onclick="why(event)" >О чём этот сайт?<span>&#10148;</span></button>
+        <button class="doc-btn" onclick="nachalo(event)">Как мне зарегистрироваться на iPosters?<span>&#10148;</span></button>
+        <button class="doc-btn" onclick="stat(event)">Как мне опубликовать статью?<span>&#10148;</span></button>
+        <!-- <button class="doc-btn" onclick="why(event)">О чём этот сайт?<span>&#10148;</span></button> -->
 
-
-        <!-- <div class="pogoda-mobile">
-          <a id="ms-informer-link-2312b3bf0300f402069ab4ae4b940f7f" class="ms-informer-link"
-            href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
-          <script class="ms-informer-script"
-            src="https://www.meteoservice.ru/informer/script/2312b3bf0300f402069ab4ae4b940f7f"></script>
-        </div> -->
-        <!-- Weather widget by https://www.meteoservice.ru -->
-        <a id="ms-informer-link-a7b7311be5153391379cf97898f4deb3" class="ms-informer-link"
-          href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
-        <script class="ms-informer-script"
-          src="https://www.meteoservice.ru/informer/script/a7b7311be5153391379cf97898f4deb3"></script>
-        <!-- End -->
       </div>
-
-      <div class="glass-card fact-box">
-        <h3>💡 Знаете ли вы?</h3>
-        <p id="random-fact">Загрузка интересного факта...</p>
-        <button onclick="showNextFact()" class="next-fact-btn">Ещё факт</button>
-      </div>
-
-      <div class="glass-card">
-
-        <div id="vacation-timer">Загрузка каникул...</div>
-        <img src="/img/img_stylez/каникулы.png" style="width: 50%; margin-top: 10px;" alt="Каникулы">
-      </div>
-
     </aside>
 
     <!-- ЦЕНТР (ЛЕНТА) -->
-    <main class="articles-feed">
-      <div class="glass-card admin-zone">
-        <h2 style="margin: 0;">Напишите свою статью на iPosters!</h2>
-        <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)...">
-        <input type="text" id="postTitle" placeholder="Заголовок статьи...">
-        <textarea id="postInput" placeholder="Текст статьи..." rows="4"></textarea>
-        <button class="publish-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
+    <main class="doc-feed">
+
+      <div class="doc-card admin-zone">
+        
+        <div id="doc"></div>
       </div>
 
-      <h2 style="margin-left: 10px;">Свежие статьи</h2>
-      <div class="tag-filters glass-card">
-        <span
-          style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
-        <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
-        <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
-        <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
-        <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
-        <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
 
-      </div>
 
-      <div id="dynamic-cards">
-        <!-- Сюда JS загрузит посты -->
-      </div>
 
-      <div id="load-more-container" style="text-align: center; margin: 30px 0;">
-        <button type="button" class="filter-btn active" onclick="loadMore()">
-          ПОКАЗАТЬ ЕЩЕ
-        </button>
 
-      </div>
 
     </main>
+
+
     <!-- ПРАВАЯ КОЛОНКА (ЧАТ) -->
     <aside class="right-sidebar">
-      <div class="glass-card trending-box">
-        <h3>🔥 Популярное</h3>
-        <div id="trending-list">
-          <!-- Сюда JS вставит топ-посты -->
-        </div>
-      </div>
-      <div class="glass-card stats-box">
-        <h3>📊 Статистика</h3>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value" id="stat-posts">0</span>
-            <span class="stat-label">Статей</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value" id="stat-likes">0</span>
-            <span class="stat-label">Лайков</span>
-          </div>
 
-        </div>
-      </div>
-      <div class="glass-card holiday-widget">
-        <div class="calendar-leaf">
-          <div class="leaf-top" id="leaf-month">ФЕВРАЛЬ</div>
-          <div class="leaf-body" id="leaf-day">19</div>
-        </div>
-        <div class="holiday-info">
-          <span class="holiday-label">СЕГОДНЯ:</span>
-          <div id="holiday-text" class="holiday-main"></div>
-        </div>
-      </div>
 
     </aside>
   </div>
@@ -244,13 +169,15 @@
       <!-- Поля (используем единые ID для входа и регистрации) -->
       <input type="text" id="user" placeholder="Ваш ник">
       <input type="password" id="pass" placeholder="Пароль">
-      <div id="auth-error-msg" style="color: #ff4141; font-size: 14px; margin: 10px; height: 25px; text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);"></div>
+      <div id="auth-error-msg"
+        style="color: #ff4141; font-size: 14px; margin: 10px; height: 25px; text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);">
+      </div>
       <div id="reg-error-msg"></div>
       <button id="modal-btn" onclick="handleModalAction()">Войти</button>
 
       <p class="modal-switch">
         <span id="modal-switch-text">Еще нет аккаунта?</span>
-        
+
         <span id="modal-switch-link" onclick="toggleModalMode()">Создать аккаунт</span>
       </p>
     </div>
@@ -273,12 +200,13 @@
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
   <script src="/scripts/sweetalert2.all.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script type="module" src="/scripts/staty.js"></script>
-  <script type="module" src="/scripts/start-api.js"></script>
+
   <script src="/scripts/header.js"></script>
-  <script src="/scripts/statistick.js"></script>
-  <script src="/scripts/fact.js"></script>
+  <script type="module" src="/scripts/documentashion.js"></script>
   <script src="/scripts/main.js"></script>
+<script type="module" src="/scripts/staty.js"></script>
+  <script type="module" src="/scripts/start-api.js"></script>
+
   <!-- 
   
   <script src="/scripts/chat.js"></script>

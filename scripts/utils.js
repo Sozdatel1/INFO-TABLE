@@ -84,7 +84,7 @@ function filterByTag(tag, button) {
     displayedCount = 8;
 
 
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+   document.querySelectorAll('.filt er-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
 
     // Очищаем пришедший тег от решетки (на всякий случай)

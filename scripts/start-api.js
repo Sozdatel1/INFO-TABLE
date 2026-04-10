@@ -4,6 +4,7 @@ import { loadFullArticle } from './render.js';
 import { loadMore } from './utils.js';
 import { calculateReadingTimeStat } from './time-read.js';
 import { loginUser } from './render.js';
+import {why} from './documentashion.js';
 window.publishPost = publishPost;
 window.loadMore = loadMore;
 // Инициализируем глобальные данные
@@ -25,4 +26,7 @@ if (document.getElementById('dynamic-cards')) {
     await loadPosts();
 
 
+}
+if (document.getElementById('doc')) {
+why()
 }

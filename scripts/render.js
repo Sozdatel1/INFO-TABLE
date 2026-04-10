@@ -164,7 +164,14 @@ const { createClient } = window.supabase;
 export const supabase = createClient('https://nwopcdkydnuudovkgvxs.supabase.co', 'sb_publishable_U38NKz2Gg_btgccNGzIDCA_ynTC9x7q')
 
 // --- АВТОРИЗАЦИЯ (НИК + ПАРОЛЬ) ---
+window.openAuthModal = function () {
+    document.getElementById('auth-modal').style.display = 'flex';
+};
 
+// Закрыть модальное окно
+window.closeAuthModal = function () {
+    document.getElementById('auth-modal').style.display = 'none';
+};
 // --- ВХОД ---
 export async function loginUser(username, password) {
     const errorDisplay = document.getElementById('auth-error-msg');
@@ -204,7 +211,7 @@ export async function registerUser(username, password) {
         if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${error.message}`;
         return;
     }
-
+closeAuthModal()
     // Если всё ок, можно оставить SweetAlert для красоты
     await Swal.fire({
         title: "Готово!",
@@ -491,14 +498,7 @@ export async function publishPost() {
 let isRegMode = false;
 
 // Открыть модальное окно
-window.openAuthModal = function () {
-    document.getElementById('auth-modal').style.display = 'flex';
-};
 
-// Закрыть модальное окно
-window.closeAuthModal = function () {
-    document.getElementById('auth-modal').style.display = 'none';
-};
 
 // Переключение между Входом и Регистрацией
 window.toggleModalMode = function () {
