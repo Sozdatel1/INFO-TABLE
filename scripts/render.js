@@ -269,11 +269,17 @@ export async function loadPosts() {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        const { data: allLikes, error: likeError } = await supabase
+            .from('likes')
+            .select('post_id');
+
+        if (likeError) throw likeError;
 
         // Превращаем массив комментариев в простое число (количество)
         const processedData = data.map(post => ({
             ...post,
-            commentCount: post.comments ? post.comments.length : 0
+            commentCount: post.comments ? post.comments.length : 0,
+            real_likes: allLikes.filter(l => l.post_id === post.id).length
         }));
 
         // Сохраняем в глобальную переменную для фильтров
@@ -342,11 +348,24 @@ export async function loadFullArticle() {
         // Твои переменные из старого кода
         document.getElementById('artTitle').innerText = article.title;
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
+        // const likesSpan = document.getElementById('artLikes');
+        // if (likesSpan) {
+        //     // Если в базе 0 или NULL, показываем 0
+        //     likesSpan.innerText = article.likes || 0;
+        // }
+                // --- НОВАЯ ЛОГИКА ЛАЙКОВ ---
+        const { count, error: countError } = await supabase
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', id);
+
         const likesSpan = document.getElementById('artLikes');
         if (likesSpan) {
-            // Если в базе 0 или NULL, показываем 0
-            likesSpan.innerText = article.likes || 0;
+            // Теперь берем count из таблицы likes, а не из поля article.likes
+            likesSpan.innerText = !countError ? (count || 0) : 0;
         }
+        // ---------------------------
+
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
             imgTag.src = article.image;

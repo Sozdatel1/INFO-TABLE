@@ -5,79 +5,128 @@ import { supabase } from './render.js'; // или путь к файлу, где
 
 // ФАЙЛ В КОТОРОМ ЛОГИКА ЛАЙКОВ И ТОП 3 СТАТЕЙ
 
+// window.likePost = async function () {
+//     // 1. Получаем ID из URL
+//     const params = new URLSearchParams(window.location.search);
+//     const id = params.get('id');
+
+//     // Проверка: если ID нет, выходим из функции
+//     if (!id || id === "undefined") {
+//         console.error("ID статьи не найден в URL!");
+//         return;
+//     }
+
+//     try {
+//         if (typeof confetti === 'function') {
+//             confetti({
+//                 particleCount: 2000,    // 5000 — это перебор, 2000 — идеально густо
+//                 spread: 360,
+//                 startVelocity: 1000,      // Взрыв во все стороны
+//                 startVelocity: 40,      // Мощный толчок, чтобы разлетелись дальше
+//                 origin: { x: 0.5, y: 0.4 }, // Чуть выше центра, чтобы летели дольше
+
+//                 // ДОБАВЛЯЕМ ХАОС:
+//                 drift: 0,               // Легкий "ветер" в сторону, чтобы круг ломался
+//                 ticks: 400,             // Частицы живут дольше
+//                 gravity: 0.5,           // Гравитация слабее — они ПАРЯТ, а не падают камнем
+//                 scalar: 1.4,            // Крупные куски радуги
+
+//                 // ВОТ ОНА, РАДУГА:
+//                 colors: [
+//                     '#ff0000', // Красный
+//                     '#ff7f00', // Оранжевый
+//                     '#ffff00', // Желтый
+//                     '#00ff00', // Зеленый
+//                     '#0000ff', // Синий
+//                     '#4b0082', // Индиго
+//                     '#9400d3', // Фиолетовый
+//                     '#ffffff'  // Белый для блеска
+//                 ],
+
+
+//             });
+
+
+//         }
+//         // 2. Запрашиваем лайки (используем наш проверенный ID)
+//         const { data: article, error: getError } = await supabase
+//             .from('articles')
+//             .select('likes')
+//             .eq('id', id) // Здесь теперь точно будет UUID, а не undefined
+//             .single();
+
+//         if (getError) throw getError;
+
+//         const currentLikes = article.likes || 0;
+
+//         // 3. Обновляем
+//         const { error: updateError } = await supabase
+//             .from('articles')
+//             .update({ likes: currentLikes + 1 })
+//             .eq('id', id);
+
+//         if (updateError) throw updateError;
+
+//         // 4. Обновляем интерфейс
+//         const likesSpan = document.getElementById('artLikes');
+//         if (likesSpan) {
+//             likesSpan.innerText = currentLikes + 1;
+//         }
+
+//     } catch (err) {
+//         console.error("Ошибка при лайке:", err.message);
+//     }
+// };
+
 window.likePost = async function () {
-    // 1. Получаем ID из URL
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
 
-    // Проверка: если ID нет, выходим из функции
-    if (!id || id === "undefined") {
-        console.error("ID статьи не найден в URL!");
-        return;
+    if (!id || id === "undefined") return;
+ const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
+     if (likedPosts.includes(id)) {
+        return Swal.fire("Хватит!", "Вы уже поставили лайк этой статье", "info");
     }
-
     try {
+        // 1. Пытаемся поставить лайк (просто добавляем запись)
+        const { error: insertError } = await supabase
+            .from('likes')
+            .insert([{ post_id: id }]);
+
+        // Если юзер не вошел или база запретила — выходим
+        if (insertError) {
+            console.error("Не удалось поставить лайк:", insertError.message);
+            return Swal.fire("Стоп!", "Чтобы лайкать, нужно войти в аккаунт", "warning");
+        }
+
+        // 2. РАДУЖНОЕ КОНФЕТТИ (если лайк прошел)
         if (typeof confetti === 'function') {
             confetti({
-                particleCount: 2000,    // 5000 — это перебор, 2000 — идеально густо
-                spread: 360,
-                startVelocity: 1000,      // Взрыв во все стороны
-                startVelocity: 40,      // Мощный толчок, чтобы разлетелись дальше
-                origin: { x: 0.5, y: 0.4 }, // Чуть выше центра, чтобы летели дольше
-
-                // ДОБАВЛЯЕМ ХАОС:
-                drift: 0,               // Легкий "ветер" в сторону, чтобы круг ломался
-                ticks: 400,             // Частицы живут дольше
-                gravity: 0.5,           // Гравитация слабее — они ПАРЯТ, а не падают камнем
-                scalar: 1.4,            // Крупные куски радуги
-
-                // ВОТ ОНА, РАДУГА:
-                colors: [
-                    '#ff0000', // Красный
-                    '#ff7f00', // Оранжевый
-                    '#ffff00', // Желтый
-                    '#00ff00', // Зеленый
-                    '#0000ff', // Синий
-                    '#4b0082', // Индиго
-                    '#9400d3', // Фиолетовый
-                    '#ffffff'  // Белый для блеска
-                ],
-
-
+                particleCount: 200, // 2000 может тормозить телефон, 200 — супер
+                spread: 160,
+                colors: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#9400d3']
             });
-
-
         }
-        // 2. Запрашиваем лайки (используем наш проверенный ID)
-        const { data: article, error: getError } = await supabase
-            .from('articles')
-            .select('likes')
-            .eq('id', id) // Здесь теперь точно будет UUID, а не undefined
-            .single();
 
-        if (getError) throw getError;
+        // 3. ОБНОВЛЯЕМ ЦИФРУ НА СТРАНИЦЕ
+        // Запрашиваем актуальное количество строк в таблице likes для этого поста
+        const { count, error: countError } = await supabase
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', id);
 
-        const currentLikes = article.likes || 0;
-
-        // 3. Обновляем
-        const { error: updateError } = await supabase
-            .from('articles')
-            .update({ likes: currentLikes + 1 })
-            .eq('id', id);
-
-        if (updateError) throw updateError;
-
-        // 4. Обновляем интерфейс
-        const likesSpan = document.getElementById('artLikes');
-        if (likesSpan) {
-            likesSpan.innerText = currentLikes + 1;
+        if (!countError) {
+            const likesSpan = document.getElementById('artLikes');
+            if (likesSpan) {
+                likesSpan.innerText = count;
+            }
         }
 
     } catch (err) {
         console.error("Ошибка при лайке:", err.message);
     }
+    loadFullArticle()
 };
-
 
 
 
@@ -238,7 +287,7 @@ export function renderTrending(posts) {
         <a href="article.html?id=${post.id}" class="trending-item">
             <div class="trending-info">
                 <span class="trending-title">${index === 0 ? '👑 ' : ''}${post.title}</span>
-                <span class="trending-likes">❤️ ${post.likes || 0}</span>
+                <span class="trending-likes">❤️ ${post.real_likes || 0}</span>
                 
 <span>💬 ${post.commentCount}</span>
 
@@ -252,15 +301,15 @@ export function renderTrending(posts) {
 
 //     // 1. ЖЕСТКИЕ КОРНИ (Ищем везде)
 //     const heavyRoots = ['хуй', 'хуя', 'хуе', 'пизд', 'еба', 'бля'];
-    
+
 //     // 2. ОБЫЧНЫЕ ОСКОРБЛЕНИЯ (Ищем только как отдельные слова!)
 //     const badWords = ['дебил', 'дибил', 'пидор', 'лох', 'чмо', 'ублюдок', 'сука'];
 
 //     const lowerText = text.toLowerCase();
-    
+
 //     // Проверка 1: Склейка (для мата)
 //     const compressed = lowerText.replace(/[^а-яёa-z]/g, '');
-    
+
 //     // Исключение для латыни Hydrochoerus (чтобы не путать с "хуе")
 //     if (compressed.includes('hydrochoer')) {
 //         // Пропускаем проверку тяжелых корней для этого научного термена
@@ -270,7 +319,7 @@ export function renderTrending(posts) {
 
 //     // Проверка 2: По словам (чтобы "лохматой" и "присущих" прошли)
 //     const words = lowerText.replace(/[^а-яёa-z\s]/g, ' ').split(/\s+/);
-    
+
 //     const hasBadWord = words.some(word => {
 //         // Проверяем, не является ли всё слово целиком оскорблением
 //         return badWords.includes(word);
