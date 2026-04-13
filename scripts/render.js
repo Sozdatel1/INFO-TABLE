@@ -175,7 +175,7 @@ window.closeAuthModal = function () {
 // --- ВХОД ---
 export async function loginUser(username, password) {
     const errorDisplay = document.getElementById('auth-error-msg');
-    if (errorDisplay) errorDisplay.innerText = ""; 
+    if (errorDisplay) errorDisplay.innerText = "";
 
     // Сначала проверяем поля, чтобы не слать пустой запрос (избегаем ошибки 400)
     if (!username.trim() || !password.trim()) {
@@ -211,7 +211,7 @@ export async function registerUser(username, password) {
         if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${error.message}`;
         return;
     }
-closeAuthModal()
+    closeAuthModal()
     // Если всё ок, можно оставить SweetAlert для красоты
     await Swal.fire({
         title: "Готово!",
@@ -219,13 +219,37 @@ closeAuthModal()
         icon: "success",
         confirmButtonColor: "#00d4ff"
     });
-    
+
     location.reload();
 }
 
+
+
+// ПРОСМОТРЫ
+
+async function registerView(postId) {
+    try {
+        // Проверяем, вошел ли юзер
+        const { data: { user } } = await supabase.auth.getUser();
+        // Если нет — используем простой фингерпринт (пропсы браузера)
+        const viewerId = user ? user.id : (navigator.userAgent + navigator.language);
+
+        // Отправляем просмотр в базу
+        // Если такой viewer_id уже смотрел этот post_id, база просто выдаст ошибку (и это ок)
+        await supabase
+            .from('views')
+            .insert([{ post_id: postId, viewer_id: viewerId }]);
+
+    } catch (err) {
+        // Ошибку не выводим, чтобы не пугать юзера (дубликаты просмотров нам не важны)
+    }
+}
+
+
+
 function handleSearch(event) {
     const term = event.target.value.toLowerCase().trim();
-    console.log("Печатаю:", event.target.value); 
+    console.log("Печатаю:", event.target.value);
     if (!window.allPostsData) return console.warn("Нет данных!");
 
     // 1. Проверяем, есть ли данные для поиска
@@ -235,11 +259,11 @@ function handleSearch(event) {
     }
 
     // 2. Фильтруем массив по заголовку и тексту
-    const filtered = window.allPostsData.filter(post => 
-        post.title.toLowerCase().includes(term) || 
+    const filtered = window.allPostsData.filter(post =>
+        post.title.toLowerCase().includes(term) ||
         post.text.toLowerCase().includes(term)
     );
-     console.log("Найдено статей:", filtered.length); // Проверка в консоли
+    console.log("Найдено статей:", filtered.length); // Проверка в консоли
     // 3. Вызываем твою функцию отрисовки
     if (typeof window.renderFilteredPosts === 'function') {
         window.renderFilteredPosts(filtered, false);
@@ -274,24 +298,34 @@ export async function loadPosts() {
             .select('post_id');
 
         if (likeError) throw likeError;
-
+        // 3. ДОБАВЬ ЭТОТ ЗАПРОС (загружаем просмотры)
+        const { data: allViews, error: viewError } = await supabase
+            .from('views')
+            .select('post_id');
+        if (viewError) {
+            console.warn("Таблица просмотров не найдена или недоступна");
+        }
         // Превращаем массив комментариев в простое число (количество)
         const processedData = data.map(post => ({
             ...post,
             commentCount: post.comments ? post.comments.length : 0,
-            real_likes: allLikes.filter(l => l.post_id === post.id).length
+            real_likes: allLikes.filter(l => l.post_id === post.id).length,
+            viewCount: allViews ? allViews.filter(v => v.post_id === post.id).length : 0
         }));
 
         // Сохраняем в глобальную переменную для фильтров
-        window.allPostsData = processedData;
+
 
         // Запускаем отрисовку всех блоков на главной
         if (typeof renderFilteredPosts === 'function') renderFilteredPosts(processedData);
         if (typeof renderTrending === 'function') renderTrending(processedData);
         if (typeof updateHubStats === 'function') updateHubStats(processedData);
-        window.allPostsData = data; // СОХРАНЯЕМ ДАННЫЕ В ПАМЯТЬ
-        
-    
+
+        // window.allPostsData = data; // СОХРАНЯЕМ ДАННЫЕ В ПАМЯТЬ
+        window.allPostsData = processedData; // Теперь в фильтрах будут и лайки, и просмотры
+
+
+
     } catch (err) {
         console.error("Ошибка загрузки iPosters:", err.message);
     }
@@ -335,7 +369,7 @@ export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) return;
-
+    registerView(id);
     try {
         const { data: article, error } = await supabase
             .from('articles')
@@ -353,7 +387,7 @@ export async function loadFullArticle() {
         //     // Если в базе 0 или NULL, показываем 0
         //     likesSpan.innerText = article.likes || 0;
         // }
-                // --- НОВАЯ ЛОГИКА ЛАЙКОВ ---
+        // --- НОВАЯ ЛОГИКА ЛАЙКОВ ---
         const { count, error: countError } = await supabase
             .from('likes')
             .select('*', { count: 'exact', head: true })
@@ -374,6 +408,15 @@ export async function loadFullArticle() {
         if (document.getElementById('avtor')) {
             document.getElementById('avtor').innerText = article.author_name || "Аноним";
         }
+        const { count: vCount, error: vError } = await supabase
+            .from('views')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', id);
+        const viwElem = document.getElementById('viw');
+        if (viwElem) {
+            // Берем vCount из таблицы views
+            viwElem.innerHTML = `<span>👁️ ${!vError ? (vCount || 0) : 0}</span>`;
+        }
 
         // const delArt = document.getElementById('delete-art');
         // if (delArt) {
@@ -393,7 +436,8 @@ export async function loadFullArticle() {
         if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
             <div class="panel" style="display: flex;">
-                <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
+                
+            <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
     color: white;
     border-color: #41cfff;
     box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
@@ -414,7 +458,8 @@ export async function loadFullArticle() {
     box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
         0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
                     Удалить статью
-                </button></div>`;
+                </button></div>
+                `;
         } else if (delArt) {
             // Если не автор — очищаем контейнер (на всякий случай)
             delArt.innerHTML = `
@@ -430,21 +475,28 @@ export async function loadFullArticle() {
     }
     loadComments(); // Чтобы комменты подгружались вместе со статьей
 
+
 }
+
+
+
+
+
+
 
 // 4. ПУБЛИКАЦИЯ (С твоими переменными)
 export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
-//     if (!window.isClean(title) || !window.isClean(text)) {
-//     return Swal.fire({
-//         title: "🔒 Цензура iPosters",
-//         text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
-//         icon: "error",
-//         confirmButtonColor: "#00d4ff" // Твой голубой неон
-//     });
-// }
+    //     if (!window.isClean(title) || !window.isClean(text)) {
+    //     return Swal.fire({
+    //         title: "🔒 Цензура iPosters",
+    //         text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
+    //         icon: "error",
+    //         confirmButtonColor: "#00d4ff" // Твой голубой неон
+    //     });
+    // }
     if (!title || !text) {
         return Swal.fire({
             title: "Заполни поля!",
@@ -550,7 +602,7 @@ window.handleModalAction = function () {
         if (errorDisplay) {
             errorDisplay.innerText = "⚠️ Заполните все поля!";
         }
-        return; 
+        return;
     }
     if (errorDisplay) errorDisplay.innerText = "";
     if (isRegMode) {

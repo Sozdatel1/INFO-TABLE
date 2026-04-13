@@ -84,37 +84,50 @@ window.likePost = async function () {
 
     if (!id || id === "undefined") return;
 
-    // 1. Проверяем локальную память
-    const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
-    if (likedPosts.includes(id)) {
-        return Swal.fire("Хватит!", "Вы уже поставили лайк этой статье", "info");
-    }
-
     try {
-        // 2. Попытка лайка
+        // Проверяем статус пользователя
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // --- 1. ПРОВЕРКА ДЛЯ АНОНИМОВ (LocalStorage) ---
+        if (!user) {
+            const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
+            if (likedPosts.includes(id)) {
+                return Swal.fire("Хватит!", "Анонимам можно лайкать только один раз", "info");
+            }
+        }
+
+        // --- 2. ОТПРАВКА В БАЗУ ---
         const { error: insertError } = await supabase
             .from('likes')
             .insert([{ post_id: id }]);
 
         if (insertError) {
+            // Ошибка 23505 — это нарушение UNIQUE (юзер уже лайкал)
+            if (insertError.code === '23505') {
+                return Swal.fire("Упс!", "Вы уже поставили лайк этому посту", "info");
+            }
             console.error("Ошибка базы:", insertError.message);
-            // Если ты настроил RLS для анонимов, эта ошибка пропадет
-            return Swal.fire("Упс!", "Не удалось поставить лайк. Попробуйте позже.", "error");
+            return Swal.fire("Ошибка", "Не удалось засчитать лайк", "error");
         }
 
-        // --- ВАЖНО: ЗАПОМИНАЕМ ЛАЙК ---
-        likedPosts.push(id);
-        localStorage.setItem('my_likes', JSON.stringify(likedPosts));
-        // ------------------------------
+        // --- 3. СОХРАНЯЕМ МЕТКУ (Только если аноним) ---
+        if (!user) {
+            const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
+            likedPosts.push(id);
+            localStorage.setItem('my_likes', JSON.stringify(likedPosts));
+        }
 
+        // --- 4. ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ---
         if (typeof confetti === 'function') {
             confetti({
-                particleCount: 200,
-                spread: 160,
-                colors: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#9400d3']
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.7 },
+                colors: ['#ff0000', '#41cfff', '#ffffff']
             });
         }
 
+        // --- 5. ОБНОВЛЕНИЕ СЧЕТЧИКА ---
         const { count, error: countError } = await supabase
             .from('likes')
             .select('*', { count: 'exact', head: true })
@@ -122,14 +135,14 @@ window.likePost = async function () {
 
         if (!countError) {
             const likesSpan = document.getElementById('artLikes');
-            if (likesSpan) likesSpan.innerText = count;
+            if (likesSpan) likesSpan.innerText = count || 0;
         }
 
     } catch (err) {
-        console.error("Критическая ошибка:", err.message);
+        console.error("Ошибка в функции likePost:", err.message);
     }
-    // loadFullArticle() - УДАЛИ ЭТУ СТРОКУ, она вызывает ошибку
 };
+
 
 
 
@@ -284,7 +297,7 @@ export function renderTrending(posts) {
 
     // Сортируем по лайкам и берем первые 3
     const topPosts = [...posts]
-        .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+        .sort((a, b) => (b.real_likes || 0) - (a.real_likes || 0))
         .slice(0, 3);
 
     trendingList.innerHTML = topPosts.map((post, index) => `
@@ -294,6 +307,7 @@ export function renderTrending(posts) {
                 <span class="trending-likes">❤️ ${post.real_likes || 0}</span>
                 
 <span>💬 ${post.commentCount}</span>
+<span>👁️ ${post.viewCount || 0}</span>
 
             </div>
         </a>
