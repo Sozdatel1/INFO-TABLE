@@ -83,33 +83,38 @@ window.likePost = async function () {
     const id = params.get('id');
 
     if (!id || id === "undefined") return;
- const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
-     if (likedPosts.includes(id)) {
+
+    // 1. Проверяем локальную память
+    const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
+    if (likedPosts.includes(id)) {
         return Swal.fire("Хватит!", "Вы уже поставили лайк этой статье", "info");
     }
+
     try {
-        // 1. Пытаемся поставить лайк (просто добавляем запись)
+        // 2. Попытка лайка
         const { error: insertError } = await supabase
             .from('likes')
             .insert([{ post_id: id }]);
 
-        // Если юзер не вошел или база запретила — выходим
         if (insertError) {
-            console.error("Не удалось поставить лайк:", insertError.message);
-            return Swal.fire("Стоп!", "Чтобы лайкать, нужно войти в аккаунт", "warning");
+            console.error("Ошибка базы:", insertError.message);
+            // Если ты настроил RLS для анонимов, эта ошибка пропадет
+            return Swal.fire("Упс!", "Не удалось поставить лайк. Попробуйте позже.", "error");
         }
 
-        // 2. РАДУЖНОЕ КОНФЕТТИ (если лайк прошел)
+        // --- ВАЖНО: ЗАПОМИНАЕМ ЛАЙК ---
+        likedPosts.push(id);
+        localStorage.setItem('my_likes', JSON.stringify(likedPosts));
+        // ------------------------------
+
         if (typeof confetti === 'function') {
             confetti({
-                particleCount: 200, // 2000 может тормозить телефон, 200 — супер
+                particleCount: 200,
                 spread: 160,
                 colors: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#9400d3']
             });
         }
 
-        // 3. ОБНОВЛЯЕМ ЦИФРУ НА СТРАНИЦЕ
-        // Запрашиваем актуальное количество строк в таблице likes для этого поста
         const { count, error: countError } = await supabase
             .from('likes')
             .select('*', { count: 'exact', head: true })
@@ -117,16 +122,15 @@ window.likePost = async function () {
 
         if (!countError) {
             const likesSpan = document.getElementById('artLikes');
-            if (likesSpan) {
-                likesSpan.innerText = count;
-            }
+            if (likesSpan) likesSpan.innerText = count;
         }
 
     } catch (err) {
-        console.error("Ошибка при лайке:", err.message);
+        console.error("Критическая ошибка:", err.message);
     }
-    loadFullArticle()
+    // loadFullArticle() - УДАЛИ ЭТУ СТРОКУ, она вызывает ошибку
 };
+
 
 
 
