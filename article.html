@@ -6,11 +6,12 @@
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="/styles/content.css">
     <link rel="stylesheet" href="/styles/burger.css">
-  
+
     <link rel="stylesheet" href="/styles/top.css">
     <link rel="stylesheet" href="/styles/scroll.css">
     <link rel="stylesheet" href="/styles/like.css">
     <link rel="stylesheet" href="/styles/sign_in.css">
+    <link rel="stylesheet" href="/styles/spinner.css">
     <link rel="icon" href="/img/IT.png" type="image/png">
     <title>Статья | iPosters</title>
 </head>
@@ -122,9 +123,27 @@
 
         <img id="artImage" src="" alt="photo"
             style="display: none; width: 100%; border-radius: 10px; margin-bottom: 20px;">
-        <p>Автор: <span id="avtor" style="font-weight: bold; color: #000000;">Загрузка...</span> Просмотров: <span id="viw" style="font-weight: bold; color: #000000;">Загрузка...</span></p>
 
-        <h1 id="artTitle">Загрузка...</h1>
+        <p>Автор:
+            <span id="avtor" style="font-weight: bold; color: #000000;">
+                <span class="spinner"></span>
+
+            </span> | Просмотров:
+
+            <span id="viw" style="font-weight: bold; color: #000000;"><span class="spinner"></span> </span>
+        </p>
+
+        <h1 id="artTitle">Загрузка заголовка...<span class="spinner" style="
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(0, 255, 0, 0.1); /* Тусклый зеленый фон */
+  border-top: 2px solid #41cfff;/* Яркий неоновый верх */
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite; /* Заставляем крутиться */
+  vertical-align: middle;
+  margin-left: 5px;
+"></span> </h1>
 
 
 
@@ -133,10 +152,28 @@
 
         <hr>
         <p id="artText" style="font-size: 20px;
-  text-align: left;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 1 !important;">
-            <!-- Сюда попадет текст из JSON -->
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: 1 !important;">
+
+
+            <span class="spinner" style="
+  width: 55px !important;
+  height: 55px !important;
+  border: 2px solid rgba(0, 255, 0, 0.1); /* Тусклый зеленый фон */
+  border-top: 2px solid #41cfff !important; /* Яркий неоновый верх */
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite; /* Заставляем крутиться */
+  vertical-align: middle;
+  margin-left: 5px;
+
+/* Анимация вращения */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+"></span>
         </p>
         <hr>
         <div id="likeBtn" onclick="likePost()" style="cursor: pointer; 
@@ -155,7 +192,7 @@ padding: 8px 12px 8px 12px;
 margin-right: 30px; background-color: #ff8000;">
                 <img src="/img/staty/thumb_up_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg"></span>
             <span id="artLikes">0</span>
-            
+
         </div>
 
 

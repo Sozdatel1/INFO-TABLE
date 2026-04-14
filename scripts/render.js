@@ -415,7 +415,7 @@ export async function loadFullArticle() {
         const viwElem = document.getElementById('viw');
         if (viwElem) {
             // Берем vCount из таблицы views
-            viwElem.innerHTML = `<span>👁️ ${!vError ? (vCount || 0) : 0}</span>`;
+            viwElem.innerHTML = `<span> ${!vError ? (vCount || 0) : 0}</span>`;
         }
 
         // const delArt = document.getElementById('delete-art');

@@ -1,5 +1,6 @@
 /* КОНТЕЙНЕР ТОПА */
 .trending-box {
+
     padding: 20px;
     border-left: 4px solid #41cfff;
     /* Голубая полоска как у скролла */
@@ -13,7 +14,9 @@
     letter-spacing: 1px;
     color: #333;
 }
-
+.stat {
+    display: flex;
+}
 /* ЭЛЕМЕНТ СПИСКА */
 .trending-item {
     display: block;
@@ -25,7 +28,7 @@
     /* Полупрозрачный фон */
     border-radius: 10px;
     transition: all 0.3s ease;
-    border: 1px solid transparent;
+    border: 1px solid rgb(220, 220, 220);
 }
 
 .trending-item:hover {
@@ -38,7 +41,7 @@
 
 /* ИНФОРМАЦИЯ ВНУТРИ */
 .trending-info {
-    display: flex;
+    display: flex ;
     flex-direction: column;
     /* Текст над лайками */
     gap: 5px;
@@ -63,6 +66,8 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    margin: 5px auto;
+
 }
 
 /* Номер или корона для ТОП-1 */

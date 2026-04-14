@@ -304,11 +304,14 @@ export function renderTrending(posts) {
         <a href="article.html?id=${post.id}" class="trending-item">
             <div class="trending-info">
                 <span class="trending-title">${index === 0 ? '👑 ' : ''}${post.title}</span>
+            
+                <div class="stat">
                 <span class="trending-likes">❤️ ${post.real_likes || 0}</span>
                 
-<span>💬 ${post.commentCount}</span>
-<span>👁️ ${post.viewCount || 0}</span>
+<span style="margin: 5px auto">💬 ${post.commentCount}</span>
 
+<span style="margin: 5px auto">👁️ ${post.viewCount || 0}</span>
+</div>
             </div>
         </a>
     `).join('');
