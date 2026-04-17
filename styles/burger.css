@@ -78,6 +78,73 @@
     .menu-toggle {
         display: block;
     }
+.logo {
+    display: none;
+}
+.nav-divider {
+    display: none;
+}
+
+
+
+
+      /* Скрываем десктопный поиск */
+    #desktopSearchBox {
+        display: none !important;
+    }
+
+    /* Показываем и стилизуем кнопку-лупу */
+    .search-toggle {
+        display: flex !important; /* Показываем лупу */
+        background-color: #41cfff !important;
+        border-radius: 50px;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        order: 2; /* Порядок в ряду */
+    }
+
+    /* Имя профиля (чтобы не сжималось) */
+    .user-name { 
+        order: 1;
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Бургер */
+    .burger-menu { order: 3; }
+
+    /* 2. Стиль выпадающего окна поиска */
+    .search-dropdown {
+        display: none; /* Скрыто по умолчанию, JS переключит на block */
+        position: absolute;
+        top: 100%; /* Выезжает сразу под хедером */
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: #000; /* Фон под цвет сайта */
+        padding: 15px;
+        border-bottom: 2px solid #41cfff;
+        z-index: 999;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Инпут внутри выпадашки */
+    .search-dropdown input {
+        width: 100%;
+        padding: 12px;
+        background: #111;
+        border: 1px solid #00d4ff;
+        border-radius: 10px;
+        color: #fff;
+        outline: none;
+    }
+
+
+
+
 
     .dropdown-menu {
         position: fixed;

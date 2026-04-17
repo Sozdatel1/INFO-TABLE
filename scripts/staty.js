@@ -386,25 +386,27 @@ export function renderTrending(posts) {
 
 
 
-// Функция самой фильтрации
-// Функция поиска для iPosters
-function runSearch() {
-    const input = document.getElementById('searchInput');
-    const grid = document.getElementById('dynamic-cards'); // Контейнер твоих карточек
-    const loadMoreContainer = document.getElementById('load-more-container');
 
+function runSearch(el) {
+    // Исправлено: берем или переданный элемент (this), или активный инпут
+    const input = el || document.activeElement;
+    const grid = document.getElementById('dynamic-cards');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const result = document.getElementById('result');
+    const filters = document.getElementById('tag'); // или твой ID фильтров
     if (!input || !grid) return;
+
 
     const term = input.value.toLowerCase().trim();
     console.log("🔍 Ищем на iPosters:", term);
-
-    // Проверяем, загружены ли данные ( window.allPostsData )
+    if (filters) {
+        filters.style.display = term === "" ? "block" : "none";
+    }
     if (!window.allPostsData) {
         console.error("Данные еще не загружены в window.allPostsData");
         return;
     }
 
-    // Фильтруем данные по заголовку и тексту
     const filtered = window.allPostsData.filter(post =>
         (post.title && post.title.toLowerCase().includes(term)) ||
         (post.text && post.text.toLowerCase().includes(term))
@@ -412,22 +414,21 @@ function runSearch() {
 
     console.log("✅ Найдено статей:", filtered.length);
 
-    // ШАГ 1: Вручную очищаем грид, чтобы старые статьи исчезли
     grid.innerHTML = '';
 
-    // ШАГ 2: Вызываем отрисовку
     if (window.renderFilteredPosts) {
-        // Передаем TRUE, чтобы функция НЕ обрезала список до 8 штук (displayedCount)
         window.renderFilteredPosts(filtered, true);
 
-        // ШАГ 3: Скрываем кнопку "Показать еще", если мы в режиме поиска
         if (loadMoreContainer) {
             loadMoreContainer.style.display = term === "" ? "block" : "none";
         }
+        // Обновляем заголовок, если он есть
+        if (result) {
+            result.innerHTML = term === "" ? "Мои статьи" : `Результаты поиска для "${term}":`;
+        }
     }
 
-    // Если ничего не нашли - выводим неоновую заглушку
-    if (filtered.length === 0) {
+    if (filtered.length === 0 && term !== "") {
         grid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #00d4ff;">
                 <span style="font-size: 40px;">🛸</span>
@@ -436,17 +437,32 @@ function runSearch() {
         `;
     }
 }
+// Присваиваем функцию без скобок, чтобы она не запускалась сама
+window.runSearch = runSearch;
 
-// Привязываем события после загрузки страницы
+
 document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('searchInput');
-    const btn = document.getElementById('searchBtn');
+    const toggleBtn = document.getElementById('searchToggle');
+    const mobileBox = document.getElementById('mobileSearchBox');
 
-    if (input) {
-        input.addEventListener('input', runSearch); // Поиск при вводе
+    if (toggleBtn && mobileBox) {
+        toggleBtn.onclick = function (e) {
+            e.stopPropagation();
+            // Проверяем через стиль: если скрыт — показываем
+            const isHidden = mobileBox.style.display === 'none';
+            mobileBox.style.display = isHidden ? 'block' : 'none';
+
+            if (isHidden) {
+                const inp = mobileBox.querySelector('input');
+                if (inp) inp.focus();
+            }
+        };
     }
-    if (btn) {
-        btn.addEventListener('click', runSearch); // Поиск при клике на кнопку
-    }
+
+    // Закрываем мобильный поиск, если кликнули мимо
+    document.addEventListener('click', (e) => {
+        if (mobileBox && !mobileBox.contains(e.target) && e.target.id !== 'searchToggle') {
+            mobileBox.style.display = 'none';
+        }
+    });
 });
-

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | iPosters</title>
     <link rel="stylesheet" href="/styles/main.css">
-    
+
     <link rel="stylesheet" href="/styles/burger.css">
     <link rel="stylesheet" href="/styles/popul.css">
     <link rel="stylesheet" href="/styles/fact.css">
@@ -76,19 +76,29 @@
             </ul>
         </nav>
 
+        <!-- <div class="search-container" style=" width: 100%; display: flex; gap: 10px; padding: 0 20px;">
+            <button class="search-toggle" id="searchToggle" style="display: none;">🔍</button>
 
-        <div class="search-container" style=" max-width: 600px; display: flex; gap: 10px; padding: 0 20px;">
-    <input type="text" id="searchInput" placeholder="Поиск на iPosters..." 
-        style="flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; background: transparent; color: #00d4ff;">
-    
-    <button id="searchBtn" style="background: #41cfff; border-color: #41cfff; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;  box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+            <div class="search-dropdown" id="searchBox" style="display: none;">
+                <input type="text" id="searchInput" placeholder="Что ищем?.." oninput="runSearch()">
+            </div>
+            <div class="search-box" id="searchBox">
+                <input type="text" id="searchInput" placeholder="Поиск на iPosters..."oninput="runSearch()"
+                    style="flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; background: transparent; color: #00d4ff;">
+
+                <button id="searchBtn" style="background: #41cfff; border-color: #41cfff; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;  box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
         0 0 5px rgba(0, 255, 65, 0.2);">
-        Найти
-    </button>
-</div>
+                    Найти
+                </button>
+            </div>
+        </div> -->
+
+
+
+
         <!-- 3. Профиль (ТЕПЕРЬ ОН ВНУТРИ UL И ПРИЖАТ ВПРАВО) -->
         <li class="profile-dropdown"
-            style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 30px;">
+            style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4); padding: 1px; border-radius: 20px;">
             <a href="#" id="profile-trigger"
                 style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
                 <span id="username-display" style="margin-left: auto !important; font-size: 21px;">Загрузка...</span>
@@ -148,7 +158,7 @@
 
         <!-- КОЛОНКА 2: Список моих статей -->
         <section>
-            <h1>Мои статьи</h1>
+            <h1 id="result">Мои статьи</h1>
             <div class="tag-filters glass-card">
                 <span
                     style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
