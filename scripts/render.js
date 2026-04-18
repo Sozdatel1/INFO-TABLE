@@ -382,6 +382,7 @@ export async function loadFullArticle() {
         // Твои переменные из старого кода
         document.getElementById('artTitle').innerText = article.title;
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
+        document.getElementById('arti').innerHTML = `${article.title} | iPosters`;
         // const likesSpan = document.getElementById('artLikes');
         // if (likesSpan) {
         //     // Если в базе 0 или NULL, показываем 0
@@ -625,8 +626,9 @@ async function updateAuthUI() {
     const loginBtn = document.getElementById('login-btn');
     const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
+
     // Если кнопок нет на текущей странице, прерываем функцию
-    if (!loginBtn && !profileBtn) return;
+    // if (!loginBtn && !profileBtn) return;
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -635,14 +637,16 @@ async function updateAuthUI() {
         if (usernameDisplay) {
             usernameDisplay.innerText = user.email.split('@')[0];
         }
-        loginBtn.style.display = 'none';
+
+
+        // loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
     } else {
-        loginBtn.style.display = 'block';
+        // loginBtn.style.display = 'block';
         profileBtn.style.display = 'none';
     }
 }
-
+window.updateAuthUI = updateAuthUI
 // Функция защиты роута (ДЛЯ ПРОФИЛЯ)
 async function checkUserProfile() {
     const { data: { user }, error } = await supabase.auth.getUser();
@@ -655,14 +659,25 @@ async function checkUserProfile() {
 
     // Показываем ник в шапке (отрезаем домен)
     const username = user.email.split('@')[0];
+    const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
+    const akk = document.getElementById('akk')
+    const prof = document.getElementById('profile')
     // const avtor = document.getElementById('avtor');
+    if (profileBtn) {
+        profileBtn.style.setProperty('display', 'block', 'important');
+    }
     if (usernameDisplay) {
         usernameDisplay.innerText = username;
     }
-    // if (avtor) {
-    //     avtor.innerText = username;
-    // }
+    if (akk) {
+        const name = user.email.split('@')[0];
+        akk.innerText = `${name} | Профиль`; // Получится: "ivan | Профиль"
+    }
+    if (prof) {
+        const us = user.email.split('@')[0];
+        prof.innerText = `${us} • Профиль | iPosters`; // Получится: "ivan | Профиль"
+    }
     // Загружаем только статьи этого пользователя
     if (typeof loadMyArticles === 'function') {
         loadMyArticles(user.id);
