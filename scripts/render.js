@@ -608,7 +608,7 @@ window.logoutUser = async function () {
 
 // --- ГЛАВНОЕ ИСПРАВЛЕНИЕ: Разделение запуска по страницам ---
 document.addEventListener('DOMContentLoaded', () => {
-    const isProfilePage = window.location.pathname.includes('profile');
+    const isProfilePage = document.getElementById('prof')
 
     if (isProfilePage) {
         // На странице профиля проверяем сессию и редиректим если не залогинен
