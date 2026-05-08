@@ -50,9 +50,9 @@
         }
 
         .logo-icon {
-            width: 30px;
+            width: 55px;
             /* Подбери размер под высоту текста */
-            height: 30px;
+          
             object-fit: contain;
             filter: drop-shadow(0 0 5px rgba(65, 207, 255, 0.5));
             /* Легкое неоновое свечение */
