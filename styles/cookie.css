@@ -1,0 +1,59 @@
+.notification {
+    position: fixed;
+    /* или absolute, если нужен внутри определёного блка */
+    z-index: 9999;
+    /* выше, чем у остального контента */
+    bottom: 0;
+    /* внизу */
+    display: flex;
+    border: 1px solid #41cfff;
+    background-color: rgb(255, 255, 255);
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 700px;
+    align-items: center;
+    margin: 20px auto;
+    color: rgb(0, 0, 0);
+    font-weight: 600;
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    /* box-shadow: 0 0 10px rgba(0,0,0,0.5); */
+    box-shadow: 0 4px 15px rgba(22, 195, 253, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2);
+    
+}
+    .notification p {
+        margin-bottom: 10px;
+    }
+
+    .notification a {
+        color: #000000;
+        text-decoration: underline;
+    }
+
+    .accept-button {
+        /* background: linear-gradient(to bottom, rgba(55,182,0,1) 0%,rgba(55,182,0,1) 0%,rgba(34,144,0,1) 2%,rgba(64,202,0,1) 50%,rgba(55,182,0,1) 79%,rgba(55,182,0,1) 79%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        background-color: #00ddff;
+        background: #50d3ff;
+        border: none;
+        color: white;
+        border-color: #41cfff;
+        box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+            0 0 5px rgba(0, 255, 65, 0.2);
+
+        font-weight: bold;
+        font-size: 15px;
+        /* border: 1px solid rgb(165, 165, 165); */
+
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .accept-button:hover {
+        background-color: #00ddffd6;
+        color: #ffffff;
+    }
