@@ -594,7 +594,7 @@ async function checkUserProfile() {
         loadMyArticles(user.id);
     }
 }
-
+window.checkUserProfile = checkUserProfile;
 // Функция для кнопки "Профиль"
 window.goToProfile = function () {
     window.location.href = 'profile.html';
