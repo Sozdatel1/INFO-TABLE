@@ -558,8 +558,10 @@ async function updateAuthUI() {
     }
 }
 window.updateAuthUI = updateAuthUI
+
+
 // Функция защиты роута (ДЛЯ ПРОФИЛЯ)
-async function checkUserProfile() {
+export async function checkUserProfile() {
     const { data: { session }, error } = await supabase.auth.getSession();
 const user = session?.user; 
     // Если не вошел — отправляем на главную БЕЗ сохранения в истории переходов
