@@ -280,126 +280,76 @@ function handleSearch(event) {
 window.handleSearch = handleSearch;
 
 
-// 1. ЗАГРУЗКА ВСЕХ ПОСТОВ (Для ленты)
 export async function loadPosts() {
     try {
-        // Запрашиваем статьи и сразу подтягиваем ID всех связанных комментариев
-        const { data, error } = await supabase
-            .from('articles')
-            .select(`
-                *,
-                comments(id)
-            `)
-            .order('created_at', { ascending: false });
+        const response = await fetch('https://pro-info-api.onrender.com/api/posts');
+        const data = await response.json();
 
-        if (error) throw error;
-        const { data: allLikes, error: likeError } = await supabase
-            .from('likes')
-            .select('post_id');
-
-        if (likeError) throw likeError;
-        // 3. ДОБАВЬ ЭТОТ ЗАПРОС (загружаем просмотры)
-        const { data: allViews, error: viewError } = await supabase
-            .from('views')
-            .select('post_id');
-        if (viewError) {
-            console.warn("Таблица просмотров не найдена или недоступна");
-        }
-        // Превращаем массив комментариев в простое число (количество)
-        const processedData = data.map(post => ({
-            ...post,
-            commentCount: post.comments ? post.comments.length : 0,
-            real_likes: allLikes.filter(l => l.post_id === post.id).length,
-            viewCount: allViews ? allViews.filter(v => v.post_id === post.id).length : 0
-        }));
-
-        // Сохраняем в глобальную переменную для фильтров
-
-
-        // Запускаем отрисовку всех блоков на главной
-        if (typeof renderFilteredPosts === 'function') renderFilteredPosts(processedData);
-        if (typeof renderTrending === 'function') renderTrending(processedData);
-        if (typeof updateHubStats === 'function') updateHubStats(processedData);
-
-        // window.allPostsData = data; // СОХРАНЯЕМ ДАННЫЕ В ПАМЯТЬ
-        window.allPostsData = processedData; // Теперь в фильтрах будут и лайки, и просмотры
-
-
-
-    } catch (err) {
-        console.error("Ошибка загрузки iPosters:", err.message);
-    }
-}
-
-// 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА (Индивидуально)
-export async function loadMyArticles() {
-    // 1. Сначала проверяем, есть ли сессия в браузере вообще
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-        console.log("Сессия не найдена. Пользователь не вошел.");
-        return;
-    }
-
-    // 2. Берем пользователя из сессии
-    const user = session.user;
-
-    // 3. Делаем запрос в базу
-    const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Ошибка при получении статей:", error.message);
-        return;
-    }
-
-    console.log("Статьи успешно получены из базы:", data);
-    window.displayedCount = data.length; // Даем функции отрисовщика количество постов
-    window.allPostsData = data;
-    // 4. Отправляем в твою функцию отрисовки
-    if (data && typeof renderFilteredPosts === 'function') {
+        window.allPostsData = data;
         renderFilteredPosts(data);
+        renderTrending(data);
+        updateHubStats(data);
+    } catch (err) {
+        console.error("Ошибка фронтенда:", err.message);
     }
 }
 
-// 3. ЗАГРУЗКА ПОЛНОЙ СТАТЬИ (Для article.html)
+
+// 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА
+
+export async function loadMyArticles() {
+    try {
+        // 1. Получаем сессию, чтобы взять токен доступа
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        // 2. Стучимся на СВОЙ сервер, передавая токен в заголовке
+        const response = await fetch('https://pro-info-api.onrender.com/api/my-articles', {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+
+        // 3. Сохраняем и отрисовываем
+        window.displayedCount = data.length;
+        window.allPostsData = data;
+
+        if (typeof renderFilteredPosts === 'function') {
+            renderFilteredPosts(data);
+        }
+    } catch (err) {
+        console.error("Ошибка загрузки моих статей:", err.message);
+    }
+}
+
+
 export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) return;
-    registerView(id);
+
+    // Вызываем твою функцию регистрации просмотра (её тоже можно будет потом перенести)
+    if (typeof registerView === 'function') registerView(id);
+
     try {
-        const { data: article, error } = await supabase
-            .from('articles')
-            .select('*')
-            .eq('id', id)
-            .single();
+        // 1. Получаем данные от нашего сервера
+        const response = await fetch(`https://pro-info-api.onrender.com/api/article/${id}`);
+        const article = await response.json();
+        if (!response.ok) throw new Error(article.error);
 
-        if (error) throw error;
-
-        // Твои переменные из старого кода
+        // 2. Отрисовка текста и заголовков (ТВОЙ КОД)
         document.getElementById('artTitle').innerText = article.title;
         document.getElementById('artText').innerHTML = article.text.replace(/\n/g, '<br>');
         document.getElementById('arti').innerHTML = `${article.title} | iPosters`;
-        // const likesSpan = document.getElementById('artLikes');
-        // if (likesSpan) {
-        //     // Если в базе 0 или NULL, показываем 0
-        //     likesSpan.innerText = article.likes || 0;
-        // }
-        // --- НОВАЯ ЛОГИКА ЛАЙКОВ ---
-        const { count, error: countError } = await supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', id);
 
         const likesSpan = document.getElementById('artLikes');
-        if (likesSpan) {
-            // Теперь берем count из таблицы likes, а не из поля article.likes
-            likesSpan.innerText = !countError ? (count || 0) : 0;
-        }
-        // ---------------------------
+        if (likesSpan) likesSpan.innerText = article.real_likes;
+
+        const viwElem = document.getElementById('viw');
+        if (viwElem) viwElem.innerHTML = `<span> ${article.view_count}</span>`;
 
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
@@ -409,95 +359,75 @@ export async function loadFullArticle() {
         if (document.getElementById('avtor')) {
             document.getElementById('avtor').innerText = article.author_name || "Аноним";
         }
-        const { count: vCount, error: vError } = await supabase
-            .from('views')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', id);
-        const viwElem = document.getElementById('viw');
-        if (viwElem) {
-            // Берем vCount из таблицы views
-            viwElem.innerHTML = `<span> ${!vError ? (vCount || 0) : 0}</span>`;
-        }
 
-        // const delArt = document.getElementById('delete-art');
-        // if (delArt) {
-        //     // Передаем переменную 'id', которую получили выше из URL
-        //     delArt.innerHTML = `
-        //     <button onclick="location.href='create-article.html?edit=${id}'" style="color: blue; border: none; background: none; cursor: pointer;    margin-right: 10px;">
-        //         Редактировать
-        //     </button>
-        //         <button onclick="deletePost('${id}')" style="color: red; border: none; background: none; cursor: pointer; font-size: 14px;">
-        //             Удалить статью
-        //         </button>`;
-        // }
+        // 3. Проверка прав на удаление/редактирование
         const { data: { user } } = await supabase.auth.getUser();
         const delArt = document.getElementById('delete-art');
 
-        // Показываем кнопки ТОЛЬКО если пользователь залогинен И он автор статьи
         if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
-            <div class="panel" style="display: flex;">
-                
-            <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
-    color: white;
-    border-color: #41cfff;
-    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
-                    Редактировать
-                </button>
-
-                <p id="read-time" style="padding: 11px; background: #0019fc;
-    color: white;
-    border-color: #ff4141;
-    box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
-        0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px">
-
-        </p>
-                <button onclick="deletePost('${id}')" style="  cursor: pointer; padding: 11px; background: #fc2a00;
-    color: white;
-    border-color: #ff4141;
-    box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
-                    Удалить статью
-                </button></div>
-                `;
+                <div class="panel" style="display: flex;">
+                    <button onclick="openEditModal('${id}')" class="btn-edit">Редактировать</button>
+                    <p id="read-time" class="time-block"></p>
+                    <button onclick="deletePost('${id}')" class="btn-delete">Удалить статью</button>
+                </div>`;
         } else if (delArt) {
-            // Если не автор — очищаем контейнер (на всякий случай)
-            delArt.innerHTML = `
-            <p id="read-time" style="padding: 11px; background: #0019fc;
-    color: white;
-    border-color: #ff4141;
-    box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
-        0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px"></p>`;
+            delArt.innerHTML = `<p id="read-time" class="time-block"></p>`;
         }
 
     } catch (err) {
-        console.error('Ошибка:', err.message);
+        console.error('Ошибка загрузки статьи:', err.message);
     }
-    loadComments(); // Чтобы комменты подгружались вместе со статьей
 
-
+    if (typeof loadComments === 'function') loadComments();
 }
 
 
 
+//         <div class="panel" style="display: flex;">
+
+//         <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
+// color: white;
+// border-color: #41cfff;
+// box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+//     0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
+//                 Редактировать
+//             </button>
+
+//             <p id="read-time" style="padding: 11px; background: #0019fc;
+// color: white;
+// border-color: #ff4141;
+// box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+//     0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px">
+
+//     </p>
+//             <button onclick="deletePost('${id}')" style="  cursor: pointer; padding: 11px; background: #fc2a00;
+// color: white;
+// border-color: #ff4141;
+// box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
+//     0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
+//                 Удалить статью
+//             </button></div>
+//             `;
+//     } else if (delArt) {
+//         // Если не автор — очищаем контейнер (на всякий случай)
+//         delArt.innerHTML = `
+//         <p id="read-time" style="padding: 11px; background: #0019fc;
+// color: white;
+// border-color: #ff4141;
+// box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+//     0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px"></p>`
 
 
 
 
-// 4. ПУБЛИКАЦИЯ (С твоими переменными)
+
+
 export async function publishPost() {
     const title = document.getElementById('postTitle').value;
     const text = document.getElementById('postInput').value;
     const image = document.getElementById('postImage').value;
-    //     if (!window.isClean(title) || !window.isClean(text)) {
-    //     return Swal.fire({
-    //         title: "🔒 Цензура iPosters",
-    //         text: "Твое сообщение содержит запрещенные слова. Давай соблюдать правила!",
-    //         icon: "error",
-    //         confirmButtonColor: "#00d4ff" // Твой голубой неон
-    //     });
-    // }
+
     if (!title || !text) {
         return Swal.fire({
             title: "Заполни поля!",
@@ -506,65 +436,46 @@ export async function publishPost() {
             confirmButtonColor: "#ff8000"
         });
     }
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        openAuthModal()
-    };
-    const generatedName = user.email.split('@')[0];
 
-    let response; // Создаем переменную для результата
+    try {
+        // 1. Получаем токен
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return openAuthModal();
 
-    if (window.currentEditId) {
-        // --- РЕЖИМ ОБНОВЛЕНИЯ ---
-        response = await supabase
-            .from('articles')
-            .update({
+        // 2. Отправляем данные на наш Node.js сервер
+        const response = await fetch(`https://pro-info-api.onrender.com/api/publish`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
                 title,
                 text,
-                image: image || "/img/staty/газета.png"
+                image,
+                id: window.currentEditId // Если null — сервер поймет, что это новый пост
             })
-            .eq('id', window.currentEditId);
-    } else {
-        // --- РЕЖИМ СОЗДАНИЯ ---
-        response = await supabase.from('articles').insert([{
-            title,
-            text,
-            image: image || "/img/staty/газета.png",
-            user_id: user.id,
-            author_name: generatedName
-        }]);
-    }
+        });
 
-    const { error } = response; // Достаем ошибку из результата нужного действия
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
 
-    if (error) {
-        Swal.fire("Ошибка", error.message, "error");
-    } else {
+        // 3. Успех
         const isEdit = !!window.currentEditId;
         await Swal.fire(isEdit ? "Обновлено!" : "Опубликовано!", "", "success");
 
         if (isEdit) {
-            // Если редактировали — возвращаемся к статье
             window.location.href = `article.html?id=${window.currentEditId}`;
         } else {
-            // Если создавали — чистим поля
             document.getElementById('postTitle').value = "";
             document.getElementById('postInput').value = "";
             document.getElementById('postImage').value = "";
         }
+
+    } catch (err) {
+        Swal.fire("Ошибка", err.message, "error");
     }
 }
-
-
-// // 5. ЛАЙКИ
-// export async function likePost(id) {
-//     const { data } = await supabase.from('articles').select('likes').eq('id', id).single();
-//     const newLikes = (data.likes || 0) + 1;
-//     await supabase.from('articles').update({ likes: newLikes }).eq('id', id);
-
-//     const likeSpan = document.getElementById('artLikes');
-//     if (likeSpan) likeSpan.innerText = newLikes;
-// }
 
 
 let isRegMode = false;
