@@ -541,8 +541,8 @@ async function updateAuthUI() {
     // Если кнопок нет на текущей странице, прерываем функцию
     // if (!loginBtn && !profileBtn) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user; 
     if (user) {
 
         if (usernameDisplay) {

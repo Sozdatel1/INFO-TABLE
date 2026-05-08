@@ -160,7 +160,7 @@ window.loadComments = async function () {
     try {
         // 1. Параллельно берем комменты с сервера и текущего юзера из Supabase Auth
         const [commentsRes, authRes] = await Promise.all([
-            fetch(`https://onrender.com{postId}`),
+            fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`),
             supabase.auth.getUser()
         ]);
 
