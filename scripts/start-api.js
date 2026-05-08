@@ -5,6 +5,7 @@ import { loadMore } from './utils.js';
 import { calculateReadingTimeStat } from './time-read.js';
 import { loginUser } from './render.js';
 import {why} from './documentashion.js';
+import {checkUserProfile} from './render.js';
 window.publishPost = publishPost;
 window.loadMore = loadMore;
 // Инициализируем глобальные данные
@@ -19,7 +20,9 @@ if (document.getElementById('artText')) {
     calculateReadingTimeStat()
 
 }
-
+if (document.getElementById('prof')) {
+checkUserProfile() 
+}
 // ПРОВЕРКА: Если мы на главной (index.html)
 if (document.getElementById('dynamic-cards')) {
     console.log("Загружаем ленту постов...");
