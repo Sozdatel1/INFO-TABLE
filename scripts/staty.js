@@ -151,64 +151,83 @@ window.likePost = async function () {
 
 
 
-
-
-// 1. ФУНКЦИЯ ЗАГРУЗКИ КОММЕНТАРИЕВ
 window.loadComments = async function () {
     const params = new URLSearchParams(window.location.search);
     const postId = params.get('id');
     const list = document.getElementById('comments-list');
+    if (!list || !postId) return;
 
-    // 1. ПОЛУЧАЕМ ТЕКУЩЕГО ЮЗЕРА (чтобы понять, чьи это комменты)
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+        // 1. Параллельно берем комменты с сервера и текущего юзера из Supabase Auth
+        const [commentsRes, authRes] = await Promise.all([
+            fetch(`https://onrender.com{postId}`),
+            supabase.auth.getUser()
+        ]);
 
-    // 2. ЗАГРУЖАЕМ КОММЕНТЫ
-    const { data: comments, error } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('post_id', postId)
-        .order('created_at', { ascending: false });
+        const comments = await commentsRes.json();
+        const user = authRes.data?.user;
 
-    if (error) return console.error("Ошибка загрузки комментов:", error);
+        if (!comments || comments.length === 0) {
+            list.innerHTML = '<p style="color: gray;">Пока никто не прокомментировал. Будьте первым!</p>';
+            return;
+        }
 
-    // Если комментов нет — выводим заглушку и выходим
-    if (!comments || comments.length === 0) {
-        list.innerHTML = '<p style="color: gray;">Пока никто не прокомментировал. Будьте первым!</p>';
-        return;
+        // 2. ОТРИСОВКА
+        list.innerHTML = comments.map(c => {
+            const isOwner = user && user.id === c.user_id;
+
+            return `
+            <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
+                    <small style="color: #000000; margin: 0 auto; font-family: Arial">
+                        ${new Date(c.created_at).toLocaleString('ru-RU', {
+                            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                        })}
+                    </small>
+                </div>
+                <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
+                
+                ${isOwner ? `
+                    <button onclick="deleteComment('${c.id}')" 
+                        style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px;" 
+                        title="Удалить">🗑️</button>
+                ` : ''}
+            </div>`;
+        }).join('');
+
+    } catch (err) {
+        console.error("Ошибка загрузки комментов:", err.message);
     }
-
-    // 3. ОТРИСОВКА (isOwner объявляем ВНУТРИ цикла .map)
-    list.innerHTML = comments.map(c => {
-        // Теперь браузер знает, что такое 'c' и 'user'
-        const isOwner = user && user.id === c.user_id;
-
-        return `
-        <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
-                <small style="color: #000000; margin: 0 auto; font-family: Arial">
-                    ${new Date(c.created_at).toLocaleString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        })}
-                </small>
-            </div>
-            <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
-            
-            <!-- КНОПКА УДАЛЕНИЯ (появится только у автора) -->
-            ${isOwner ? `
-                <button onclick="deleteComment('${c.id}')" 
-                    style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; margin-right: auto" 
-                    title="Удалить">
-                    🗑️
-                </button>
-            ` : ''}
-        </div>
-    `;
-    }).join('');
 };
+
+
+
+        
+        // <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
+        //     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        //         <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
+        //         <small style="color: #000000; margin: 0 auto; font-family: Arial">
+        //             ${new Date(c.created_at).toLocaleString('ru-RU', {
+        //     day: '2-digit',
+        //     month: '2-digit',
+        //     hour: '2-digit',
+        //     minute: '2-digit'
+        // })}
+        //         </small>
+        //     </div>
+        //     <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
+            
+        //     <!-- КНОПКА УДАЛЕНИЯ (появится только у автора) -->
+        //     ${isOwner ? `
+        //         <button onclick="deleteComment('${c.id}')" 
+        //             style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; margin-right: auto" 
+        //             title="Удалить">
+        //             🗑️
+        //         </button>
+        //     ` : ''}
+        // </div>
+
 
 
 // 2. ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЯ

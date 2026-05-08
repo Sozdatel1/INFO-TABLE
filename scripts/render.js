@@ -379,7 +379,7 @@ export async function loadFullArticle() {
         console.error('Ошибка загрузки статьи:', err.message);
     }
 
-    if (typeof loadComments === 'function') loadComments();
+    loadComments();
 }
 
 
