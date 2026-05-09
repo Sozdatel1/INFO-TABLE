@@ -81,70 +81,62 @@ import { supabase } from './render.js'; // или путь к файлу, где
 window.likePost = async function () {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-
-    if (!id || id === "undefined") return;
+    if (!id) return;
 
     try {
-        // Проверяем статус пользователя
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
 
-        // --- 1. ПРОВЕРКА ДЛЯ АНОНИМОВ (LocalStorage) ---
+        // 1. Быстрая проверка для анонимов через localStorage
         if (!user) {
-            const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
-            if (likedPosts.includes(id)) {
-                return Swal.fire("Хватит!", "Анонимам можно лайкать только один раз", "info");
-            }
-        }
-
-        // --- 2. ОТПРАВКА В БАЗУ ---
-        const { error: insertError } = await supabase
-            .from('likes')
-            .insert([{ post_id: id }]);
-
-        if (insertError) {
-            // Ошибка 23505 — это нарушение UNIQUE (юзер уже лайкал)
-            if (insertError.code === '23505') {
+            const myLikes = JSON.parse(localStorage.getItem('my_likes') || '[]');
+            if (myLikes.includes(id)) {
                 return Swal.fire("Упс!", "Вы уже поставили лайк этому посту", "info");
             }
-            console.error("Ошибка базы:", insertError.message);
-            return Swal.fire("Ошибка", "Не удалось засчитать лайк", "error");
         }
 
-        // --- 3. СОХРАНЯЕМ МЕТКУ (Только если аноним) ---
-        if (!user) {
-            const likedPosts = JSON.parse(localStorage.getItem('my_likes') || '[]');
-            likedPosts.push(id);
-            localStorage.setItem('my_likes', JSON.stringify(likedPosts));
-        }
+        // 2. Запрос на сервер
+        const response = await fetch('https://pro-info-api.onrender.com/api/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': session ? `Bearer ${session.access_token}` : ''
+            },
+            body: JSON.stringify({ postId: id })
+        });
 
-        // --- 4. ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ---
-        if (typeof confetti === 'function') {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.7 },
-                colors: ['#ff0000', '#41cfff', '#ffffff']
-            });
-        }
+        const result = await response.json();
 
-        // --- 5. ОБНОВЛЕНИЕ СЧЕТЧИКА ---
-        const { count, error: countError } = await supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', id);
+        if (response.ok) {
+            // --- ПРАЗДНИК ТОЛЬКО ПРИ УСПЕХЕ ---
+            if (typeof confetti === 'function') {
+                confetti({ 
+                    particleCount: 150, 
+                    spread: 70, 
+                    origin: { y: 0.7 },
+                    colors: ['#00d9ff', '#ffffff', '#a67358'] 
+                });
+            }
 
-        if (!countError) {
+            // Обновляем число на странице
             const likesSpan = document.getElementById('artLikes');
-            if (likesSpan) likesSpan.innerText = count || 0;
+            if (likesSpan) likesSpan.innerText = result.count;
+
+            // Записываем анониму в локалку
+            if (!user) {
+                const myLikes = JSON.parse(localStorage.getItem('my_likes') || '[]');
+                myLikes.push(id);
+                localStorage.setItem('my_likes', JSON.stringify(myLikes));
+            }
+        } else if (result.error === "already_liked") {
+            // Если сервер вернул, что лайк уже есть (для зареганных)
+            Swal.fire("Упс!", "Вы уже поставили лайк этому посту", "info");
         }
 
     } catch (err) {
-        console.error("Ошибка в функции likePost:", err.message);
+        console.error("Like error:", err);
     }
 };
-
-
-
 
 
 
@@ -159,13 +151,18 @@ window.loadComments = async function () {
 
     try {
         // 1. Параллельно берем комменты с сервера и текущего юзера из Supabase Auth
-        const [commentsRes, authRes] = await Promise.all([
-            fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`),
-            supabase.auth.getUser()
-        ]);
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
 
+        // const [commentsRes, authRes] = await Promise.all([
+        //     fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`),
+        //     supabase.auth.getSession()
+        // ]);
+        const commentsRes = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`);
         const comments = await commentsRes.json();
-        const user = authRes.data?.user;
+
+    
+    
 
         if (!comments || comments.length === 0) {
             list.innerHTML = '<p style="color: gray;">Пока никто не прокомментировал. Будьте первым!</p>';

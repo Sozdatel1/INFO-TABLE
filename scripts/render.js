@@ -230,13 +230,15 @@ export async function registerUser(username, password) {
 async function registerView(postId) {
     try {
         // Проверяем, вошел ли юзер
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
         // Если нет — используем простой фингерпринт (пропсы браузера)
         const viewerId = user ? user.id : (navigator.userAgent + navigator.language);
 
         // Отправляем просмотр в базу
         // Если такой viewer_id уже смотрел этот post_id, база просто выдаст ошибку (и это ок)
-        await supabase
+        supabase
             .from('views')
             .insert([{ post_id: postId, viewer_id: viewerId }]);
 
@@ -361,16 +363,45 @@ export async function loadFullArticle() {
         }
 
         // 3. Проверка прав на удаление/редактирование
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
         const delArt = document.getElementById('delete-art');
 
         if (delArt && user && user.id === article.user_id) {
             delArt.innerHTML = `
                 <div class="panel" style="display: flex;">
-                    <button onclick="openEditModal('${id}')" class="btn-edit">Редактировать</button>
-                    <p id="read-time" class="time-block"></p>
-                    <button onclick="deletePost('${id}')" class="btn-delete">Удалить статью</button>
-                </div>`;
+
+        <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
+color: white;
+border-color: #41cfff;
+box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+    0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
+                Редактировать
+            </button>
+
+            <p id="read-time" style="padding: 11px; background: #0019fc;
+color: white;
+border-color: #ff4141;
+box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+    0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px">
+
+    </p>
+            <button onclick="deletePost('${id}')" style="  cursor: pointer; padding: 11px; background: #fc2a00;
+color: white;
+border-color: #ff4141;
+box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
+    0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
+                Удалить статью
+            </button></div>
+            `;
+        } else if (delArt) {
+            // Если не автор — очищаем контейнер (на всякий случай)
+            delArt.innerHTML = `
+        <p id="read-time" style="padding: 11px; background: #0019fc;
+color: white;
+border-color: #ff4141;
+box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
+    0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px"></p>`;
         } else if (delArt) {
             delArt.innerHTML = `<p id="read-time" class="time-block"></p>`;
         }
@@ -384,39 +415,7 @@ export async function loadFullArticle() {
 
 
 
-//         <div class="panel" style="display: flex;">
 
-//         <button onclick="openEditModal ('${id}')" style="cursor: pointer; padding: 11px; background: #41cfff;
-// color: white;
-// border-color: #41cfff;
-// box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-//     0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
-//                 Редактировать
-//             </button>
-
-//             <p id="read-time" style="padding: 11px; background: #0019fc;
-// color: white;
-// border-color: #ff4141;
-// box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
-//     0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px">
-
-//     </p>
-//             <button onclick="deletePost('${id}')" style="  cursor: pointer; padding: 11px; background: #fc2a00;
-// color: white;
-// border-color: #ff4141;
-// box-shadow: 0 4px 15px rgba(255, 65, 65, 0.4),
-//     0 0 5px rgba(0, 255, 65, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px auto">
-//                 Удалить статью
-//             </button></div>
-//             `;
-//     } else if (delArt) {
-//         // Если не автор — очищаем контейнер (на всякий случай)
-//         delArt.innerHTML = `
-//         <p id="read-time" style="padding: 11px; background: #0019fc;
-// color: white;
-// border-color: #ff4141;
-// box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
-//     0 0 5px rgba(0, 8, 255, 0.2); border: none; border-radius: 20px; font-size: 20px; margin: 20px"></p>`
 
 
 
@@ -542,7 +541,7 @@ async function updateAuthUI() {
     // if (!loginBtn && !profileBtn) return;
 
     const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user; 
+    const user = session?.user;
     if (user) {
 
         if (usernameDisplay) {
@@ -563,7 +562,7 @@ window.updateAuthUI = updateAuthUI
 // Функция защиты роута (ДЛЯ ПРОФИЛЯ)
 export async function checkUserProfile() {
     const { data: { session }, error } = await supabase.auth.getSession();
-const user = session?.user; 
+    const user = session?.user;
     // Если не вошел — отправляем на главную БЕЗ сохранения в истории переходов
     if (!user || error) {
         window.location.replace('index.html');
