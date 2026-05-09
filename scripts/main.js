@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updateVacationCountdown() {
   // Укажите дату начала каникул: Год, Месяц (0-11), Число, Часы, Минуты
-  const vacationDate = new Date(2026, 6, 1, 0, 0); // 23 марта 2026, 09:00
+  const vacationDate = new Date(2026, 5, 1, 0, 0); // 23 марта 2026, 09:00
   const now = new Date();
   const diff = vacationDate - now;
 
