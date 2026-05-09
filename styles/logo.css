@@ -1,0 +1,95 @@
+:root {
+    --border-color: #2b2b2b; /* Цвет контура */
+    --line-color: #2b2b2b;   /* Цвет полосок текста */
+}
+
+.logo-container {
+    position: relative;
+    width: 60px;  
+    height: 50px;
+    margin-right: auto;
+    /* Убедись, что у родителя (хедера) тоже есть align-items: center */
+
+
+        transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.sheet {
+    position: absolute;
+    background: #f5f5f5;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    /* 1. Сначала опускаем верхний левый угол в центр контейнера */
+    top: 50%;
+    left: 50%;
+
+
+        -webkit-font-smoothing: none;
+}
+
+/* Задний листок */
+.sheet-back {
+    width: 50px;
+    height: 35px;
+    z-index: 1;
+    /* 2. Сдвигаем назад на половину размера + небольшой сдвиг вправо-вниз */
+    transform: translate(-47%, -45%); 
+}
+
+/* Передний листок */
+.sheet-front {
+    width: 50px;
+    height: 35px;
+    z-index: 2;
+    /* 2. Сдвигаем назад на половину размера + небольшой сдвиг влево-вверх */
+    transform: translate(-60%, -60%);
+    image-rendering: pixelated;
+    padding: 4px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Тот самый коричневый квадрат */
+.brown-box {
+    width: 17px;
+    height: 17px;
+    background: #a67358;
+    border: 1.5px solid var(--border-color);
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+/* Контейнер для линий текста */
+.lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 1px;
+}
+
+.line {
+    height: 0;
+    border-top: 1.5px solid var(--line-color);
+    background: var(--line-color);
+   /* Убираем любые скругления, если они были выше */
+    border-radius: 0 !important; 
+    /* Принудительная четкость */
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+/* Короткая черточка в середине */
+.short { width: 60%; }
+
+/* Длинные черточки внизу */
+.bottom-lines {
+    width: 100%;
+    margin-top: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.full { width: 100%; }
