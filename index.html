@@ -174,10 +174,10 @@
             src="https://www.meteoservice.ru/informer/script/2312b3bf0300f402069ab4ae4b940f7f"></script>
         </div> -->
         <!-- Weather widget by https://www.meteoservice.ru -->
-        <a id="ms-informer-link-a7b7311be5153391379cf97898f4deb3" class="ms-informer-link"
-          href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
-        <script class="ms-informer-script"
-          src="https://www.meteoservice.ru/informer/script/a7b7311be5153391379cf97898f4deb3"></script>
+        <!-- Weather widget by https://www.meteoservice.ru -->
+<a id="ms-informer-link-ad7848da9e54e5994d59cd89336dc2cc" class="ms-informer-link" href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
+<script class="ms-informer-script" src="https://www.meteoservice.ru/informer/script/ad7848da9e54e5994d59cd89336dc2cc"></script>
+<!-- End -->
         <!-- End -->
       </div>
 
@@ -217,23 +217,29 @@
 
       </div>
 
-      <div id="dynamic-cards">
+      <div id="dynamic-cards" >
         <!-- Сюда JS загрузит посты -->
 
         <span class="spinner" style="
         display: block !important;
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border: 4px solid rgba(0, 255, 0, 0.1); /* Тусклый зеленый фон */
   border-top: 4px solid #41cfff;/* Яркий неоновый верх */
   border-radius: 50%;
   display: inline-block;
   animation: spin 0.8s linear infinite; /* Заставляем крутиться */
   vertical-align: middle;
-  margin:0 auto !important;
-  text-align: center;
+ position: relative; /* Чтобы он не улетел за края */
+  left: 50%;
+  transform: translateX(-50%); 
+  margin-top: 20px;
+  margin-bottom: 20px;
 
 "></span>
+
+
+
       </div>
 
       <div id="load-more-container" style="text-align: center; margin: 30px 0;">
@@ -330,14 +336,14 @@
   </footer>
 
 
-  <div class="notification" id="cookieAlert">
+  <!-- <div class="notification" id="cookieAlert">
     <p>
-    Мы используем файлы Cookies для повышения удобства пользования.
+    Мы используем файлы Cookies для повышения удобства использования сайта. Вы можете ознакомиться с <a href="/privacy.html">Политикой конфиденциальности.</a>
     </p>
     <button class="accept-button" onclick="document.getElementById('cookieAlert').style.display='none'">
     Ок
     </button>
-  </div>
+  </div> -->
 
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
   <script src="/scripts/sweetalert2.all.min.js"></script>
