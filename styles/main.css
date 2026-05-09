@@ -123,7 +123,7 @@
   animation-timeline: scroll();
   animation-range: 0px 20px; Анимация срабатывает на первых 200px скрола */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            z-index: 20000000000;
+            z-index: 1000;
         }
 
         /* СЕТКА GRID */
