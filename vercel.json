@@ -3,7 +3,7 @@
     "trailingSlash": false,
     "crons": [
         {
-            "path": "/api/ping-render",
+            "path": "/api/cron",
             "schedule": "*/10 * * * *"
         }
     ]
