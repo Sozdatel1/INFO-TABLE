@@ -230,14 +230,14 @@ export async function registerUser(username, password) {
 async function registerView(postId) {
     try {
         // Просто пинаем сервер, он сам разберется с IP и юзером
-        await fetch(`https://pro-info-api.onrender.com/api/view/{postId}`, {
+        await fetch(`https://pro-info-api.onrender.com/api/view/${postId}`, {
             method: 'POST'
         });
     } catch (err) {
         console.error('Ошибка регистрации просмотра');
     }
 }
-
+window.registerView = registerView
 
 
 function handleSearch(event) {
