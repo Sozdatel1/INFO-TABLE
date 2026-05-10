@@ -742,8 +742,8 @@ window.deletePost = async function (postId) {
                 showConfirmButton: false
             });
 
-            if (window.location.pathname.includes('article.html')) {
-                window.location.replace('profile.html');
+            if (document.getElementById('artTitle')) { // Если на странице есть заголовок статьи
+                window.location.href = '/profile'; // Vercel сам поймет, что это profile.html
             } else {
                 // Если мы в профиле, просто обновляем страницу, чтобы статья исчезла из списка
                 location.reload();
