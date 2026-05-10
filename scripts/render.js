@@ -459,8 +459,15 @@ export async function publishPost() {
 
         // 3. Успех
         const isEdit = !!window.currentEditId;
-        await Swal.fire(isEdit ? "Обновлено!" : "Опубликовано!", "", "success");
 
+        await Swal.fire({
+            title: isEdit ? "Обновлено!" : "Опубликовано!",
+            icon: "success",
+            timer: 1500, // Окно само закроется через 1.5 сек
+            showConfirmButton: false
+        });
+
+        location.reload();
         if (isEdit) {
             window.location.href = `article.html?id=${window.currentEditId}`;
         } else {
@@ -765,6 +772,7 @@ window.openEditModal = async function (id) {
     if (article) {
         document.getElementById('editTitle').value = article.title;
         document.getElementById('editText').value = article.text;
+        document.getElementById('editImage').value = article.image;
         document.getElementById('edit-modal').style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Запрещаем скролл страницы
     }
@@ -778,6 +786,7 @@ window.closeEditModal = function () {
 window.saveChanges = async function () {
     const newTitle = document.getElementById('editTitle').value;
     const newText = document.getElementById('editText').value;
+    const newImage = document.getElementById('editImage').value;
 
     // 1. Проверяем наличие ID
     if (!window.currentEditId) {
@@ -792,7 +801,7 @@ window.saveChanges = async function () {
         // 2. Добавляем .select(), чтобы проверить, обновилось ли что-то реально
         const { data, error } = await supabase
             .from('articles')
-            .update({ title: newTitle, text: newText })
+            .update({ title: newTitle, text: newText, image: newImage })
             .eq('id', window.currentEditId)
             .select();
 
