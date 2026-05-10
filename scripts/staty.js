@@ -110,11 +110,11 @@ window.likePost = async function () {
         if (response.ok) {
             // --- ПРАЗДНИК ТОЛЬКО ПРИ УСПЕХЕ ---
             if (typeof confetti === 'function') {
-                confetti({ 
-                    particleCount: 150, 
-                    spread: 70, 
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
                     origin: { y: 0.7 },
-                    colors: ['#00d9ff', '#ffffff', '#a67358'] 
+                    colors: ['#00d9ff', '#ffffff', '#a67358']
                 });
             }
 
@@ -161,8 +161,8 @@ window.loadComments = async function () {
         const commentsRes = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`);
         const comments = await commentsRes.json();
 
-    
-    
+
+
 
         if (!comments || comments.length === 0) {
             list.innerHTML = '<p style="color: gray;">Пока никто не прокомментировал. Будьте первым!</p>';
@@ -179,8 +179,8 @@ window.loadComments = async function () {
                     <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
                     <small style="color: #000000; margin: 0 auto; font-family: Arial">
                         ${new Date(c.created_at).toLocaleString('ru-RU', {
-                            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-                        })}
+                day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+            })}
                     </small>
                 </div>
                 <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
@@ -200,30 +200,30 @@ window.loadComments = async function () {
 
 
 
-        
-        // <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
-        //     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        //         <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
-        //         <small style="color: #000000; margin: 0 auto; font-family: Arial">
-        //             ${new Date(c.created_at).toLocaleString('ru-RU', {
-        //     day: '2-digit',
-        //     month: '2-digit',
-        //     hour: '2-digit',
-        //     minute: '2-digit'
-        // })}
-        //         </small>
-        //     </div>
-        //     <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
-            
-        //     <!-- КНОПКА УДАЛЕНИЯ (появится только у автора) -->
-        //     ${isOwner ? `
-        //         <button onclick="deleteComment('${c.id}')" 
-        //             style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; margin-right: auto" 
-        //             title="Удалить">
-        //             🗑️
-        //         </button>
-        //     ` : ''}
-        // </div>
+
+// <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
+//     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+//         <b style="color: #333; font-family: Arial; font-size: 15px">${c.user_name || 'Аноним'}</b>
+//         <small style="color: #000000; margin: 0 auto; font-family: Arial">
+//             ${new Date(c.created_at).toLocaleString('ru-RU', {
+//     day: '2-digit',
+//     month: '2-digit',
+//     hour: '2-digit',
+//     minute: '2-digit'
+// })}
+//         </small>
+//     </div>
+//     <p style="margin: 0; color: #000000; line-height: 1.5;">${c.content}</p>
+
+//     <!-- КНОПКА УДАЛЕНИЯ (появится только у автора) -->
+//     ${isOwner ? `
+//         <button onclick="deleteComment('${c.id}')" 
+//             style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px; margin-right: auto" 
+//             title="Удалить">
+//             🗑️
+//         </button>
+//     ` : ''}
+// </div>
 
 
 
@@ -236,31 +236,29 @@ window.sendComment = async function () {
 
     if (!text) return Swal.fire("Ошибка", "Напишите хотя бы пару слов!", "warning");
 
-    // Проверяем авторизацию
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        openAuthModal()
-    }
-
-    const username = user.email.split('@')[0];
+    // Берем сессию, чтобы получить токен доступа (JWT)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return openAuthModal();
 
     try {
-        const { error } = await supabase.from('comments').insert([{
-            post_id: postId,
-            user_id: user.id,
-            user_name: username,
-            content: text
-        }]);
+        const response = await fetch(`https://pro-info-api.onrender.com/api/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}` // Отправляем токен для проверки
+            },
+            body: JSON.stringify({ postId, text })
+        });
 
-        if (error) throw error;
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
 
-        input.value = ''; // Чистим поле
-        loadComments(); // Обновляем список сразу
+        input.value = '';
+        loadComments(); // Перезагружаем список
     } catch (err) {
         Swal.fire("Ошибка", err.message, "error");
     }
 };
-
 
 
 

@@ -397,6 +397,7 @@
         #load-more-container {
             padding: 20px;
             text-align: center;
+            display: none;
         }
 
         /* Сама кнопка (используем твой стиль filter-btn) */

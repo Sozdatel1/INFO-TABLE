@@ -229,21 +229,12 @@ export async function registerUser(username, password) {
 
 async function registerView(postId) {
     try {
-        // Проверяем, вошел ли юзер
-        const { data: { session } } = await supabase.auth.getSession();
-        const user = session?.user;
-
-        // Если нет — используем простой фингерпринт (пропсы браузера)
-        const viewerId = user ? user.id : (navigator.userAgent + navigator.language);
-
-        // Отправляем просмотр в базу
-        // Если такой viewer_id уже смотрел этот post_id, база просто выдаст ошибку (и это ок)
-        supabase
-            .from('views')
-            .insert([{ post_id: postId, viewer_id: viewerId }]);
-
+        // Просто пинаем сервер, он сам разберется с IP и юзером
+        await fetch(`https://pro-info-api.onrender.com/api/view/{postId}`, {
+            method: 'POST'
+        });
     } catch (err) {
-        // Ошибку не выводим, чтобы не пугать юзера (дубликаты просмотров нам не важны)
+        console.error('Ошибка регистрации просмотра');
     }
 }
 
@@ -350,8 +341,7 @@ export async function loadFullArticle() {
         const likesSpan = document.getElementById('artLikes');
         if (likesSpan) likesSpan.innerText = article.real_likes;
 
-        const viwElem = document.getElementById('viw');
-        if (viwElem) viwElem.innerHTML = `<span> ${article.view_count}</span>`;
+
 
         const imgTag = document.getElementById('artImage');
         if (article.image && imgTag) {
@@ -360,6 +350,14 @@ export async function loadFullArticle() {
         }
         if (document.getElementById('avtor')) {
             document.getElementById('avtor').innerText = article.author_name || "Аноним";
+        }
+        const postId = params.get('id');
+        const count = await fetch(`https://pro-info-api.onrender.com/api/view-count/${postId}`);
+        const data = await count.json();
+
+        const viwElem = document.getElementById('viw');
+        if (viwElem) {
+            viwElem.innerHTML = `<span>${data.count}</span>`;
         }
 
         // 3. Проверка прав на удаление/редактирование
@@ -549,10 +547,10 @@ async function updateAuthUI() {
         }
 
 
-        // loginBtn.style.display = 'none';
+        loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
     } else {
-        // loginBtn.style.display = 'block';
+        loginBtn.style.display = 'block';
         profileBtn.style.display = 'none';
     }
 }

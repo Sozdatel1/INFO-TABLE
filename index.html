@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/styles/sign_in.css">
   <link rel="stylesheet" href="/styles/spinner.css">
   <link rel="stylesheet" href="/styles/cookie.css">
-   <link rel="stylesheet" href="/styles/logo.css">
+  <link rel="stylesheet" href="/styles/logo.css">
   <link rel="icon" type="image/svg+xml" href="/img/icon-512.png">
 
 
@@ -29,7 +29,7 @@
 
 
 <body>
-  
+
 
   <header class="header-content">
 
@@ -38,23 +38,23 @@
       <a href="index.html">
         <!-- <img src="/img/лого.png" class="logo-icon"> -->
         <div class="logo-container">
-    <!-- Задний лист -->
-    <div class="sheet sheet-back"></div>
-    <!-- Передний лист -->
-    <div class="sheet sheet-front">
-        <div class="brown-box"></div>
-        <div class="lines">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line short"></div>
-            <div class="line"></div>
+          <!-- Задний лист -->
+          <div class="sheet sheet-back"></div>
+          <!-- Передний лист -->
+          <div class="sheet sheet-front">
+            <div class="brown-box"></div>
+            <div class="lines">
+              <div class="line"></div>
+              <div class="line"></div>
+              <div class="line short"></div>
+              <div class="line"></div>
+            </div>
+            <div class="bottom-lines">
+              <div class="line full"></div>
+              <div class="line full"></div>
+            </div>
+          </div>
         </div>
-        <div class="bottom-lines">
-            <div class="line full"></div>
-            <div class="line full"></div>
-        </div>
-    </div>
-</div>
 
         <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
           <span class="logo-neon">i</span>Posters
@@ -90,23 +90,26 @@
 
 
     </nav>
-<div class="search-container" style="width: 100%; display: flex; gap: 0px; padding: 0 20px;">
-    <!-- Кнопка-лупа -->
-    <button class="search-toggle" id="searchToggle" style="display: none;"><img src="/img/serh.png" width="30"></button>
+    <div class="search-container" style="width: 100%; display: flex; gap: 0px; padding: 0 20px;">
+      <!-- Кнопка-лупа -->
+      <button class="search-toggle" id="searchToggle" style="display: none;"><img src="/img/serh.png"
+          width="30"></button>
 
-    <!-- МОБИЛЬНЫЙ блок (Dropdown) -->
-    <div class="search-dropdown" id="mobileSearchBox" style="display: none;">
-        <input type="text" id="mobileSearchInput" class="search-input-mob" placeholder="Поиск на iPosters..." oninput="runSearch(this)">
-    </div>
+      <!-- МОБИЛЬНЫЙ блок (Dropdown) -->
+      <div class="search-dropdown" id="mobileSearchBox" style="display: none;">
+        <input type="text" id="mobileSearchInput" class="search-input-mob" placeholder="Поиск на iPosters..."
+          oninput="runSearch(this)">
+      </div>
 
-    <!-- ДЕСКТОПНЫЙ блок -->
-    <div class="search-box" id="desktopSearchBox" style="width: 100%;">
-        <input type="text" id="desktopSearchInput" class="search-input-with-icon" placeholder="Поиск на iPosters..." oninput="runSearch(this)"
-          style=" padding: 12px; border-radius: 10px; border: 2px solid #00d4ff;  color: #00d4ff; width: 100%;" >
-        
+      <!-- ДЕСКТОПНЫЙ блок -->
+      <div class="search-box" id="desktopSearchBox" style="width: 90%;">
+        <input type="text" id="desktopSearchInput" class="search-input-with-icon" placeholder="Поиск на iPosters..."
+          oninput="runSearch(this)"
+          style=" padding: 12px; border-radius: 10px; border: 2px solid #00d4ff;  color: #00d4ff; width: 100%;">
+
         <!-- <button id="searchBtn" onclick="runSearch()">Найти</button> -->
+      </div>
     </div>
-</div>
 
 
 
@@ -115,7 +118,7 @@
     <!-- Кнопка "Войти" (по умолчанию видна) -->
     <button id="login-btn"
       style="padding: 11px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); border-radius: 30px; display: none; border: none; font-size: 17px; color: #ffffff; font-weight: bold; cursor: pointer;"
+        0 0 5px rgba(0, 255, 65, 0.2); border-radius: 10px; display: none; border: none; font-size: 17px; color: #ffffff; font-weight: bold; cursor: pointer;"
       onclick="openAuthModal()">Войти</button>
 
     <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
@@ -125,17 +128,10 @@
         onclick="goToProfile()">Профиль</button> -->
 
 
-    <li class="profile-menu" id="profile-btn" style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); padding: 1px; border-radius: 20px; display: none;">
-      <a href="#" id="profile-trigger"
-        style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
-        <span id="username-display" style="margin-left: auto !important; font-size: 21px;">Загрузка...</span>
-        <!-- Ник будет здесь -->
-      </a>
+    <li class="profile-menu" id="profile-btn" style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: none; padding: 9px;"><a href="#" id="profile-trigger" style="text-decoration: none; font-weight: bold;  display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;"><span id="username-display" style="margin-left: auto !important; font-size: 21px; letter-spacing: normal !important;">Загрузка...</span></a>
 
       <!-- Выпадающее меню -->
-      <ul id="profile-menu"
-        style="display: none; ">
+      <ul id="profile-menu" style="display: none; ">
         <li style="margin-bottom: 1px;">
           <button
             style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
@@ -175,9 +171,11 @@
         </div> -->
         <!-- Weather widget by https://www.meteoservice.ru -->
         <!-- Weather widget by https://www.meteoservice.ru -->
-<a id="ms-informer-link-ad7848da9e54e5994d59cd89336dc2cc" class="ms-informer-link" href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
-<script class="ms-informer-script" src="https://www.meteoservice.ru/informer/script/ad7848da9e54e5994d59cd89336dc2cc"></script>
-<!-- End -->
+        <a id="ms-informer-link-ad7848da9e54e5994d59cd89336dc2cc" class="ms-informer-link"
+          href="https://www.meteoservice.ru/weather/overview/dubna">Погода в Дубне</a>
+        <script class="ms-informer-script"
+          src="https://www.meteoservice.ru/informer/script/ad7848da9e54e5994d59cd89336dc2cc"></script>
+        <!-- End -->
         <!-- End -->
       </div>
 
@@ -217,7 +215,7 @@
 
       </div>
 
-      <div id="dynamic-cards" >
+      <div id="dynamic-cards">
         <!-- Сюда JS загрузит посты -->
 
         <span class="spinner" style="
