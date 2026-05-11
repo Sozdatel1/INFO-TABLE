@@ -91,10 +91,9 @@
 
 
       </nav>
-      <div class="search-container" style="width: 100%; display: flex; gap: 0px; padding: 0 20px;">
+      <div class="search-container" style="width: 100%; display: flex; gap: 0px; padding: 0 20px; margin: 0 auto;">
         <!-- Кнопка-лупа -->
-        <button class="search-toggle" id="searchToggle" style="display: none;"><img src="/img/serh.png"
-            width="30"></button>
+        <button class="search-toggle" id="searchToggle" style="display: none;"><img src="/img/search_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"></button>
 
         <!-- МОБИЛЬНЫЙ блок (Dropdown) -->
         <div class="search-dropdown" id="mobileSearchBox" style="display: none;">
@@ -103,7 +102,7 @@
         </div>
 
         <!-- ДЕСКТОПНЫЙ блок -->
-        <div class="search-box" id="desktopSearchBox" style="width: 100%;">
+        <div class="search-box" id="desktopSearchBox" style="width: 50%; margin: 0 auto;">
           <input type="text" id="desktopSearchInput" class="search-input-with-icon" placeholder="Поиск на iPosters..."
             oninput="runSearch(this)"
             style=" padding: 12px; border-radius: 10px; border: 2px solid #00d4ff;  color: #00d4ff; width: 100%;">
@@ -112,6 +111,7 @@
         </div>
       </div>
 
+      <div class="akk">
 
 
       <button id="plus" onclick="openCreateModal()">
@@ -132,7 +132,7 @@
 
 
       <li class="profile-menu" id="profile-btn"
-        style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: block; padding: 9px;">
+        style=" position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: block; padding: 9px;">
         <a href="#" id="profile-trigger"
           style="text-decoration: none; font-weight: bold;  display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;"><span
             id="username-display"
@@ -162,6 +162,7 @@
           </li>
         </ul>
       </li>
+</div>
 
     </div>
 
