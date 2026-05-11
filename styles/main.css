@@ -38,9 +38,9 @@
 
 
         .nav-divider {
-            width: 1px;
-            height: 30px;
-            background: linear-gradient(to bottom, transparent, rgba(65, 207, 255, 0.5), transparent);
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgb(0, 191, 255), transparent);
             margin: 0 15px;
         }
 
@@ -52,7 +52,7 @@
         .logo-icon {
             width: 55px;
             /* Подбери размер под высоту текста */
-          
+
             object-fit: contain;
             filter: drop-shadow(0 0 5px rgba(65, 207, 255, 0.5));
             /* Легкое неоновое свечение */
@@ -104,19 +104,20 @@
         .header-content {
             position: fixed;
             display: flex;
-            top: 10px;
+            top: 0px;
             left: 50%;
+            height: 70px;
             transform: translateX(-50%);
             align-items: center;
-            border-radius: 30px;
+            border-radius: 0px;
             /* Выравнивает элементы по вертикали по центру */
             gap: 10px;
             /* Добавляет немного пространства между картинкой и текстом */
             /* background-color: #fcfbbde1; */
             /* background-color: hsla(0, 0%, 60%, .14); */
-            background-color: hsla(0, 0%, 100%, 0.1);
+            background-color: hsl(0, 0%, 100%);
             backdrop-filter: blur(10px);
-            width: 70%;
+            width: 100%;
             padding: 10px 22px;
             transition: transform 0.6s ease;
             /* animation: hideHeader linear both;
@@ -124,6 +125,20 @@
   animation-range: 0px 20px; Анимация срабатывает на первых 200px скрола */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+        }
+
+        .hed {
+            width: 100%;
+            max-width: 1410px;
+            /* Узкий контейнер */
+            display: flex;
+            justify-content: space-between;
+            /* Элементы по краям */
+            padding: 0px;
+            margin: 0 auto;
+            text-align: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
         /* СЕТКА GRID */
@@ -145,7 +160,7 @@
             backdrop-filter: blur(10px); */
             background-color: hsla(0, 0%, 100%, 0.668);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
+            border-radius: 10px;
             padding: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             border: 0.1px solid rgb(225, 225, 225);
@@ -181,9 +196,9 @@
             background: #50d3ff;
             border: none;
             color: white;
-    border-color: #41cfff;
-    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2);
+            border-color: #41cfff;
+            box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+                0 0 5px rgba(0, 255, 65, 0.2);
             padding: 15px;
             border-radius: 10px;
             font-weight: bold;
@@ -215,7 +230,7 @@
             gap: 15px;
             background: #fff;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid #000;
             height: 100%;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -347,7 +362,7 @@
             /* Твой неоновый голубой */
             color: white !important;
             padding: 3px 10px;
-            border-radius: 12px;
+            border-radius: 7px;
             font-size: 10px;
             font-weight: bold;
             z-index: 100;
@@ -359,8 +374,9 @@
             text-transform: uppercase;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
         #reading-time {
-              position: absolute;
+            position: absolute;
             top: 10px;
             right: 10px;
             background: #41cfff !important;

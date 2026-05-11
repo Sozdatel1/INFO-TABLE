@@ -300,6 +300,49 @@ window.deleteComment = async function (commentId) {
 
 // ------------------------------------------------------------
 
+window.openCreateModal = async function() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+    const ak = user.email.split('@')[0];
+    await Swal.fire({
+        title: `Напишите статью, ${ak}!`,
+        // Вставляем твою верстку прямо сюда
+        width: '1000px',
+        html: `
+        <div class="glass-card admin-zone" style="height: auto; border: none; box-shadow: none; background: transparent; padding: 0;">
+            <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)..." style="width: 100%; margin-bottom: 10px;">
+            <input type="text" id="postTitle" placeholder="Заголовок статьи..." style="width: 100%; margin-bottom: 10px;">
+            <textarea id="postInput" placeholder="Текст статьи..." rows="20" style="width: 100%; margin-bottom: 10px;"></textarea>
+        
+        </div>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Опубликовать',
+        confirmButtonColor: '#41cfff',
+        showCancelButton: true,
+        cancelButtonText: 'Отмена',
+        focusConfirm: false,
+        // Собираем данные перед тем как вызвать твою функцию
+        preConfirm: () => {
+            const title = document.getElementById('postTitle').value;
+            const text = document.getElementById('postInput').value;
+            const image = document.getElementById('postImage').value;
+
+            if (!title || !text) {
+                Swal.showValidationMessage('Заголовок и текст обязательны!');
+                return false;
+            }
+            return { title, text, image };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Когда нажали "Опубликовать", вызываем твою функцию
+            // Передаем туда данные из полей
+            publishPost(result.value);
+        }
+    });
+};
+
 
 
 

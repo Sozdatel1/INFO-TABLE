@@ -99,7 +99,25 @@
     padding: 15px;
     border-radius: 8px;
     z-index: 1000;
+    right: 0;
     list-style: none;
+}
+
+#plus {
+    margin-left: auto !important;
+    position: relative;
+    list-style: none;
+    display: flex;
+    background: #41cfff !important;
+    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4), 0 0 5px rgba(0, 255, 65, 0.2);
+    border-radius: 10px;
+    margin-right: 5px;
+    padding: 9px;
+    border: none;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+
 }
 
 /* Адаптивность для мобильных */
@@ -349,7 +367,7 @@ body.menu-open {
     align-items: center;
     color: rgb(0, 0, 0);
     text-align: center;
-    padding: 16px;
+    padding: 0px;
     margin: 0px 0px 0px 0px;
     text-decoration: none;
     /* Убираем подчеркивание сылок */

@@ -20,122 +20,120 @@
 <body>
 
     <header class="header-content">
+    <div class="hed">
 
+      <div class="logo">
+        <a href="index.html">
+          <!-- <img src="/img/лого.png" class="logo-icon"> -->
+          <div class="logo-container">
+            <!-- Задний лист -->
+            <div class="sheet sheet-back"></div>
+            <!-- Передний лист -->
+            <div class="sheet sheet-front">
+              <div class="brown-box"></div>
+              <div class="lines">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line short"></div>
+                <div class="line"></div>
+              </div>
+              <div class="bottom-lines">
+                <div class="line full"></div>
+                <div class="line full"></div>
+              </div>
+            </div>
+          </div>
 
-        <div class="logo">
-            <a href="index.html">
-                <!-- <img src="/img/IT.png?v=777" class="logo-icon"> -->
-                  <div class="logo-container">
-    <!-- Задний лист -->
-    <div class="sheet sheet-back"></div>
-    <!-- Передний лист -->
-    <div class="sheet sheet-front">
-        <div class="brown-box"></div>
-        <div class="lines">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line short"></div>
-            <div class="line"></div>
-        </div>
-        <div class="bottom-lines">
-            <div class="line full"></div>
-            <div class="line full"></div>
-        </div>
-    </div>
-</div>
-                <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
-                    <span class="logo-neon">i</span>Posters
-                </div>
-            </a>
-        </div>
-
-
-
-
-        <div class="nav-divider"></div> <!-- ВОТ ОНА -->
-
-        <!-- Кнопка бургер (появится на моилах) -->
-        <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
-            <span></span>
-        </button>
-
-        <nav class="dropdown-menu" id="headerNav">
-            <ul>
-                <li><a href="index.html"><img src="/img/images (1)-Photoroom.png" width="21"></a></li>
-
-                <li class="dropdown">
-                    <div class="dropdown-link-wrapper">
-
-                    </div>
-
-                </li>
+          <div class="logo-text"> <!-- ОБЕРТКА ДЛЯ СЛОВ -->
+            <span class="logo-neon">i</span>Posters
+          </div>
+        </a>
+      </div>
 
 
 
 
-            </ul>
+      <div class="nav-divider"></div> <!-- ВОТ ОНА -->
+
+      <!-- Кнопка бургер (появится на моилах) -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню">
+        <span></span>
+      </button>
+
+      <nav class="dropdown-menu" id="headerNav">
+        <ul>
+          <li><a href="index.html"><img src="/img/home_45dp_000000_FILL0_wght400_GRAD0_opsz48.svg" width="30"></a></li>
+
+          <li class="dropdown">
+            <div class="dropdown-link-wrapper">
+
+            </div>
+
+          </li>
 
 
-        </nav>
-        <!-- <div class="search-container" style=" max-width: 600px; display: flex; gap: 10px; padding: 0 20px;">
-    <input type="text" id="searchInput" placeholder="Поиск на iPosters..." 
-        style="flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; background: transparent; color: #00d4ff;">
+
+
+        </ul>
+
+
+      </nav>
     
-    <button id="searchBtn" style="background: #41cfff; border-color: #41cfff; color: #ffffff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;  box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2);">
-        Найти
-    </button>
-</div> -->
 
 
 
-        <!-- Кнопка "Войти" (по умолчанию видна) -->
-        <button id="login-btn"
-            style="padding: 11px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); border-radius: 30px; display: none; border: none; font-size: 17px; color: #ffffff; font-weight: bold; cursor: pointer;"
-            onclick="openAuthModal()">Войти</button>
+      <!-- <button id="plus" onclick="openCreateModal()">
+        <img src="/img/add_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">
+      </button> -->
 
-        <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
-        <!-- <button id="profile-btn"
+      <!-- Кнопка "Войти" (по умолчанию видна) -->
+      <button id="login-btn"
+        style="display: none; padding: 9px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+        0 0 5px rgba(0, 255, 65, 0.2); border-radius: 10px;  border: none; font-size: 21px; color: #ffffff; font-weight: bold; cursor: pointer; gap: 5px;"
+        onclick="openAuthModal()"><img src="/img/login_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">Войти</button>
+
+      <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
+      <!-- <button id="profile-btn"
       style="display: none; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
         href="profile.html" style="color: #000000; text-decoration: none;  background-color: #41d0ff00;"
         onclick="goToProfile()">Профиль</button> -->
 
 
-        <li class="profile-menu" id="profile-btn" style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
-        0 0 5px rgba(0, 255, 65, 0.2); padding: 1px; border-radius: 20px; display: none;">
-            <a href="#" id="profile-trigger"
-                style="text-decoration: none; font-weight: bold; padding: 10px; display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;">
-                <span id="username-display" style="margin-left: auto !important; font-size: 21px;">Загрузка...</span>
-                <!-- Ник будет здесь -->
-            </a>
+      <li class="profile-menu" id="profile-btn"
+        style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: block; padding: 9px;">
+        <a href="#" id="profile-trigger"
+          style="text-decoration: none; font-weight: bold;  display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;"><span
+            id="username-display"
+            style="margin-left: auto !important; font-size: 21px; letter-spacing: normal !important;">Загрузка...</span></a>
 
-            <!-- Выпадающее меню -->
-            <ul id="profile-menu"
-                style="display: none; position: absolute; top: 100%; left: 0; background: #ffffff; min-width: 220px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; z-index: 1000; list-style: none;">
-                <li style="margin-bottom: 1px;">
-                    <button
-                        style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
-                            href="profile.html"
-                            style="color: #000000; text-decoration: none;  background-color: #41d0ff00;">Профиль</a></button>
-                </li>
-                <hr>
-                <li style="margin-bottom: 1px;">
-                    <button onclick="logoutUser()"
-                        style="width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;">Выйти</button>
-                </li>
-                <hr>
-                <li>
-                    <button onclick="deleteMyAccount()"
-                        style="width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;">Удалить
-                        аккаунт</button>
-                </li>
-            </ul>
-        </li>
+        <!-- Выпадающее меню -->
+        <ul id="profile-menu" style="display: none; ">
+          <li style="margin-bottom: 1px;">
+            <button
+              style="display: flex;   width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left; align-items: center;"><a
+                href="profile.html"
+                style="display: flex; gap: 5px; color: #000000; text-decoration: none;  background-color: #41d0ff00; align-items: center;"><img
+                  src="/img/account_circle_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Профиль</a></button>
+          </li>
+          <hr>
+          <li style="margin-bottom: 1px;">
+            <button onclick="logoutUser()"
+              style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><img
+                src="/img/logout_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Выйти</button>
+          </li>
+          <hr>
+          <li>
+            <button onclick="deleteMyAccount()"
+              style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;"><img
+                src="/img/delete_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Удалить
+              аккаунт</button>
+          </li>
+        </ul>
+      </li>
 
+    </div>
 
-
-    </header>
+  </header>
     <div id="scrollProgress"></div>
 
     <div class="content-stat">

@@ -228,16 +228,28 @@ export async function registerUser(username, password) {
 // ПРОСМОТРЫ
 
 async function registerView(postId) {
+    // 1. Проверяем метку в браузере
+    const storageKey = `viewed_${postId}`;
+    if (localStorage.getItem(storageKey)) {
+        return; // Если уже смотрели, просто выходим
+    }
+
     try {
-        // Просто пинаем сервер, он сам разберется с IP и юзером
-        await fetch(`https://pro-info-api.onrender.com/api/view/${postId}`, {
+        // 2. Если метки нет — пинаем сервер
+        const response = await fetch(`https://pro-info-api.onrender.com/api/view/${postId}`, {
             method: 'POST'
         });
+
+        // 3. Если сервер ответил успешно — ставим метку
+        if (response.ok) {
+            localStorage.setItem(storageKey, 'true');
+        }
     } catch (err) {
         console.error('Ошибка регистрации просмотра');
     }
 }
-window.registerView = registerView
+window.registerView = registerView;
+
 
 
 function handleSearch(event) {
@@ -470,10 +482,6 @@ export async function publishPost() {
         location.reload();
         if (isEdit) {
             window.location.href = `article.html?id=${window.currentEditId}`;
-        } else {
-            document.getElementById('postTitle').value = "";
-            document.getElementById('postInput').value = "";
-            document.getElementById('postImage').value = "";
         }
 
     } catch (err) {
@@ -541,7 +549,7 @@ async function updateAuthUI() {
     const loginBtn = document.getElementById('login-btn');
     const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
-
+    const plus = document.getElementById('plus')
     // Если кнопок нет на текущей странице, прерываем функцию
     // if (!loginBtn && !profileBtn) return;
 
@@ -552,13 +560,16 @@ async function updateAuthUI() {
         if (usernameDisplay) {
             usernameDisplay.innerText = user.email.split('@')[0];
         }
-
-
+        if (plus){
+        plus.style.display = 'flex';
+        }
         loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
     } else {
-        loginBtn.style.display = 'block';
+        loginBtn.style.display = 'flex';
         profileBtn.style.display = 'none';
+        plus.style.display = 'none';
+
     }
 }
 window.updateAuthUI = updateAuthUI
@@ -635,9 +646,12 @@ document.addEventListener('DOMContentLoaded', () => {
 //     </button>`}
 window.deleteMyAccount = async function () {
     // 1. Показываем всплывающее окно с предупреждением
+    const { data: { session }, error } = await supabase.auth.getSession();
+    const user = session?.user;
+    const username = user.email.split('@')[0];
     const result = await Swal.fire({
-        title: "Вы уверены?",
-        text: "Ваш профиль и ВСЕ ваши статьи будут удалены навсегда!",
+        title: `Удалить аккаунт ${username}?`,
+        text: "Ваш профиль и ВСЕ ваши статьи будут безвозвратно удалены!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#ff4d4d",
