@@ -16,7 +16,65 @@
 border: 1px solid #41cfff;
 
 }
+.filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.filt {
+    
+    position: absolute;
+    top: 100%; /* Падает чётко под нижний край .header-content (70px) */
+    left: 0;
+    right: 0;
+    width: 100%; /* Теперь растягивается на ВСЮ ШИРИНУ ХЕДЕРА! */
+    background: #ffffff;
+    padding: 15px 22px;
+    border-bottom: 2px solid #41cfff;
+    z-index: 999;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+     /* СЕКРЕТНЫЙ АНИМАЦИОННЫЙ БЭКЕНД */
+    opacity: 0;   
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; 
+    
+    /* РАССТОЯНИЕ МЕЖДУ КНОПКАМИ: Теперь заработает идеально! */
+    gap: 12px !important;                  /* По умолчанию фильтр полностью невидим */
+    visibility: hidden;    /* Полностью скрыт от кликов, пока закрыт */
+    transform: translateY(-20px); /* Смещен чуть вверх, внутрь шапки */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Плавный физический отклик */
+}
+.filt.active {
+    opacity: 1;            /* Фильтр плавно растворяется до полной видимости */
+    visibility: visible;   /* Становится доступным для кликов */
+    transform: translateY(0); /* Сочно выезжает вниз на своё законное место */
+}
+#add-filt {
+    display: none;
+    position: relative;
+    list-style: none;
+    background: #41cfff !important;
+    box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4), 0 0 5px rgba(0, 255, 65, 0.2);
+    border-radius: 10px;
+    right: 0;
+    padding: 9px;
+    border: none;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+}
+@media (max-width: 1310px) {
+    #add-filt {
+        display: flex; /* Показываем кнопку на мобилках */
+    }
+}
+.filt-adap {
+    display: none; /* Скрыт на десктопе, чтобы не мешался */
+}
 .tag-filters::-webkit-scrollbar {
     display: none;
 }
@@ -64,4 +122,14 @@ border: 1px solid #41cfff;
         padding: 6px 15px;
         font-size: 12px;
     }
+}
+@media (max-width: 1310px) {
+    .tag-filters {
+        display: none;
+    }
+    .filt-adap {
+        display: block; /* Включаем на мобилках */
+        position: static; /* Важно: отвязываем абсолютные координаты выпадашки от этого блока! */
+    }
+
 }

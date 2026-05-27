@@ -233,3 +233,11 @@ function updateHoliday() {
 }
 
 updateHoliday()
+function openFilt() {
+    // Находим наш мобильный блок фильтров по классу
+    const mobileFilter = document.querySelector('.filt');
+    
+    // Мгновенно переключаем класс 'active' (если его нет - добавит, если есть - удалит)
+    mobileFilter.classList.toggle('active');
+}
+window.openFilt = openFilt

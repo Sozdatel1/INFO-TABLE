@@ -111,19 +111,40 @@
           <!-- <button id="searchBtn" onclick="runSearch()">Найти</button> -->
         </div>
       </div>
-  <div class="tag-filters glass-card" id="tag">
-        <span
-          style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
-        <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
-        <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
-        <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
-        <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
-        <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
 
-      </div>
-<div class="filt">
-  
+
+
+     <div class="filter">
+  <!-- КНОПКА ФИЛЬТРОВ (Появляется только на мобилках) -->
+  <button id="add-filt" onclick="openFilt()">
+    <img src="/img/filter_list_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">
+  </button>
+
+  <!-- ДЕСКТОПНЫЙ БЛОК (Скрывается на мобилках) -->
+  <div class="tag-filters glass-card" id="tag">
+    <span style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+    <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+    <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+    <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+    <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+    <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+  </div>
+
+  <!-- МОБИЛЬНЫЙ ВЫПАДАЮЩИЙ БЛОК -->
+  <div class="filt-adap">
+    <div class="filt">
+      
+      <span style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+      <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+      <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+      <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+      <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+      <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+      
+    </div>
+  </div>
 </div>
+
       <div class="akk">
 
 

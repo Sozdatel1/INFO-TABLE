@@ -163,7 +163,7 @@
     #desktopSearchBox {
         display: none !important;
     }
-
+    
     /* Показываем и стилизуем кнопку-лупу */
     .search-toggle {
         display: flex !important;
@@ -173,7 +173,7 @@
         padding: 9px;
         border: none;
         cursor: pointer;
-        order: 8;
+        /* order: 8; */
         margin-left: auto;
         /* Порядок в ряду */
     }
