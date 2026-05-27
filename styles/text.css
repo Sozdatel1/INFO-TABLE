@@ -1,0 +1,16 @@
+.text-container::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px; /* Высота затухания */
+    background: linear-gradient(transparent, white); /* Переход из прозрачного в цвет фона */
+    transition: opacity 0.5s ease;
+    pointer-events: none; /* Чтобы градиент не мешал кликать по тексту */
+}
+
+/* Когда текст развернут, убираем затухание */
+.text-container.expanded::after {
+    opacity: 0;
+}

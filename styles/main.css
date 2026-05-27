@@ -158,10 +158,11 @@
         .glass-card {
             /* background: var(--glass);
             backdrop-filter: blur(10px); */
-            background-color: hsla(0, 0%, 100%, 0.668);
+            background-color: hsl(0, 0%, 100%);
             backdrop-filter: blur(10px);
             border-radius: 10px;
             padding: 15px;
+            
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             border: 0.1px solid rgb(225, 225, 225);
             margin-bottom: 20px;
@@ -217,9 +218,11 @@
         /* СЕТКА СТАТЕЙ (чтобы были ровными) */
         #dynamic-cards {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 40px;
             align-items: stretch;
+            width: 80%;
+            margin: 0 auto;
         }
 
         /* САМА КАРТОЧКА СТАТЬИ */
@@ -253,7 +256,18 @@
             opacity: 1;
             transform: translateY(0);
         }
+        
+.article-post {
+    opacity: 0;
+    transform: translateY(20px);
+}
 
+/* Анимация сработает только для них */
+.article-post.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
         /* ЭФФЕКТ ПРИ НАВЕДЕНИИ (Теперь он не будет конфликтовать) */
         .news-card.visible:hover {
             border-color: var(--accent);
@@ -263,7 +277,7 @@
         }
 
         .card-icon {
-            width: 100%;
+            width: 70%;
             /* 1. Прямоугольник 2 к 1 (Ширина в два раза больше высоты) */
             aspect-ratio: 2 / 1;
             flex-shrink: 0;
@@ -275,8 +289,8 @@
 
         .card-icon img {
             /* 2. ЗАСТАВЛЯЕМ КАРТИНКУ ЗАНЯТЬ ВЕСЬ СЕРЫЙ БЛОК */
-            width: 100% !important;
-            height: 100% !important;
+            width: 50% !important;
+            height: 50% !important;
 
             /* 3. МАГИЯ: картинка не растягивается "соплей", а аккуратно обрезается */
             object-fit: cover;
@@ -284,6 +298,54 @@
         }
 
 
+#postInput img {
+    max-width: 100%;       /* Картинка никогда не вылезет за границы редактора */
+    max-height: 500px;     /* Ограничиваем максимальную высоту аккуратным размером */
+    object-fit: contain;     /* Картинка красиво заполнит блок без искажения пропорций */
+    border-radius: 8px;    /* Скругляем углы под твой стеклянный дизайн */
+    margin: 10px 0; 
+    height: 100%;       /* Добавляем отступы сверху и снизу от текста */
+    display: block;        /* Картинка встает отдельной строкой, не мешая буквам */
+}
+/* Ограничиваем картинки внутри самой статьи на сайте */
+.text-container img {
+     display: inline-block !important; 
+    max-width: 100%;
+    max-height: 500px;     /* В самой ленте можно сделать чуть крупнее, чем в редакторе */
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: block;
+    
+}
+.carousel-track {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* Выстраиваем слайды строго в один ряд */
+    height: 100% !important;
+    width: 100% !important;
+    
+    /* 🔥 СБРИВАЕМ ТЕКСТОВЫЕ СТИЛИ, КОТОРЫЕ ВЫТАЛКИВАЛИ КАРТИНКУ ВНИЗ */
+    line-height: 0 !important;      /* Обнуляем высоту строки */
+    font-size: 0 !important;       /* Обнуляем размер шрифта внутри трека */
+    white-space: nowrap !important; /* Запрещаем переносы строк, чтобы слайды не улетали вниз */
+}
+/* Жестко фиксируем отображение картинок строго по одной в слайде */
+.carousel-track img {
+    width: 100% !important;        /* Картинка занимает ровно всю ширину карусели */
+    max-width: 100% !important;
+    height: 100% !important;     
+    display: inline-block !important;  
+    height: 100% !important;  /* Занимает всю высоту карусели (350px) */
+    max-height: 100% !important;
+    object-fit: contain !important; /* Центруется, сохраняет пропорции и не обрезается */
+    flex-shrink: 0 !important;     /* 🔥 САМОЕ ВАЖНОЕ: запрещает картинкам сжиматься и лезть друг на друга! */
+    margin: 0 !important;
+    padding: 0 !important;
+    background: black !important;
+}
 
 
         .news-card p {
@@ -315,6 +377,9 @@
 
             .left-sidebar {
                 display: none;
+            }
+            #dynamic-cards {
+                width: 100%;
             }
         }
 

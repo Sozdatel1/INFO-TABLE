@@ -11,8 +11,8 @@ export function getAutoCategory(title, text = '') {
 
     const keywordsMap = {
         'Интернет': ['интерн', 'брауз', 'веб', 'сайт', 'веб страница', 'мессен'],
-        'Технологии': ['техн', 'серв', 'робо', 'прогре', 'искуственный интеллект', 'язык', 'dota', 'xbox', 'плей'],
-        'Природа': ['капибар', 'животн', 'кот', 'пес', 'лес', 'природ', 'море', 'птиц', 'эко', 'океан','орнитол','амадин','гульд'],
+        'Технологии': ['технологии', 'сервер', 'робот', 'прогрес', 'искуственный интеллект', 'язык'],
+        'Природа': ['капибар', 'животн', 'кот', 'пес', 'лес', 'природ', 'море', 'птиц', 'эко', 'океан', 'орнитол', 'амадин', 'гульд', 'самка', 'муравь', 'яйц', 'матк', 'джунгли', 'насеком'],
         // 'Жи+': ['школ', 'жизнь', 'день', 'учеба', 'хобби', 'отдых', 'мысли', 'совет', 'урок'],
         'Еда': ['гот', 'пригот', 'ед', 'печен', 'рецепт', 'кухня', 'пицца', 'бургер', 'вкусн', 'завтрак']
         // 'Нейро': ['нейро', 'ai', 'ии', 'gpt', 'бот', 'чат', 'midjourney', 'генерация']
@@ -48,8 +48,8 @@ export function calculateReadingTimeForCard(text) {
 
     // Склонение (бонус!)
     let suffix = 'мин.';
-    if (minutes === 1) suffix = 'минута';
-    if (minutes >= 2 && minutes <= 4) suffix = 'минуты';
+    if (minutes === 1) suffix = 'мин.';
+    if (minutes >= 2 && minutes <= 4) suffix = 'мин.';
 
     return `${minutes} ${suffix}`;
 }
@@ -80,11 +80,15 @@ window.loadMore = loadMore;
 
 
 function filterByTag(tag, button) {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Сделает прокрутку плавной и кайфовой
+    });
     // 1. Сбрасываем счетчик, чтобы снова видеть первые 8 постов
     displayedCount = 8;
 
 
-   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
 
     // Очищаем пришедший тег от решетки (на всякий случай)
@@ -103,3 +107,74 @@ function filterByTag(tag, button) {
     renderFilteredPosts(filtered, false);
 }
 window.filterByTag = filterByTag;
+
+
+let loaderInterval = null;
+
+window.renderLoader = {
+    start: function () {
+        const container = document.getElementById('render-loader-container');
+        const bar = document.getElementById('render-loader-bar');
+
+        const percentText = document.getElementById('loader-percent');
+
+        if (!container) return;
+
+        container.style.display = 'block'; // Показываем прогресс-бар
+
+        let currentPercent = 0;
+        let timeLeft = 50; // Сколько секунд всего надо ждать
+
+        // Очищаем старый интервал, если он вдруг был запущен
+        clearInterval(loaderInterval);
+
+        // Запускаем тик каждые 500 миллисекунд (полсекунды)
+        loaderInterval = setInterval(() => {
+            currentPercent += 1; // Увеличиваем на 1%
+
+            // Каждые два тика (1 секунда) уменьшаем оставшееся время
+            if (currentPercent % 2 === 0 && timeLeft > 0) {
+                timeLeft -= 1;
+            }
+
+            // Обновляем данные на экране
+            bar.style.width = `${currentPercent}%`;
+            percentText.innerText = currentPercent;
+
+
+            // Если доползли до 100%, останавливаем счетчик
+            if (currentPercent >= 100) {
+                clearInterval(loaderInterval);
+                timerText.innerText = "0";
+            }
+        }, 500); // 500мс = полсекунды
+    },
+
+    stop: function () {
+        clearInterval(loaderInterval); // Останавливаем таймер
+        const container = document.getElementById('render-loader-container');
+        if (container) {
+            container.style.display = 'none'; // Полностью прячем блок загрузки
+        }
+    }
+};
+
+window.formatDoc = function (cmd, value = null) {
+    document.execCommand(cmd, false, value);
+
+    // Возвращаем фокус на поле
+    const input = document.getElementById('postInput');
+    input.focus();
+
+    // ПРОВЕРКА: Нажата ли кнопка "Ж" прямо сейчас?
+    const isBold = document.queryCommandState('bold');
+    const boldBtn = document.getElementById('btn-bold');
+
+    if (boldBtn) {
+        // Если жирный включен — красим в твой фирменный голубой, если нет — возвращаем серый
+        boldBtn.style.background = isBold ? '#41cfff' : '#e0e0e0';
+        boldBtn.style.color = isBold ? 'white' : 'black';
+    }
+
+
+};

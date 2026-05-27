@@ -315,10 +315,10 @@
     }
 }
 
-.header--hidden {
-    /* Сохраняем -50% по горизонтали и добавляем -105% по вертикали */
+/* .header--hidden {
+    
     transform: translate(-50%, -110%) !important;
-}
+} */
 
 body.menu-open {
     overflow: hidden;

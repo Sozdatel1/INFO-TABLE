@@ -9,7 +9,7 @@ import { renderTrending } from './staty.js';
 
 
 
-export function renderFilteredPosts(postsToRender, append = false) {
+export async function renderFilteredPosts(postsToRender, append = false) {
 
     const grid = document.getElementById('dynamic-cards');
     const loadMoreContainer = document.getElementById('load-more-container');
@@ -26,6 +26,8 @@ export function renderFilteredPosts(postsToRender, append = false) {
         if (loadMoreContainer) loadMoreContainer.style.display = 'none';
         return; // Останавливаем функцию, чтобы не рисовать пустой список
     }
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUser = session?.user;
 
     const dataToDraw = append ? postsToRender : postsToRender.slice(0, displayedCount);
 
@@ -35,83 +37,87 @@ export function renderFilteredPosts(postsToRender, append = false) {
     // ВОТ ТУТ СОЗДАЕТСЯ ВРЕМЕННАЯ ПЕРЕМЕННАЯ post ОТ КОТОРОЙ МОЖНО ПЕРЕХОДИТЬ В КОНКРЕТНОЙ КАРТОЧКЕ
     //                                  \\//  
     //                                   ||
+    // const response = await fetch(`https://pro-info-api.onrender.com/api/article/${id}`);
     const postsHtml = dataToDraw.map(post => {
-
+        const isOwner = currentUser && (currentUser.id === post.user_id || currentUser.id === post.author_id);
         // КОГДА МЫ УПОМИНАЕМ post.text МЫ УПОМИНАЕМ ЭТУ ПЕРЕМЕННУЮ И ПУНКТ ТЕКСТ В МАССИВЕ КАРТОЧКИ И СТАТЬИ (на гитхаб файл постс джсон) ПРОСТО ЗДЕСЬ ОТРИСОВЫВАЕТСЯ ТОЛЬКО ЗАГОЛОВОК СТАТЬИ В КАРТОЧКЕ, А НА САМОМ ДЕЛЕ ОБРАТИТЬСЯ К ПЕРЕМЕННОЙ post МОЖНО И ЗА ТЕКСТОМ СТАТЬИ (post.text) КАК ЭТО ДЕЛАЕТ ФУНКЦИЯ ПЕРЕСЧЕТА СЛОВ calculateReadingTimeForCard
 
         // ------------------------------------------------------------------------------------------
 
+
+
+        const timeAgo = formatTime(post.created_at); // Вот тут магия
+//  ${(post.image || post.image_url) ? `<img src="${post.image || post.image_url}" style="width: calc(100% + 50px)! important; 
+//            /* Добавь фиксированную высоту, чтобы object-fit сработал */
+//             margin: 0 -25px 15px -25px !important; 
+//             display: block; 
+//             aspect-ratio: 2 / 1;
+//             object-fit: cover; 
+//             border-radius: 0px; 
+//             flex-shrink: 0; 
+//             overflow: hidden; 
+//             background-color: #eee;">` : ''}
 
         const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
 
         // вызываем счетчик времени чтения
         const readingTime = calculateReadingTimeForCard(post.text);
 
+        // Внутри твоего return `...`
         return `
-   
-    <a href="article.html?id=${post.id}" style="text-decoration: none; color: inherit;">
-        <div class="news-card">
+    <div class="glass-card article-post" id="post-card-${post.id}" style="margin-bottom: 20px; padding: 25px; transition: all 0.5s ease; border-radius: 5px; background: rgb(255, 255, 255); backdrop-filter: blur(10px); scroll-margin-top: 0px;">
+      <span class="auto-tag"> • ${category} •</span>
+        <p style="font-size: 15px; opacity: 0.7; margin-bottom: 15px;">
+            Автор: <b>${post.author_name || "Аноним"} | ${timeAgo}</b> | 
+        
+            Читать ${readingTime} |
+            Просмотров: <b id="viw-${post.id}">${post.viewCount || 0}</b>
+        </p>
+        <!-- Картинка: берем либо post.image, либо post.image_url (проверь как в базе) -->
+       
+         ${isOwner ? `
+        <div class="author-panel" style="display: flex; gap: 10px; margin-bottom: 15px; padding: 10px; background: rgba(65, 207, 255, 0.1); border-radius: 10px;">
+            <button onclick="window.openEditModal('${post.id}')" style="background:#41cfff; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">✏️ Редактировать</button>
+            <button onclick="window.deletePost('${post.id}')" style="background:#fc2a00; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">🗑️ Удалить</button>
+        </div>
+    ` : ''}
+        <h1 style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 28px;">${post.title}</h1>
+         <div id="container-${post.id}" class="text-container" style="max-height: 100px; overflow: hidden; position: relative; transition: max-height 0.5s ease;"><div id="text-${post.id}" style="overflow: hidden; transition: max-height 0.5s ease; font-size: 18px; line-height: 1.3; color: #333; white-space: pre-wrap; text-align: left; left: 0;">${post.text}
+        </div>
 
-        <span class="auto-tag">• ${category} •</span>
-        <span id="reading-time-${post.id}" style=" position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #0044ff !important;
-            /* Твой неоновый голубой */
-            color: white !important;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
-            z-index: 100;
-
-            /* ГЛАВНОЕ: Отключаем скрытие */
-            opacity: 1 !important;
-            visibility: visible !important;
-            display: block !important;
-            text-transform: uppercase;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
-            🕜 ${calculateReadingTimeForCard(post.text)}
-            </span>
+    </div>
+        <button onclick="window.togglePost('${post.id}')" id="btn-${post.id}" style="background: none; border: none; color: #41cfff; font-weight: bold; cursor: pointer; margin-top: 15px; padding: 0; font-size: 16px;">
+            Развернуть пост ↓
+        </button>
+                <div style="display: flex; gap: 10px;">
+        <div id="like-btn-container-${post.id}" onclick="window.likePost('${post.id}')" style="cursor: pointer; display: flex; align-items: center; margin: 15px 0;">
+    <span style="border: 2px solid red; border-radius: 50px; padding: 6px 10px; background-color: #ff8000; display: flex; align-items: center;">
+        <img src="/img/staty/thumb_up_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" style="width: 20px;">
+    </span>
+    <span id="likes-count-${post.id}" style="margin-left: 15px; color: #ff8000; font-weight: bold; font-size: 24px;">
+        ${post.real_likes || 0}
+    </span>
+    
+    
+</div>
+ <button onclick="window.sharePost('${post.id}')" class="share-btn" style="background: none; border: none;   cursor: pointer; font-size: 18px; padding: 5px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">Поделиться</button>
+ </div>
+<div id="comments-section-${post.id}" style="display: none; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
+            <h2>💬 Комментарии</h2>
+            <textarea id="commentInput-${post.id}" placeholder="Ваш комментарий..." style="width: 100%; height: 60px; border-radius: 10px; padding: 10px; margin-bottom: 10px;"></textarea>
+            <button onclick="window.sendComment('${post.id}')" style="background: #41cfff; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Отправить</button>
+            <div id="comments-list-${post.id}" style="margin-top: 15px;"></div>
+        </div>
         
 
-            <div class="card-icon">
-            ${post.image ? `<img src="${post.image}" alt="icon" style="margin-bottom: 10px;
-     background: #ffe5e000;
-     width: 100%;
-
-     border-radius: 5px;
-     display: flex;
-     text-align: center;
-     align-items: center;
-     justify-content: center;
-     color: #ff5733;
-
-     height: 50%;
-     
-     object-fit: cover;">` : ''}
-            </div>
-            <p>
-                <strong>${post.title}</strong><br>
-                <span style="  font-size: 10px; 
-    opacity: 0.5; 
-    display: block;
-    width: 100%; 
-    white-space: nowrap; 
-    overflow: hidden;   
-    text-overflow: ellipsis; /* Рисует три точки, если текст слишком длинный */">Читать статью...</span>
-            </p>
-
-            
-
-
-        </div>
-    </a>
-`}).join('');
+    </div>
+`;
+    }).join('');
 
     // СТРАБАТЫВАЕТ ЕСЛИ НАЖАЛ ПОКАЗАТЬ ЕЩЕ, ДОРИСОВЫВАЕТ ЕЩЕ 9 СТАТЕЙ
     if (append) {
-        grid.insertAdjacentHTML('beforeend', postsHtml);
+        // grid.insertAdjacentHTML('beforeend', postsHtml);
+        grid.innerHTML += postsHtml;
 
 
         // СТРАБАТЫВАЕТ ЕСЛИ ПЕРЕКЛЮЧИЛ ФИЛЬТР И ЧТОБЫ НЕ ОТРЫСОСВЫВАТЬ ВСЕ СТАТЬИ 
@@ -146,15 +152,85 @@ export function renderFilteredPosts(postsToRender, append = false) {
     }
 
     // Ищем ТОЛЬКО ТЕ карточки, которые МЫ ТОЛЬКО ЧТО ДОБАВИЛИ КНОПКОЙ ПОКАЗАТЬ ЕЩЕ, ДЕЛАЕМ ИМ АНИМАЦИЮ ПОЯВЛЕНИЯ
-    const newCards = grid.querySelectorAll('.news-card:not(.visible)');
+    const newCards = grid.querySelectorAll('.article-post:not(.visible)');
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            newCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('visible');
+                }, index * 50); // Уменьшил до 50мс для сочности и скорости
+            }, 200);
 
-    newCards.forEach((card, index) => {
-        setTimeout(() => {
-            card.classList.add('visible');
-        }, index * 50); // Уменьшил до 50мс для сочности и скорости
+
+        });
     });
+};
 
-}
+window.togglePost = async function (postId) {
+    const textBlock = document.getElementById(`text-${postId}`);
+    const btn = document.getElementById(`btn-${postId}`);
+    const commentSection = document.getElementById(`comments-section-${postId}`);
+    const container = document.getElementById(`container-${postId}`);
+    if (!container.classList.contains('expanded')) {
+        // --- РАСКРЫВАЕМ ---
+        container.classList.add('expanded');
+        container.style.maxHeight = textBlock.scrollHeight + "px";
+        btn.innerText = "Свернуть пост ↑";
+
+        // 1. Считаем просмотр (localStorage внутри спасет от накрутки)
+        if (typeof registerView === 'function') {
+            await registerView(postId);
+        }
+
+        // 2. Показываем комменты
+        if (commentSection) {
+            commentSection.style.display = 'block';
+            if (window.loadComments) window.loadComments(postId, 3);
+        }
+
+        // 3. Обновляем цифру просмотров в карточке
+        try {
+            const countRes = await fetch(`https://pro-info-api.onrender.com/api/view-count/${postId}`);
+            if (countRes.ok) {
+                const data = await countRes.json();
+                const viewElem = document.getElementById(`viw-${postId}`);
+                if (viewElem) viewElem.innerText = data.count;
+            }
+        } catch (e) { console.log("Счетчик пока спит..."); }
+
+    } else {
+        // --- СВОРАЧИВАЕМ ---
+        container.classList.remove('expanded'); // Возвращаем градиент
+        container.style.maxHeight = "100px"; // Возвр
+        btn.innerText = "Развернуть пост ↓";
+        if (commentSection) commentSection.style.display = 'none';
+
+         const card = document.getElementById(`post-card-${postId}`);
+        if (card) {
+            const startTime = performance.now();
+            const duration = 500; // Длительность твоей CSS анимации (0.5s)
+
+            function scrollSync(now) {
+                const elapsed = now - startTime;
+
+                // Пока идет анимация, прижимаем нижний край карточки к низу экрана
+                card.scrollIntoView({
+                    behavior: 'auto', // 'auto' вместо 'smooth', чтобы не было конфликта скоростей
+                    block: 'end'
+                });
+
+                // Если 500мс не прошло, запрашиваем следующий кадр анимации
+                if (elapsed < duration) {
+                    requestAnimationFrame(scrollSync);
+                }
+            }
+
+            // Запускаем синхронизацию скролла
+            requestAnimationFrame(scrollSync);
+        }
+
+    }
+};
 
 
 
@@ -286,6 +362,7 @@ window.handleSearch = handleSearch;
 
 
 export async function loadPosts() {
+    window.renderLoader.start();
     try {
         const response = await fetch('https://pro-info-api.onrender.com/api/posts');
         const data = await response.json();
@@ -294,8 +371,13 @@ export async function loadPosts() {
         renderFilteredPosts(data);
         renderTrending(data);
         updateHubStats(data);
+         // 🔥 ФИНАЛЬНЫЙ ШТРИХ: посты на экране, проверяем ссылку!
+    window.checkUrlHash();
     } catch (err) {
         console.error("Ошибка фронтенда:", err.message);
+    }
+    finally {
+        window.renderLoader.stop(); // 2. 🔥 ТУШИМ ЛОАДЕР сразу после ответа сервера!
     }
 }
 
@@ -306,6 +388,7 @@ export async function loadMyArticles() {
     try {
         // 1. Получаем сессию, чтобы взять токен доступа
         const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user;
         if (!session) return;
 
         // 2. Стучимся на СВОЙ сервер, передавая токен в заголовке
@@ -432,11 +515,13 @@ box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
 
 
 
-export async function publishPost() {
-    const title = document.getElementById('postTitle').value;
-    const text = document.getElementById('postInput').value;
-    const image = document.getElementById('postImage').value;
+export async function publishPost(data) {
+    const title = data ? data.title : document.getElementById('postTitle').value;
+    const image = data ? data.image : document.getElementById('postImage').value;
 
+    // МАГИЯ ТУТ: если есть data, берем готовый текст. 
+    // Если нет, проверяем сначала .value, а если это div — берем .innerHTML
+    const text = data ? data.text : (document.getElementById('postInput').value || document.getElementById('postInput')?.innerHTML);
     if (!title || !text) {
         return Swal.fire({
             title: "Заполни поля!",
@@ -560,8 +645,8 @@ async function updateAuthUI() {
         if (usernameDisplay) {
             usernameDisplay.innerText = user.email.split('@')[0];
         }
-        if (plus){
-        plus.style.display = 'flex';
+        if (plus) {
+            plus.style.display = 'flex';
         }
         loginBtn.style.display = 'none';
         profileBtn.style.display = 'block';
@@ -776,21 +861,10 @@ window.deletePost = async function (postId) {
     }
 }
 
-// 2. ФУНКЦИИ МОДАЛЬНОГО ОКНА
-window.openEditModal = async function (id) {
-    window.currentEditId = id;
 
-    // Загружаем актуальные данные перед открытием
-    const { data: article } = await supabase.from('articles').select('*').eq('id', id).single();
 
-    if (article) {
-        document.getElementById('editTitle').value = article.title;
-        document.getElementById('editText').value = article.text;
-        document.getElementById('editImage').value = article.image;
-        document.getElementById('edit-modal').style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Запрещаем скролл страницы
-    }
-};
+
+
 
 window.closeEditModal = function () {
     document.getElementById('edit-modal').style.display = 'none';
