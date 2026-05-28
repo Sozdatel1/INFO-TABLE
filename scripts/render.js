@@ -86,7 +86,7 @@ export async function renderFilteredPosts(postsToRender, append = false) {
         </div>
 
     </div>
-        <button onclick="window.togglePost('${post.id}')" id="btn-${post.id}" style="background: none; border: none; color: #41cfff; font-weight: bold; cursor: pointer; margin-top: 15px; padding: 0; font-size: 16px;">
+        <button onclick="window.togglePost('${post.id}')" id="btn-${post.id}" style="background: none; border: none; color: #41cfff; font-weight: bold; cursor: pointer; margin-top: 15px; padding: 10px; font-size: 16px;">
             Развернуть пост ↓
         </button>
                 <div style="display: flex; gap: 10px;">
