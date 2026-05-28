@@ -219,7 +219,7 @@
         #dynamic-cards {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
-            gap: 40px;
+            gap: 15px;
             align-items: stretch;
             width: 80%;
             margin: 0 auto;
@@ -315,7 +315,7 @@
     object-fit: contain;
     width: 100%;
     height: 100%;
-    border-radius: 8px;
+    border-radius: 5px;
     margin: 15px 0;
     display: block;
     
@@ -421,8 +421,8 @@
         /* 1. СТИЛЬ ТЕГА (Чтобы горел всегда) */
         .auto-tag {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             background: #41cfff !important;
             /* Твой неоновый голубой */
             color: white !important;

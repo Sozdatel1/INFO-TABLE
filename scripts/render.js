@@ -65,7 +65,7 @@ export async function renderFilteredPosts(postsToRender, append = false) {
 
         // Внутри твоего return `...`
         return `
-    <div class="glass-card article-post" id="post-card-${post.id}" style="margin-bottom: 20px; padding: 25px; transition: all 0.5s ease; border-radius: 5px; background: rgb(255, 255, 255); backdrop-filter: blur(10px); scroll-margin-top: 0px;">
+    <div class="glass-card article-post" id="post-card-${post.id}" style="margin-bottom: 0px; border: 1px solid rgba(0, 0, 0, 0.09); padding: 30px 25px 25px 25px ; transition: all 0.5s ease; border-radius: 3px; background: rgb(255, 255, 255); scroll-margin-top: 0px; box-shadow: none !important; ">
       <span class="auto-tag"> • ${category} •</span>
         <p style="font-size: 15px; opacity: 0.7; margin-bottom: 15px;">
             Автор: <b>${post.author_name || "Аноним"} | ${timeAgo}</b> | 
@@ -82,7 +82,7 @@ export async function renderFilteredPosts(postsToRender, append = false) {
         </div>
     ` : ''}
         <h1 style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 28px;">${post.title}</h1>
-         <div id="container-${post.id}" class="text-container" style="max-height: 100px; overflow: hidden; position: relative; transition: max-height 0.5s ease;"><div id="text-${post.id}" style="overflow: hidden; transition: max-height 0.5s ease; font-size: 18px; line-height: 1.3; color: #333; white-space: pre-wrap; text-align: left; left: 0;">${post.text}
+         <div id="container-${post.id}" class="text-container" style="max-height: 230px; overflow: hidden; position: relative; transition: max-height 0.5s ease;"><div id="text-${post.id}" style="overflow: hidden; transition: max-height 0.5s ease; font-size: 18px; line-height: 1.3; color: #333; white-space: pre-wrap; text-align: left; left: 0;">${post.text}
         </div>
 
     </div>
@@ -201,7 +201,7 @@ window.togglePost = async function (postId) {
     } else {
         // --- СВОРАЧИВАЕМ ---
         container.classList.remove('expanded'); // Возвращаем градиент
-        container.style.maxHeight = "100px"; // Возвр
+        container.style.maxHeight = "230px"; // Возвр
         btn.innerText = "Развернуть пост ↓";
         if (commentSection) commentSection.style.display = 'none';
 
