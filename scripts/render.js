@@ -397,7 +397,7 @@ export async function loadMyArticles() {
                 'Authorization': `Bearer ${session.access_token}`
             }
         });
-
+window.checkAdminProfile();
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
 
@@ -515,12 +515,69 @@ box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
 
 
 
+// export async function publishPost(data) {
+//     const title = data ? data.title : document.getElementById('postTitle').value;
+//     const image = data ? data.image : document.getElementById('postImage').value;
+
+//     // МАГИЯ ТУТ: если есть data, берем готовый текст. 
+//     // Если нет, проверяем сначала .value, а если это div — берем .innerHTML
+//     const text = data ? data.text : (document.getElementById('postInput').value || document.getElementById('postInput')?.innerHTML);
+//     if (!title || !text) {
+//         return Swal.fire({
+//             title: "Заполни поля!",
+//             text: "Статья не может быть без заголовка или текста.",
+//             icon: "warning",
+//             confirmButtonColor: "#ff8000"
+//         });
+//     }
+
+//     try {
+//         // 1. Получаем токен
+//         const { data: { session } } = await supabase.auth.getSession();
+//         if (!session) return openAuthModal();
+
+//         // 2. Отправляем данные на наш Node.js сервер
+//         const response = await fetch(`https://pro-info-api.onrender.com/api/publish`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${session.access_token}`
+//             },
+//             body: JSON.stringify({
+//                 title,
+//                 text,
+//                 image,
+//                 id: window.currentEditId // Если null — сервер поймет, что это новый пост
+//             })
+//         });
+
+//         const result = await response.json();
+//         if (!response.ok) throw new Error(result.error);
+
+//         // 3. Успех
+//         const isEdit = !!window.currentEditId;
+
+//         await Swal.fire({
+//             title: isEdit ? "Обновлено!" : "Опубликовано!",
+//             icon: "success",
+//             timer: 1500, // Окно само закроется через 1.5 сек
+//             showConfirmButton: false
+//         });
+
+//         location.reload();
+//         if (isEdit) {
+//             window.location.href = `article.html?id=${window.currentEditId}`;
+//         }
+
+//     } catch (err) {
+//         Swal.fire("Ошибка", err.message, "error");
+//     }
+// }
 export async function publishPost(data) {
     const title = data ? data.title : document.getElementById('postTitle').value;
     const image = data ? data.image : document.getElementById('postImage').value;
 
-    // МАГИЯ ТУТ: если есть data, берем готовый текст. 
-    // Если нет, проверяем сначала .value, а если это div — берем .innerHTML
+    // ТВОЯ МАГИЯ: сохраняем проверку инпута или редактируемого div
     const text = data ? data.text : (document.getElementById('postInput').value || document.getElementById('postInput')?.innerHTML);
     if (!title || !text) {
         return Swal.fire({
@@ -532,11 +589,11 @@ export async function publishPost(data) {
     }
 
     try {
-        // 1. Получаем токен
+        // 1. Получаем токен сессии
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return openAuthModal();
 
-        // 2. Отправляем данные на наш Node.js сервер
+        // 2. Отправляем данные на наш Node.js сервер строго по твоему роуту /api/publish
         const response = await fetch(`https://pro-info-api.onrender.com/api/publish`, {
             method: 'POST',
             headers: {
@@ -545,7 +602,7 @@ export async function publishPost(data) {
             },
             body: JSON.stringify({
                 title,
-                text,
+                text, // Передаем текст как text
                 image,
                 id: window.currentEditId // Если null — сервер поймет, что это новый пост
             })
@@ -554,19 +611,32 @@ export async function publishPost(data) {
         const result = await response.json();
         if (!response.ok) throw new Error(result.error);
 
-        // 3. Успех
+        // 3. УСПЕХ ДЕПЛОЯ
         const isEdit = !!window.currentEditId;
 
-        await Swal.fire({
-            title: isEdit ? "Обновлено!" : "Опубликовано!",
-            icon: "success",
-            timer: 1500, // Окно само закроется через 1.5 сек
-            showConfirmButton: false
-        });
-
-        location.reload();
+        // 🔥 UI/UX ТРИУМФ МЕГА-ОГУРЦА: Меняем уведомление для новых постов!
+        // Если это редактирование старого поста (isEdit === true) - пишем "Обновлено!".
+        // Если это создание новой статьи - честно пишем, что она улетела на проверку к Капибаре!
         if (isEdit) {
+            await Swal.fire({
+                title: "Обновлено!",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
             window.location.href = `article.html?id=${window.currentEditId}`;
+        } else {
+            // Если пост новый — он скрыт, поэтому location.reload() делать не нужно, 
+            // иначе у пользователя просто моргнет пустая главная страница. 
+            // Показываем сочное окно карантина модерации!
+            await Swal.fire({
+                title: "Отправлено! 📄⏳",
+                text: "Ваша статья успешно отправлена на модерацию!. Админ решит, опубликуется она или нет.",
+                icon: "success",
+                confirmButtonColor: "#41cfff" // Твой фирменный неон!
+            });
+            // Перенаправляем человека, например, в личный кабинет профиля, чтобы он видел свои статьи на проверке
+            window.location.href = "profile.html"; 
         }
 
     } catch (err) {

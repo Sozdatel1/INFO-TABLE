@@ -169,6 +169,48 @@
         </div> -->
 
         <!-- КОЛОНКА 2: Список моих статей -->
+<!-- Секретный омни-пульт модерации Капибары (по умолчанию скрыт) -->
+<div id="admin-moderation-panel" style="display: none; margin-top: 30px; padding: 25px; border: 1px solid rgba(0, 0, 0, 0.09); border-radius: 12px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+    <h3 style="color: #222; margin-top: 0; font-size: 22px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f5f5f5; padding-bottom: 15px; margin-bottom: 20px;">
+        🦫 Главный диспетчер Капибары 
+        <span id="global-mod-badge" style="background: #ff4d4d; color: white; font-size: 12px; padding: 2px 8px; border-radius: 20px; display: none;">0</span>
+    </h3>
+
+    <!-- ========================================== -->
+    <!-- СЕКЦИЯ А. МОДЕРНИЗАЦИЯ НОВЫХ СТАТЕЙ (АРТИКЛОВ) -->
+    <!-- ========================================== -->
+    <div style="margin-bottom: 30px;">
+        <h4 style="color: #333; font-size: 17px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            📄 Новые статьи на проверку
+            <span id="articles-badge-count" style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
+        </h4>
+        <div id="admin-articles-queue-list"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- СЕКЦИЯ Б. МОДЕРНИЗАЦИЯ НОВЫХ КОММЕНТАРИЕВ -->
+    <!-- ========================================== -->
+    <div style="padding-top: 20px; border-top: 2px dashed #f5f5f5;">
+        <h4 style="color: #333; font-size: 17px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            💬 Очередь комментариев по постам
+            <span id="comments-badge-count" style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
+        </h4>
+        <div id="admin-posts-queue"></div>
+    </div>
+</div>
+
+<!-- ВСПЫШКА: ВСПЛЫВАЮЩЕЕ ОКНО ДЛЯ ПРОВЕРКИ КОММЕНТОВ -->
+<div id="mod-comment-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+    <div style="background: #ffffff; width: 90%; max-width: 600px; max-height: 80vh; border-radius: 8px; padding: 20px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+            <h4 id="modal-post-title" style="margin: 0; font-size: 18px; color: #333; padding-right: 30px; line-height: 1.3;">Проверка комментариев</h4>
+            <span onclick="window.closeModModal()" style="font-size: 24px; color: #aaa; cursor: pointer; position: absolute; top: 15px; right: 20px; font-weight: bold; transition: 0.2s;" onmouseover="this.style.color='#ff4d4d'" onmouseout="this.style.color='#aaa'">&times;</span>
+        </div>
+        <div id="modal-comments-stream" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;"></div>
+    </div>
+</div>
+
+
         <section>
             <h1 id="result">Мои статьи</h1>
           

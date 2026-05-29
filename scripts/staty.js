@@ -1,4 +1,5 @@
 
+
 import { supabase } from './render.js'; // или путь к файлу, где лежит конфиг Supabase
 
 // --------------------------------------------------
@@ -179,7 +180,7 @@ function buildCommentTree(list, parentId = null) {
 
 //         if (!comments || comments.length === 0) {
 //             list.innerHTML = '<p style="color: gray; font-size: 14px; padding: 10px;">Пока никто не прокомментировал. Будьте первым!</p>';
-            
+
 //             // Удаляем старую кнопку, если комментов нет
 //             const oldBtn = document.getElementById(`load-more-btn-${postId}`);
 //             if (oldBtn) oldBtn.remove();
@@ -201,7 +202,7 @@ function buildCommentTree(list, parentId = null) {
 //                     </small>
 //                 </div>
 //                 <p style="margin: 0; color: #333; font-size: 17px; line-height: 1.4;">${c.content || c.text}</p>
-                
+
 //                 ${isOwner ? `
 //                     <button onclick="window.deleteComment('${c.id}', '${postId}')" 
 //                         style="position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px;" 
@@ -251,8 +252,11 @@ window.loadComments = async function (postId, isLoadMore = false) {
 
         // Запрос к бэкенду Express на Рендере
         const response = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`);
-        const allComments = await response.json();
-
+        let allComments = await response.json();
+        if (!Array.isArray(allComments)) {
+            console.warn("Предупреждение: Сервер вернул ошибку, подменяем на пустой массив.");
+            allComments = [];
+        }
         if (!allComments || allComments.length === 0) {
             list.innerHTML = '<p style="color: gray; font-size: 14px; padding: 10px; text-align: center;">Пока никто не прокомментировал. Будьте первым!</p>';
             const oldBtn = document.getElementById(`load-more-btn-${postId}`);
@@ -261,8 +265,8 @@ window.loadComments = async function (postId, isLoadMore = false) {
         }
 
         // 🔥 ШАГ 2. АБСОЛЮТНЫЙ ФИКС СИНИОРА: Разделяем родителей и ответы на плоском уровне!
-       const rootComments = allComments.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === 'null' || c.parent_id === '0' || c.parent_id === '');
-       const replyComments = allComments.filter(c => c.parent_id && c.parent_id !== 'null' && c.parent_id !== '0');
+        const rootComments = allComments.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === 'null' || c.parent_id === '0' || c.parent_id === '');
+        const replyComments = allComments.filter(c => c.parent_id && c.parent_id !== 'null' && c.parent_id !== '0');
 
         // Обрезаем строго РОДИТЕЛЬСКИЕ комменты по нашему лимиту
         const limitedRoots = rootComments.slice(0, currentLimit);
@@ -278,12 +282,12 @@ window.loadComments = async function (postId, isLoadMore = false) {
         function generateCommentHtml(c, level = 0) {
             const isOwner = user && user.id === c.user_id;
             const marginShift = Math.min(level * 30, 90);
-            
+
             const borderStyle = level > 0 ? 'border-left: 3px solid #41cfff;' : 'border: 1px solid #ececec;';
             const backgroundStyle = level > 0 ? 'background: #fafafa;' : 'background: #fcfcfc;';
 
             const rawText = c.content || c.text || '';
-            const formattedText = rawText.replace(/(@[a-zA-Z0-9_а-яА-ЯёЁ]+)/g, 
+            const formattedText = rawText.replace(/(@[a-zA-Z0-9_а-яА-ЯёЁ]+)/g,
                 `<span class="mention-tag" style="color: #41cfff; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-color: transparent; transition: 0.2s;">$1</span>`
             );
 
@@ -322,13 +326,13 @@ window.loadComments = async function (postId, isLoadMore = false) {
         // Выводим дерево на страницу
         list.innerHTML = commentTree.map(c => generateCommentHtml(c, 0)).join('');
 
-          // 🔥 ШАГ 3. ЖЕЛЕЗОБЕТОННОЕ ВЫВЕДЕНИЕ КНОПКИПОДГРУЗКИ
+        // 🔥 ШАГ 3. ЖЕЛЕЗОБЕТОННОЕ ВЫВЕДЕНИЕ КНОПКИПОДГРУЗКИ
         const oldBtn = document.getElementById(`load-more-btn-${postId}`);
         if (oldBtn) oldBtn.remove();
 
         // Если реальное количество КОРНЕВЫХ (главных) комментов в базе больше текущего лимита,
         // кнопка ОБЯЗАНА появиться на экране твоего ноута!
-          if (allComments.length > filteredFlatList.length) {
+        if (allComments.length > filteredFlatList.length) {
             list.insertAdjacentHTML('afterend', `
                 <button id="load-more-btn-${postId}" onclick="window.loadComments('${postId}', true)" 
                     style="display: block; width: 100%; background: none; border: none; color: #007bff; cursor: pointer; font-size: 14px; padding: 10px 0; text-align: center; font-weight: bold; margin-top: -10px; margin-bottom: 15px;">
@@ -344,13 +348,13 @@ window.loadComments = async function (postId, isLoadMore = false) {
 
 
 // 2. ФУНКЦИЯ ПОДГОТОВКИ ОТВЕТА (Вызывается по клику на автора или кнопку "Ответить")
-window.prepareReply = function(postId, commentId, authorName) {
+window.prepareReply = function (postId, commentId, authorName) {
     const input = document.getElementById(`commentInput-${postId}`);
     if (!input) return;
 
     // Вшиваем ID родительского комментария в кастомный атрибут самого инпута
     input.setAttribute('data-parent-id', commentId);
-    
+
     // Автоматически подставляем имя с собачкой и переводим фокус на поле ввода
     input.value = `@${authorName}, `;
     input.focus();
@@ -410,10 +414,10 @@ window.prepareReply = function(postId, commentId, authorName) {
 //         if (!response.ok) throw new Error(result.error);
 
 //         input.value = ''; // Очищаем поле
-        
+
 //         // ВАЖНО: Перезагружаем список комментов именно для этой статьи
 //         if (window.loadComments) window.loadComments(postId); 
-        
+
 //     } catch (err) {
 //         Swal.fire("Ошибка", err.message, "error");
 //     }
@@ -431,7 +435,7 @@ window.sendComment = async function (postId, isLoadMore = false) {
     const parentId = input.getAttribute('data-parent-id');
 
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return openAuthModal(); 
+    if (!session) return openAuthModal();
 
     try {
         const response = await fetch(`https://pro-info-api.onrender.com/api/comments`, {
@@ -440,23 +444,23 @@ window.sendComment = async function (postId, isLoadMore = false) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.access_token}`
             },
-            body: JSON.stringify({ 
-                postId, 
-                text, 
-                parentId: parentId ? parseInt(parentId) : null 
-            }) 
+            body: JSON.stringify({
+                postId,
+                text,
+                parentId: parentId ? parseInt(parentId) : null
+            })
         });
 
         const result = await response.json();
         if (!response.ok) throw new Error(result.error);
 
         // Полная очистка поля и сброс состояния ответа после успешного сохранения в базу
-        input.value = ''; 
+        input.value = '';
         input.removeAttribute('data-parent-id');
-        
+        Swal.fire("Отправлено!", "Комментарий отправлен на модерацию.");
         // Мгновенно обновляем ветку комментов именно этой статьи
-        if (window.loadComments) window.loadComments(postId); 
-        
+        if (window.loadComments) window.loadComments(postId);
+
     } catch (err) {
         Swal.fire("Ошибка", err.message, "error");
     }
@@ -512,7 +516,7 @@ window.deleteComment = async function (commentId, postId) {
             if (error) throw error;
 
             Swal.fire('Удалено!', 'Комментарий и вся его ветка успешно стерты.', 'success');
-            if (window.loadComments) window.loadComments(postId); 
+            if (window.loadComments) window.loadComments(postId);
         } catch (err) {
             Swal.fire('Ошибка', err.message, 'error');
         }
@@ -525,7 +529,7 @@ window.deleteComment = async function (commentId, postId) {
 // А ПОТОМ МЫ ЗАПРАШИВАЕМ ДАННЫЕ ИЗ ФАЙЛА
 
 // ------------------------------------------------------------
-window.openCreateModal = async function() {
+window.openCreateModal = async function () {
     const { data: { session } } = await supabase.auth.getSession();
     const user = session?.user;
     const ak = user.email.split('@')[0];
@@ -572,11 +576,11 @@ window.openCreateModal = async function() {
         
         </div>
         `,
-                        didOpen: () => {
+        didOpen: () => {
             const input = document.getElementById('postInput');
             const boldBtn = document.getElementById('btn-bold');
             const sizeSelect = document.getElementById('select-size');
- const fileInput = document.getElementById('fileInput'); 
+            const fileInput = document.getElementById('fileInput');
             // 1. Сначала вставляем текст (для окна редактирования)
             if (typeof oldText !== 'undefined' && input) {
                 input.innerHTML = oldText;
@@ -591,12 +595,12 @@ window.openCreateModal = async function() {
                 range.collapse(false); // false означает поставить курсор в конец текста
                 sel.removeAllRanges();
                 sel.addRange(range);
- if (fileInput) {
-            fileInput.addEventListener('change', (event) => {
-                // Вызываем функцию и передаем файлы напрямую из события браузера!
-                window.uploadFile(event.target.files);
-            });
-        }
+                if (fileInput) {
+                    fileInput.addEventListener('change', (event) => {
+                        // Вызываем функцию и передаем файлы напрямую из события браузера!
+                        window.uploadFile(event.target.files);
+                    });
+                }
 
                 const checkState = () => {
                     // Подсветка кнопки Ж
@@ -621,7 +625,7 @@ window.openCreateModal = async function() {
 
                 input.addEventListener('keyup', checkState);
                 input.addEventListener('mouseup', checkState);
-                
+
                 // Даем браузеру 50мс отобразить модалку и ровно считываем стили
                 setTimeout(() => {
                     checkState();
@@ -638,12 +642,12 @@ window.openCreateModal = async function() {
         cancelButtonText: 'Отмена',
         focusConfirm: false,
         // Собираем данные перед тем как вызвать твою функцию
-              preConfirm: () => {
+        preConfirm: () => {
             const title = document.getElementById('postTitle').value.trim();
             const image = document.getElementById('postImage').value.trim();
-            
+
             // 1. Для проверки берем ЧИСТЫЙ ТЕКСТ без HTML-тегов и пробелов
-            const checkText = document.getElementById('postInput').innerText.trim(); 
+            const checkText = document.getElementById('postInput').innerText.trim();
 
             // 2. Честная проверка: если букв нет — стопим отправку
             if (!title || !checkText) {
@@ -653,7 +657,7 @@ window.openCreateModal = async function() {
 
             // 3. Если всё ок — забираем со всеми тегами жирности и размеров!
             const htmlText = document.getElementById('postInput').innerHTML;
-            
+
             return { title, text: htmlText, image };
         }
 
@@ -680,7 +684,7 @@ window.openEditModal = async function (id) {
     const { value: formValues } = await Swal.fire({
         title: `Отредактируйте статью, ${ak}`,
         width: '1000px',
-        background: '#ffffff', 
+        background: '#ffffff',
         html: `
             <div class="glass-card admin-zone" style="height: auto; border: none; box-shadow: none; background: transparent; padding: 0;">
                 <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)..." value="${oldImage || ''}" style="width: 100%; margin-bottom: 10px;">
@@ -718,15 +722,15 @@ window.openEditModal = async function (id) {
                 "></div>
             </div>
         `,
-                didOpen: () => {
+        didOpen: () => {
             const input = document.getElementById('postInput');
             const boldBtn = document.getElementById('btn-bold');
             const sizeSelect = document.getElementById('select-size');
 
             if (typeof oldText !== 'undefined' && input) {
-    // .trim() уберет все скрытые табы и переносы строк, которые прилетели из верстки HTML
-    input.innerHTML = oldText.trim(); 
-}
+                // .trim() уберет все скрытые табы и переносы строк, которые прилетели из верстки HTML
+                input.innerHTML = oldText.trim();
+            }
             if (input) {
                 // 🔥 ЖЕСТКИЙ АВТОФОКУС: ставим курсор в самый конец текста
                 input.focus();
@@ -736,12 +740,12 @@ window.openEditModal = async function (id) {
                 range.collapse(false); // false означает поставить курсор в конец текста
                 sel.removeAllRanges();
                 sel.addRange(range);
-if (fileInput) {
-            fileInput.addEventListener('change', (event) => {
-                // Вызываем функцию и передаем файлы напрямую из события браузера!
-                window.uploadFile(event.target.files);
-            });
-        }
+                if (fileInput) {
+                    fileInput.addEventListener('change', (event) => {
+                        // Вызываем функцию и передаем файлы напрямую из события браузера!
+                        window.uploadFile(event.target.files);
+                    });
+                }
                 const checkState = () => {
                     // Подсветка кнопки Ж
                     if (boldBtn) {
@@ -765,7 +769,7 @@ if (fileInput) {
 
                 input.addEventListener('keyup', checkState);
                 input.addEventListener('mouseup', checkState);
-                
+
                 // Даем браузеру 50мс отобразить модалку и ровно считываем стили
                 setTimeout(() => {
                     checkState();
@@ -797,11 +801,11 @@ if (fileInput) {
     // 4. Если нажали "Сохранить" — пушим в базу без зависаний
     if (formValues) {
         Swal.close();
-        Swal.fire({ 
-            icon: 'success', 
-            title: 'Обновлено!', 
-            timer: 1000, 
-            showConfirmButton: false 
+        Swal.fire({
+            icon: 'success',
+            title: 'Обновлено!',
+            timer: 1000,
+            showConfirmButton: false
         });
 
         const cardTitle = document.querySelector(`#post-card-${id} h1`);
@@ -857,14 +861,14 @@ export function renderTrending(posts) {
         </button>
     `).join('');
 }
-window.scrollToPost = function(postId) {
+window.scrollToPost = function (postId) {
     const element = document.getElementById(`post-card-${postId}`);
     if (element) {
         element.scrollIntoView({
             behavior: 'smooth', // Плавный скролл
             block: 'start'      // Карточка встанет вверху экрана
         });
-        
+
         // Маленький спецэффект: подсветим карточку, чтобы юзер её не потерял
         element.style.boxShadow = "0 0 30px rgba(65, 207, 255, 0.6)";
         setTimeout(() => element.style.boxShadow = "none", 2000);
@@ -949,16 +953,16 @@ function formatTime(dateString) {
     if (diff < 3600) return Math.floor(diff / 60) + ' мин. назад';
     if (diff < 86400) return Math.floor(diff / 3600) + ' час. назад';
     if (diff < 259200) return Math.floor(diff / 86400) + ' дн. назад';
-    
+
     // Если очень старый пост, просто пишем дату
-    return past.toLocaleDateString(); 
+    return past.toLocaleDateString();
 }
 window.formatTime = formatTime
 function runSearch(el) {
     window.scrollTo({
-    top: 0,
-    behavior: 'smooth' // Делает прокрутку плавной
-});
+        top: 0,
+        behavior: 'smooth' // Делает прокрутку плавной
+    });
     // Исправлено: берем или переданный элемент (this), или активный инпут
     const input = el || document.activeElement;
     const grid = document.getElementById('dynamic-cards');
@@ -1001,7 +1005,7 @@ function runSearch(el) {
             result.innerHTML = term === "" ? "Мои посты" : `Результаты поиска для "${term}":`;
         }
         if (stats) {
-            stats.innerHTML = term === "" ? "" :`Результаты поиска для "${term}":`;
+            stats.innerHTML = term === "" ? "" : `Результаты поиска для "${term}":`;
         }
 
     }
@@ -1046,34 +1050,34 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-window.uploadFile = async function(files) {
+window.uploadFile = async function (files) {
     if (!files || files.length === 0) return;
     const file = files[0];
 
     // 🔥 ВСТАВЬ СЮДА СВОЙ КЛЮЧ, КОТОРЫЙ СКОПИРОВАЛ НА САЙТЕ IMGBB
-    const IMGBB_API_KEY = 'e3025b531a8c99f617acd0ca0a5b3d10'; 
+    const IMGBB_API_KEY = 'e3025b531a8c99f617acd0ca0a5b3d10';
 
     const inputField = document.getElementById('postInput');
     Swal.showLoading(); // Включаем красивый лоадер SweetAlert
-  const imageUrls = []; 
+    const imageUrls = [];
     // Упаковываем файл в специальный формат для отправки по сети
-   
- 
+
+
 
     try {
-          for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < files.length; i++) {
             const formData = new FormData();
             formData.append('image', files[i]);
-        // Отправляем картинку в стабильное облако Imgbb вместо заблокированного Supabase
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-            method: 'POST',
-            body: formData
-        });
-   if (!response.ok) {
+            // Отправляем картинку в стабильное облако Imgbb вместо заблокированного Supabase
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
                 throw new Error(`Ошибка сети на файле №${i + 1}`);
             }
-        const result = await response.json();
-if (result.success) {
+            const result = await response.json();
+            if (result.success) {
                 imageUrls.push(result.data.url); // Собираем ссылки в массив
             } else {
                 throw new Error(result.error ? result.error.message : 'Ошибка загрузки одного из файлов');
@@ -1084,7 +1088,7 @@ if (result.success) {
 
         // ВЕРНУЛИ ФОКУС НА ТЕКСТ ПЕРЕД ВСТАВКОЙ
         if (inputField) inputField.focus();
-     // 🔍 УМНАЯ ПРОВЕРКА НА СВЯЗКУ ПОДРЯД
+        // 🔍 УМНАЯ ПРОВЕРКА НА СВЯЗКУ ПОДРЯД
         const selection = window.getSelection();
         let targetNode = null;
 
@@ -1131,25 +1135,25 @@ if (result.success) {
             
             `;
 
-            document.execCommand('insertHTML', false, carouselHtml); 
+            document.execCommand('insertHTML', false, carouselHtml);
         } else {
             // --- ОБЫЧНАЯ ОДИНОЧНАЯ ВСТАВКА (если рядом ничего не было) ---
             document.execCommand('insertImage', false, imageUrls[0]);
         }
 
-        Swal.hideLoading(); 
+        Swal.hideLoading();
     } catch (err) {
         console.error("Ошибка загрузки файла на Imgbb:", err.message);
         Swal.fire("Ошибка сети", "Не удалось загрузить картинку. Попробуй другой файл.", "error");
     }
 };
-window.moveCarousel = function(carouselId, direction) {
+window.moveCarousel = function (carouselId, direction) {
     const carousel = document.getElementById(carouselId);
     if (!carousel) return;
 
     const track = carousel.querySelector('.carousel-track');
     const images = track.querySelectorAll('img');
-    
+
     // Храним текущий индекс слайда прямо в атрибуте HTML-элемента
     let currentIndex = parseInt(carousel.getAttribute('data-index') || '0');
 
@@ -1168,7 +1172,7 @@ window.moveCarousel = function(carouselId, direction) {
 };
 
 
-window.checkUrlHash = function() {
+window.checkUrlHash = function () {
     const hash = window.location.hash;
     if (!hash || !hash.startsWith('#post-')) return;
 
@@ -1183,15 +1187,15 @@ window.checkUrlHash = function() {
         if (targetPost) {
             clearInterval(checkInterval); // Выключаем таймер, цель поймана!
 
-        
-            
+
+
             // 2. Ждем 500мс (время полной CSS-анимации), пока пост раскроется до конца
             setTimeout(() => {
                 targetPost.scrollIntoView({
-            
+
                     block: 'center'     // Отцентрует раскрытый пост на экране!
                 });
-            }, 500); 
+            }, 500);
         }
     }, 100); // Проверяем экран каждые 100мс
 
@@ -1214,10 +1218,10 @@ window.addEventListener('load', () => {
 });
 
 // 🔥 Перепиши начало функции прямо так, чтобы она мгновенно регистрировалась в браузере
-window.sharePost = async function(postId) {
+window.sharePost = async function (postId) {
     const postUrl = `${window.location.origin}/#post-${postId}`;
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    
+
     // 🔥 ВОТ ТУТ ДОБАВИЛИ ПРОВЕРКУ: НАЛИЧИЕ SHARE *И* СЕНСОРНЫЙ ЭКРАН!
     if (navigator.share && isTouchDevice) {
         try {
@@ -1227,9 +1231,9 @@ window.sharePost = async function(postId) {
             });
         } catch (err) { console.log('Отмена отправки'); }
     } else {
-         try {
+        try {
             await navigator.clipboard.writeText(postUrl);
-            
+
             Swal.fire({
                 toast: true,
                 position: 'top-end',
@@ -1238,9 +1242,240 @@ window.sharePost = async function(postId) {
                 showConfirmButton: false,
                 timer: 2000
             });
-        }  catch (err) {
+        } catch (err) {
             Swal.fire('Ошибка', 'Не удалось скопировать ссылку', 'error');
         }
     }
 };
 
+// =========================================================================
+// 🦫 ИНТЕРФЕЙС ЦЕНТРАЛЬНОГО ПУЛЬТА УПРАВЛЕНИЯ KAPIBARA (СТАТЬИ + КОММЕНТЫ)
+// =========================================================================
+
+window.currentUnapprovedCache = []; // Кэш комментариев
+
+window.checkAdminProfile = async function () {
+    const panel = document.getElementById('admin-moderation-panel');
+    const articlesList = document.getElementById('admin-articles-queue-list');
+    const commentsList = document.getElementById('admin-posts-queue');
+    const globalBadge = document.getElementById('global-mod-badge');
+    const artBadge = document.getElementById('articles-badge-count');
+    const commBadge = document.getElementById('comments-badge-count');
+
+    if (!panel || !articlesList || !commentsList) return;
+
+    // 1. Получаем токен сессии
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    // Жесткий файрвол: пускаем только kapibara
+    const username = session.user.email.split('@')[0];
+    if (username !== 'kapibara') {
+        panel.style.display = 'none';
+        return;
+    }
+
+    // Открываем пульт админа!
+    panel.style.display = 'block';
+
+    try {
+        // 2. ВЫСОКОНАГРУЖЕННЫЙ ПАРАЛЛЕЛЬНЫЙ ЗАПРОС К ДВУМ КАНТУРАМ КАРАНТИНА
+        const [resPosts, resComments] = await Promise.all([
+            fetch('https://pro-info-api.onrender.com/api/admin/unapproved-posts', { headers: { 'Authorization': `Bearer ${session.access_token}` } }),
+            fetch('https://pro-info-api.onrender.com/api/admin/unapproved', { headers: { 'Authorization': `Bearer ${session.access_token}` } })
+        ]);
+
+        const unapprovedPosts = await resPosts.json();
+        window.currentUnapprovedCache = await resComments.json();
+
+        // Общий счетчик нарушителей для главного баджа
+        const totalAlerts = (unapprovedPosts?.length || 0) + (window.currentUnapprovedCache?.length || 0);
+        if (totalAlerts > 0) {
+            globalBadge.style.display = 'inline-block';
+            globalBadge.innerText = totalAlerts;
+        } else {
+            globalBadge.style.display = 'none';
+        }
+
+        // =========================================================================
+        // РЕНДЕР КОНТУРА №1: СТАТЬИ (АРТИКЛЫ)
+        // =========================================================================
+        if (!unapprovedPosts || unapprovedPosts.length === 0) {
+            artBadge.style.display = 'none';
+            articlesList.innerHTML = '<p style="color: #28a745; font-size: 14px; font-weight: bold; margin: 0;">🏆 Нет новых статей на проверку. Вёрстка чиста!</p>';
+        } else {
+            artBadge.style.display = 'inline-block';
+            artBadge.innerText = unapprovedPosts.length;
+
+            articlesList.innerHTML = unapprovedPosts.map(p => `
+                <div style="background: #fafafa; border: 1px solid rgba(0,0,0,0.06); padding: 15px; border-radius: 6px; margin-bottom: 12px; position: relative;">
+                    <h5 style="margin: 0 0 6px 0; font-size: 16px; color: #222; font-weight: bold;">📄 ${p.title}</h5>
+                    
+                    <!-- Если у статьи есть картинка - рендерим её микро-превью -->
+                    ${p.image ? `<img src="${p.image}" style="max-width: 120px; max-height: 80px; border-radius: 4px; margin-bottom: 8px; display: block; border: 1px solid #eee;">` : ''}
+                    
+                    <p style="margin: 0 0 12px 0; color: #444; font-size: 15px; line-height: 1.4; max-height: 100px; overflow: hidden; text-overflow: ellipsis;">${p.text || p.content || ''}</p>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="window.executePostAction('approve', '${p.id}')" style="background: #41cfff; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.2s;" onmouseover="this.style.background='#007bff'" onmouseout="this.style.background='#41cfff'">Одобрить статью 👍</button>
+                        <button onclick="window.executePostAction('delete', '${p.id}')" style="background: #ff4d4d; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.2s;" onmouseover="this.style.background='#cc0000'" onmouseout="this.style.background='#ff4d4d'">Удалить 🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =========================================================================
+        // РЕНДЕР КОНТУРА №2: КОММЕНТАРИИ (Группировка по постам-аккордеонам)
+        // =========================================================================
+        if (!window.currentUnapprovedCache || window.currentUnapprovedCache.length === 0) {
+            commBadge.style.display = 'none';
+            commentsList.innerHTML = '<p style="color: #28a745; font-size: 14px; font-weight: bold; margin: 0;">🏆 Нет новых комментариев на проверку.</p>';
+            return;
+        }
+
+        commBadge.style.display = 'inline-block';
+        commBadge.innerText = window.currentUnapprovedCache.length;
+
+        const uniquePostsMap = {};
+        window.currentUnapprovedCache.forEach(c => {
+            if (!uniquePostsMap[c.post_id]) {
+                uniquePostsMap[c.post_id] = {
+                    id: c.post_id,
+                    title: c.post_title || `Статья ID: ${c.post_id.slice(0, 8)}...`,
+                    count: 0
+                };
+            }
+            uniquePostsMap[c.post_id].count++;
+        });
+
+        commentsList.innerHTML = Object.values(uniquePostsMap).map(p => `
+            <div onclick="window.openModModal('${p.id}', '${p.title}')" 
+                 style="background: #fafafa; border: 1px solid rgba(0,0,0,0.06); padding: 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;"
+                 onmouseover="this.style.borderColor='#41cfff'; this.style.background='#fcfcfc';" onmouseout="this.style.borderColor='rgba(0,0,0,0.06)'; this.style.background='#fafafa';">
+                <span style="font-size: 15px; font-weight: bold; color: #222;">📄 ${p.title}</span>
+                <span style="background: #41cfff; color: white; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px;">${p.count} коммент.</span>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error("Сбой пульта управления Капибары:", err);
+    }
+};
+
+// 3. УПРАВЛЕНИЕ СТАТЬЯМИ (ОДОБРЕНИЕ / УДАЛЕНИЕ)
+window.executePostAction = async function (action, postId) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+        if (action === 'approve') {
+            const response = await fetch(`https://pro-info-api.onrender.com/api/posts/approve/${postId}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${session.access_token}` }
+            });
+            if (!response.ok) throw new Error("Ошибка сервера при аппруве статьи");
+            Swal.fire("Статья выпущена! 📄👍", "Пост официально задеплоен на главную страницу сайта!", "success");
+        } else if (action === 'delete') {
+            const { error } = await supabase.from('articles').delete().eq('id', postId);
+            if (error) throw error;
+            Swal.fire("Уничтожено! 🗑️", "Статья навсегда стерта из базы данных Supabase.", "success");
+        }
+
+        window.checkAdminProfile(); // Мгновенный ререндер интерфейса
+    } catch (err) {
+        Swal.fire("Ошибка действия над статьей", err.message, "error");
+    }
+};
+
+// 4. ОТКРЫТИЕ МОДАЛКИ С КОММЕНТАМИ К КОНКРЕТНОМУ ПОСТУ
+window.openModModal = function (postId, postTitle) {
+    const modal = document.getElementById('mod-comment-modal');
+    const modalTitle = document.getElementById('modal-post-title');
+    const stream = document.getElementById('modal-comments-stream');
+    if (!modal || !stream) return;
+
+    modalTitle.innerText = `Модерация комментов: ${postTitle}`;
+    const postComments = window.currentUnapprovedCache.filter(c => c.post_id === postId);
+
+    if (postComments.length === 0) {
+        window.closeModModal();
+        window.checkAdminProfile();
+        return;
+    }
+
+    stream.innerHTML = postComments.map(c => `
+        <div style="background: #fcfcfc; border: 1px solid #ececec; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <b style="color: #333; font-size: 14px;">👤 ${c.user_name}</b>
+                <small style="color: #999; font-size: 11px;">${new Date(c.created_at).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</small>
+            </div>
+            <p style="margin: 0 0 12px 0; color: #222; font-size: 16px; line-height: 1.4;">${c.content || c.text}</p>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.executeAdminAction('approve', '${c.id}', '${postId}', '${postTitle}')" style="background: #41cfff; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Одобрить 👍</button>
+                <button onclick="window.executeAdminAction('delete', '${c.id}', '${postId}', '${postTitle}')" style="background: #ff4d4d; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Удалить 🗑️</button>
+            </div>
+        </div>
+    `).join('');
+    modal.style.display = 'flex';
+};
+
+window.closeModModal = function () {
+    const modal = document.getElementById('mod-comment-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+// =========================================================================
+// 5. ДЕЙСТВИЯ НАД КОММЕНТАМИ ВНУТРИ МОДАЛКИ (ОДОБРЕНИЕ / УДАЛЕНИЕ)
+// =========================================================================
+window.executeAdminAction = async function (action, commentId, postId, postTitle) {
+    // 1. Вытаскиваем токен сессии Капибары
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+        let response;
+        if (action === 'approve') {
+            // 🔥 ЖЕСТКИЙ ФИКС: Точно прописали /api/ перед comments/approve!
+            // Передаем токен Bearer в заголовках Headers для верификации на сервере Express
+            response = await fetch(`https://pro-info-api.onrender.com/api/comments/approve/${commentId}`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}` 
+                }
+            });
+            
+            // Если бэкенд выплюнул ошибку (например, ты вошел не под Капибарой)
+            if (response.status === 403) throw new Error("У вас нет прав админа Капибары! 🛑");
+            if (!response.ok) throw new Error("Ошибка сервера при одобрении");
+            
+        } else if (action === 'delete') {
+            // Уничтожаем коммент напрямую через клиент Supabase
+            // Ядерный каскад на уровне базы автоматически сотрет все ответы на него!
+            const { error } = await supabase.from('comments').delete().eq('id', commentId);
+            if (error) throw error;
+        }
+
+        // 2. РЕАКТИВНЫЙ АПДЕЙТ ИНТЕРФЕЙСА БЕЗ МОРГАНИЯ ЭКРАНА
+        // На лету вырезаем отработанный комментарий из локального кэша фронтенда
+        window.currentUnapprovedCache = window.currentUnapprovedCache.filter(c => c.id != commentId);
+        
+        // Перерисовываем модальное окно для этого поста, чтобы список обновился мгновенно!
+        window.openModModal(postId, postTitle);
+        
+    } catch (err) {
+        Swal.fire("Ошибка действия над комментарием", err.message, "error");
+    }
+};
+// Вставляй этот бронебойный триггер в самый-самый конец файла staty.js:
+document.addEventListener("DOMContentLoaded", () => {
+    // Проверяем, что глобальный объект supabase уже точно инициализирован в памяти!
+    if (window.supabase && typeof window.checkAdminProfile === "function") {
+        window.checkAdminProfile();
+    } else {
+        // Страховка: если render.js еще грузится, даем микро-таймаут в 100 миллисекунд
+        setTimeout(() => {
+            if (typeof window.checkAdminProfile === "function") window.checkAdminProfile();
+        }, 100);
+    }
+});
