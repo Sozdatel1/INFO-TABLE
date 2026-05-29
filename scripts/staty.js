@@ -145,73 +145,190 @@ if (!window.commentsLimit) {
     window.commentsLimit = {};
 }
 
+function buildCommentTree(list, parentId = null) {
+    return list
+        .filter(item => item.parent_id == parentId)
+        .map(item => ({ ...item, replies: buildCommentTree(list, item.id) }));
+}
 
+// window.loadComments = async function (postId, isLoadMore = false) {
+//     // 1. Ищем список именно для ЭТОГО поста
+//     const list = document.getElementById(`comments-list-${postId}`);
+//     if (!list || !postId) return;
+
+//     // 🔥 ИСПРАВИЛИ: Сначала ЖЕСТКО создаем объект, если его нет!
+//     if (!window.commentsLimit) {
+//         window.commentsLimit = {};
+//     }
+
+//     // Теперь эта проверка никогда не упадет в ошибку!
+//     if (!window.commentsLimit[postId] || !isLoadMore) {
+//         window.commentsLimit[postId] = 3;
+//     } else if (isLoadMore) {
+//         window.commentsLimit[postId] += 3;
+//     }
+//     try {
+//         // Получаем сессию для проверки владельца (isOwner)
+//         const { data: { session } } = await supabase.auth.getSession();
+//         const user = session?.user;
+
+//         // Запрос к твоему API на Рендере с динамическим лимитом
+//         const currentLimit = window.commentsLimit[postId];
+//         const response = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}?limit=${ currentLimit }`);
+//         const comments = await response.json();
+
+//         if (!comments || comments.length === 0) {
+//             list.innerHTML = '<p style="color: gray; font-size: 14px; padding: 10px;">Пока никто не прокомментировал. Будьте первым!</p>';
+            
+//             // Удаляем старую кнопку, если комментов нет
+//             const oldBtn = document.getElementById(`load-more-btn-${postId}`);
+//             if (oldBtn) oldBtn.remove();
+//             return;
+//         }
+
+//         // 3. ОТРИСОВКА ВНУТРИ КАРТОЧКИ (Твой оригинальный сочный шаблон)
+//         list.innerHTML = comments.map(c => {
+//             const isOwner = user && user.id === c.user_id;
+
+//             return `
+//             <div style="background: #fcfcfc; padding: 10px; border-radius: 4px; margin-bottom: 20px; position: relative; border: 1px solid #ececec;">
+//                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+//                     <b style="color: #333; font-size: 15px;">${c.user_name || 'Аноним'}</b>
+//                     <small style="color: #000000; font-size: 11px; margin: 0 auto;">
+//                         ${new Date(c.created_at).toLocaleString('ru-RU', {
+//                             day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+//                         })}
+//                     </small>
+//                 </div>
+//                 <p style="margin: 0; color: #333; font-size: 17px; line-height: 1.4;">${c.content || c.text}</p>
+                
+//                 ${isOwner ? `
+//                     <button onclick="window.deleteComment('${c.id}', '${postId}')" 
+//                         style="position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px;" 
+//                         title="Удалить">🗑️</button>
+//                 ` : ''}
+//             </div>`;
+//         }).join('');
+
+//         // 4. УМНОЕУПРАВЛЕНИЕ КНОПКОЙ "ПОКАЗАТЬ ЕЩЁ"
+//         const oldBtn = document.getElementById(`load-more-btn-${postId}`);
+//         if (oldBtn) oldBtn.remove();
+
+//         // Если сервер вернул ровно столько комментов, сколько мы просили,
+//         // значит в базе потенциально есть еще старые записи — рендерим кнопку!
+//         if (comments.length >= currentLimit) {
+//             list.insertAdjacentHTML('afterend', `
+//                 <button id="load-more-btn-${postId}" onclick="window.loadComments('${postId}', true)" 
+//                     style="display: block; width: 100%; background: none; border: none; color: #007bff; cursor: pointer; font-size: 14px; padding: 10px 0; text-align: center; font-weight: bold; margin-top: -10px; margin-bottom: 15px;">
+//                     Показать ещё комментарии...
+//                 </button>
+//             `);
+//         }
+
+//     } catch (err) {
+//         console.error("Ошибка загрузки комментов:", err);
+//     }
+// };
 window.loadComments = async function (postId, isLoadMore = false) {
-    // 1. Ищем список именно для ЭТОГО поста
     const list = document.getElementById(`comments-list-${postId}`);
     if (!list || !postId) return;
 
-    // 🔥 ИСПРАВИЛИ: Сначала ЖЕСТКО создаем объект, если его нет!
+    // 1. Инициализируем и управляем лимитом именно КОРНЕВЫХ (родительских) комментов
     if (!window.commentsLimit) {
         window.commentsLimit = {};
     }
-
-    // Теперь эта проверка никогда не упадет в ошибку!
     if (!window.commentsLimit[postId] || !isLoadMore) {
-        window.commentsLimit[postId] = 3;
+        window.commentsLimit[postId] = 3; // Стартуем ровно с 3 главных веток
     } else if (isLoadMore) {
-        window.commentsLimit[postId] += 3;
+        window.commentsLimit[postId] += 3; // Прибавляем еще 3 главные ветки по клику
     }
+
+    const currentLimit = window.commentsLimit[postId];
+
     try {
-        // Получаем сессию для проверки владельца (isOwner)
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
 
-        // Запрос к твоему API на Рендере с динамическим лимитом
-        const currentLimit = window.commentsLimit[postId];
-        const response = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}?limit=${ currentLimit }`);
-        const comments = await response.json();
+        // Запрос к бэкенду Express на Рендере
+        const response = await fetch(`https://pro-info-api.onrender.com/api/comments/${postId}`);
+        const allComments = await response.json();
 
-        if (!comments || comments.length === 0) {
-            list.innerHTML = '<p style="color: gray; font-size: 14px; padding: 10px;">Пока никто не прокомментировал. Будьте первым!</p>';
-            
-            // Удаляем старую кнопку, если комментов нет
+        if (!allComments || allComments.length === 0) {
+            list.innerHTML = '<p style="color: gray; font-size: 14px; padding: 10px; text-align: center;">Пока никто не прокомментировал. Будьте первым!</p>';
             const oldBtn = document.getElementById(`load-more-btn-${postId}`);
             if (oldBtn) oldBtn.remove();
             return;
         }
 
-        // 3. ОТРИСОВКА ВНУТРИ КАРТОЧКИ (Твой оригинальный сочный шаблон)
-        list.innerHTML = comments.map(c => {
+        // 🔥 ШАГ 2. АБСОЛЮТНЫЙ ФИКС СИНИОРА: Разделяем родителей и ответы на плоском уровне!
+       const rootComments = allComments.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === 'null' || c.parent_id === '0' || c.parent_id === '');
+       const replyComments = allComments.filter(c => c.parent_id && c.parent_id !== 'null' && c.parent_id !== '0');
+
+        // Обрезаем строго РОДИТЕЛЬСКИЕ комменты по нашему лимиту
+        const limitedRoots = rootComments.slice(0, currentLimit);
+
+        // Объединяем обратно: берем 3 родителя и ВСЕ существующие ответы из базы,
+        // чтобы рекурсивная функция buildCommentTree смогла найти детей для этих 3 родителей!
+        const filteredFlatList = [...limitedRoots, ...replyComments];
+
+        // Строим дерево только на основе отфильтрованного списка
+        const commentTree = buildCommentTree(filteredFlatList, null);
+
+        // Рекурсивный генератор HTML (Остался твоим каноничным и сочным)
+        function generateCommentHtml(c, level = 0) {
             const isOwner = user && user.id === c.user_id;
+            const marginShift = Math.min(level * 30, 90);
+            
+            const borderStyle = level > 0 ? 'border-left: 3px solid #41cfff;' : 'border: 1px solid #ececec;';
+            const backgroundStyle = level > 0 ? 'background: #fafafa;' : 'background: #fcfcfc;';
+
+            const rawText = c.content || c.text || '';
+            const formattedText = rawText.replace(/(@[a-zA-Z0-9_а-яА-ЯёЁ]+)/g, 
+                `<span class="mention-tag" style="color: #41cfff; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-color: transparent; transition: 0.2s;">$1</span>`
+            );
 
             return `
-            <div style="background: #fcfcfc; padding: 10px; border-radius: 4px; margin-bottom: 20px; position: relative; border: 1px solid #ececec;">
+            <div style="margin-left: ${marginShift}px; ${backgroundStyle} ${borderStyle} padding: 12px; border-radius: 6px; margin-bottom: 12px; position: relative; transition: 0.2s;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <b style="color: #333; font-size: 15px;">${c.user_name || 'Аноним'}</b>
+                    <b onclick="window.prepareReply('${postId}', '${c.id}', '${c.user_name || 'Аноним'}')" 
+                       class="comment-author"
+                       style="color: #333; font-size: 15px; cursor: pointer; text-decoration: underline; text-decoration-color: transparent; transition: 0.2s;">
+                       ${c.user_name || 'Аноним'}
+                    </b>
                     <small style="color: #000000; font-size: 11px; margin: 0 auto;">
-                        ${new Date(c.created_at).toLocaleString('ru-RU', {
-                            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-                        })}
+                        ${new Date(c.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </small>
                 </div>
-                <p style="margin: 0; color: #333; font-size: 17px; line-height: 1.4;">${c.content || c.text}</p>
                 
+                <p style="margin: 0; color: #222; font-size: 16px; line-height: 1.4; padding-right: 20px;">${formattedText}</p>
+                
+                <div style="margin-top: 6px;">
+                    <span onclick="window.prepareReply('${postId}', '${c.id}', '${c.user_name || 'Аноним'}')" 
+                          style="color: #007bff; font-size: 12px; cursor: pointer; font-weight: bold; transition: 0.2s;"
+                          onmouseover="this.style.color='#41cfff'" onmouseout="this.style.color='#007bff'">
+                          Ответить
+                    </span>
+                </div>
+
                 ${isOwner ? `
                     <button onclick="window.deleteComment('${c.id}', '${postId}')" 
-                        style="position: absolute; top: 5px; right: 5px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px;" 
-                        title="Удалить">🗑️</button>
+                        style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 14px; padding: 0;" title="Удалить">🗑️</button>
                 ` : ''}
-            </div>`;
-        }).join('');
+            </div>
+            ${c.replies.map(reply => generateCommentHtml(reply, level + 1)).join('')}
+            `;
+        }
 
-        // 4. УМНОЕУПРАВЛЕНИЕ КНОПКОЙ "ПОКАЗАТЬ ЕЩЁ"
+        // Выводим дерево на страницу
+        list.innerHTML = commentTree.map(c => generateCommentHtml(c, 0)).join('');
+
+          // 🔥 ШАГ 3. ЖЕЛЕЗОБЕТОННОЕ ВЫВЕДЕНИЕ КНОПКИПОДГРУЗКИ
         const oldBtn = document.getElementById(`load-more-btn-${postId}`);
         if (oldBtn) oldBtn.remove();
 
-        // Если сервер вернул ровно столько комментов, сколько мы просили,
-        // значит в базе потенциально есть еще старые записи — рендерим кнопку!
-        if (comments.length >= currentLimit) {
+        // Если реальное количество КОРНЕВЫХ (главных) комментов в базе больше текущего лимита,
+        // кнопка ОБЯЗАНА появиться на экране твоего ноута!
+          if (allComments.length > filteredFlatList.length) {
             list.insertAdjacentHTML('afterend', `
                 <button id="load-more-btn-${postId}" onclick="window.loadComments('${postId}', true)" 
                     style="display: block; width: 100%; background: none; border: none; color: #007bff; cursor: pointer; font-size: 14px; padding: 10px 0; text-align: center; font-weight: bold; margin-top: -10px; margin-bottom: 15px;">
@@ -221,10 +338,23 @@ window.loadComments = async function (postId, isLoadMore = false) {
         }
 
     } catch (err) {
-        console.error("Ошибка загрузки комментов:", err);
+        console.error("Критический сбой рендера дерева комментов:", err);
     }
 };
 
+
+// 2. ФУНКЦИЯ ПОДГОТОВКИ ОТВЕТА (Вызывается по клику на автора или кнопку "Ответить")
+window.prepareReply = function(postId, commentId, authorName) {
+    const input = document.getElementById(`commentInput-${postId}`);
+    if (!input) return;
+
+    // Вшиваем ID родительского комментария в кастомный атрибут самого инпута
+    input.setAttribute('data-parent-id', commentId);
+    
+    // Автоматически подставляем имя с собачкой и переводим фокус на поле ввода
+    input.value = `@${authorName}, `;
+    input.focus();
+};
 
 // <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; position: relative; box-shadow: 0 2px 5px rgb(235, 235, 235); border: 1px solid #bababa;">
 //     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -252,19 +382,56 @@ window.loadComments = async function (postId, isLoadMore = false) {
 
 
 
-// 2. ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЯ
-window.sendComment = async function (postId) {
-    // ВАЖНО: Берем инпут именно из этой карточки по уникальному ID
+// // 2. ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЯ
+// window.sendComment = async function (postId) {
+//     // ВАЖНО: Берем инпут именно из этой карточки по уникальному ID
+//     const input = document.getElementById(`commentInput-${postId}`);
+//     if (!input) return; // Страховка
+
+//     const text = input.value.trim();
+
+//     if (!text) return Swal.fire("Ошибка", "Напишите хотя бы пару слов!", "warning");
+
+//     // Проверка сессии (всё как ты любишь)
+//     const { data: { session } } = await supabase.auth.getSession();
+//     if (!session) return openAuthModal();
+
+//     try {
+//         const response = await fetch(`https://pro-info-api.onrender.com/api/comments`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${session.access_token}`
+//             },
+//             body: JSON.stringify({ postId, text }) // postId теперь берется из аргумента
+//         });
+
+//         const result = await response.json();
+//         if (!response.ok) throw new Error(result.error);
+
+//         input.value = ''; // Очищаем поле
+        
+//         // ВАЖНО: Перезагружаем список комментов именно для этой статьи
+//         if (window.loadComments) window.loadComments(postId); 
+        
+//     } catch (err) {
+//         Swal.fire("Ошибка", err.message, "error");
+//     }
+// };
+
+// 3. ОБНОВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ КОММЕНТАРИЯ (Умеет отправлять parentId)
+window.sendComment = async function (postId, isLoadMore = false) {
     const input = document.getElementById(`commentInput-${postId}`);
-    if (!input) return; // Страховка
+    if (!input) return;
 
     const text = input.value.trim();
-
     if (!text) return Swal.fire("Ошибка", "Напишите хотя бы пару слов!", "warning");
 
-    // Проверка сессии (всё как ты любишь)
+    // Вытаскиваем parent_id из атрибута инпута (если его нет - улетит null, то есть главный коммент)
+    const parentId = input.getAttribute('data-parent-id');
+
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return openAuthModal();
+    if (!session) return openAuthModal(); 
 
     try {
         const response = await fetch(`https://pro-info-api.onrender.com/api/comments`, {
@@ -273,15 +440,21 @@ window.sendComment = async function (postId) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.access_token}`
             },
-            body: JSON.stringify({ postId, text }) // postId теперь берется из аргумента
+            body: JSON.stringify({ 
+                postId, 
+                text, 
+                parentId: parentId ? parseInt(parentId) : null 
+            }) 
         });
 
         const result = await response.json();
         if (!response.ok) throw new Error(result.error);
 
-        input.value = ''; // Очищаем поле
+        // Полная очистка поля и сброс состояния ответа после успешного сохранения в базу
+        input.value = ''; 
+        input.removeAttribute('data-parent-id');
         
-        // ВАЖНО: Перезагружаем список комментов именно для этой статьи
+        // Мгновенно обновляем ветку комментов именно этой статьи
         if (window.loadComments) window.loadComments(postId); 
         
     } catch (err) {
@@ -292,11 +465,39 @@ window.sendComment = async function (postId) {
 
 
 
+// window.deleteComment = async function (commentId) {
+//     const result = await Swal.fire({
+//         title: 'Удалить комментарий?',
+//         text: "Это действие нельзя отменить!",
+//         icon: 'warning',
+//         showCancelButton: true,
+//         confirmButtonColor: '#ff4d4d',
+//         cancelButtonColor: '#ccc',
+//         confirmButtonText: 'Да, удалить!',
+//         cancelButtonText: 'Отмена'
+//     });
 
-window.deleteComment = async function (commentId) {
+//     if (result.isConfirmed) {
+//         try {
+//             const { error } = await supabase
+//                 .from('comments')
+//                 .delete()
+//                 .eq('id', commentId);
+
+//             if (error) throw error;
+
+//             Swal.fire('Удалено!', 'Комментарий стерт.', 'success');
+//             loadComments(); // Обновляем список сразу
+//         } catch (err) {
+//             Swal.fire('Ошибка', err.message, 'error');
+//         }
+//     }
+// };
+// 4. ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ КОММЕНТАРИЯ (Каскад на бэкенде подчистит остальное)
+window.deleteComment = async function (commentId, postId) {
     const result = await Swal.fire({
         title: 'Удалить комментарий?',
-        text: "Это действие нельзя отменить!",
+        text: "Все ответы на этот комментарий также будут уничтожены навсегда из базы данных!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ff4d4d',
@@ -307,21 +508,16 @@ window.deleteComment = async function (commentId) {
 
     if (result.isConfirmed) {
         try {
-            const { error } = await supabase
-                .from('comments')
-                .delete()
-                .eq('id', commentId);
-
+            const { error } = await supabase.from('comments').delete().eq('id', commentId);
             if (error) throw error;
 
-            Swal.fire('Удалено!', 'Комментарий стерт.', 'success');
-            loadComments(); // Обновляем список сразу
+            Swal.fire('Удалено!', 'Комментарий и вся его ветка успешно стерты.', 'success');
+            if (window.loadComments) window.loadComments(postId); 
         } catch (err) {
             Swal.fire('Ошибка', err.message, 'error');
         }
     }
 };
-
 
 
 // СНАЧАЛА МЫ ПОСЫЛАЕМ ДАННЫЕ НА СЕРВЕР РЕНДЕР, 
