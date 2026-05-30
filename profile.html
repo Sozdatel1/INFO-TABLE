@@ -2,27 +2,27 @@
 <html lang="ru">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="profile">Личный кабинет | iPosters</title>
-    <link rel="stylesheet" href="/styles/main.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="profile">Личный кабинет | iPosters</title>
+  <link rel="stylesheet" href="/styles/main.css">
 
-    <link rel="stylesheet" href="/styles/burger.css">
-    <link rel="stylesheet" href="/styles/popul.css">
-    <link rel="stylesheet" href="/styles/fact.css">
-    <link rel="stylesheet" href="/styles/logis.css">
-    <link rel="stylesheet" href="/styles/holiday.css">
-    <link rel="stylesheet" href="/styles/filt.css">
-    <link rel="stylesheet" href="/styles/sign_in.css">
-    <link rel="stylesheet" href="/styles/content.css">
-    <link rel="stylesheet" href="/styles/logo.css">
-    <link rel="icon" type="image/png" href="/img/icon-512.png">
+  <link rel="stylesheet" href="/styles/burger.css">
+  <link rel="stylesheet" href="/styles/popul.css">
+  <link rel="stylesheet" href="/styles/fact.css">
+  <link rel="stylesheet" href="/styles/logis.css">
+  <link rel="stylesheet" href="/styles/holiday.css">
+  <link rel="stylesheet" href="/styles/filt.css">
+  <link rel="stylesheet" href="/styles/sign_in.css">
+  <link rel="stylesheet" href="/styles/content.css">
+  <link rel="stylesheet" href="/styles/logo.css">
+  <link rel="icon" type="image/png" href="/img/icon-512.png">
 
-    <!-- <link rel="stylesheet" href="style.css"> Твой файл стилей -->
+  <!-- <link rel="stylesheet" href="style.css"> Твой файл стилей -->
 </head>
 
 <body>
-   <header class="header-content">
+  <header class="header-content">
     <div class="hed">
 
       <div class="logo">
@@ -81,10 +81,10 @@
 
 
       </nav>
-      <div class="search-container" style="width: 100%; display: flex; gap: 0px; padding: 0 20px;">
+      <div class="search-container" style="width: 20%; display: flex; gap: 0px; padding: 0 20px; margin: 0 auto;">
         <!-- Кнопка-лупа -->
-        <button class="search-toggle" id="searchToggle" style="display: none;"><img src="/img/serh.png"
-            width="30"></button>
+        <button class="search-toggle" id="searchToggle" style="display: none;"><img
+            src="/img/search_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"></button>
 
         <!-- МОБИЛЬНЫЙ блок (Dropdown) -->
         <div class="search-dropdown" id="mobileSearchBox" style="display: none;">
@@ -93,7 +93,7 @@
         </div>
 
         <!-- ДЕСКТОПНЫЙ блок -->
-        <div class="search-box" id="desktopSearchBox" style="width: 100%;">
+        <div class="search-box" id="desktopSearchBox" style="width: 100%; margin: 0 auto;">
           <input type="text" id="desktopSearchInput" class="search-input-with-icon" placeholder="Поиск на iPosters..."
             oninput="runSearch(this)"
             style=" padding: 12px; border-radius: 10px; border: 2px solid #00d4ff;  color: #00d4ff; width: 100%;">
@@ -104,63 +104,104 @@
 
 
 
-      <button id="plus" onclick="openCreateModal()">
-        <img src="/img/add_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">
-      </button>
+      <div class="filter">
+        <!-- КНОПКА ФИЛЬТРОВ (Появляется только на мобилках) -->
+        <button id="add-filt" onclick="openFilt()">
+          <img src="/img/filter_list_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">
+        </button>
 
-      <!-- Кнопка "Войти" (по умолчанию видна) -->
-      <button id="login-btn"
-        style="display: none; padding: 9px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
+        <!-- ДЕСКТОПНЫЙ БЛОК (Скрывается на мобилках) -->
+        <div class="tag-filters glass-card" id="tag">
+          <span
+            style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+          <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+          <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+          <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+          <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+          <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+        </div>
+
+        <!-- МОБИЛЬНЫЙ ВЫПАДАЮЩИЙ БЛОК -->
+        <div class="filt-adap">
+          <div class="filt">
+
+            <span
+              style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+            <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+            <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+            <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+            <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+            <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="akk">
+
+
+        <button id="plus" onclick="openCreateModal()">
+          <img src="/img/add_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">
+        </button>
+
+        <!-- Кнопка "Войти" (по умолчанию видна) -->
+        <button id="login-btn"
+          style="display: none; padding: 9px; margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),
         0 0 5px rgba(0, 255, 65, 0.2); border-radius: 10px;  border: none; font-size: 21px; color: #ffffff; font-weight: bold; cursor: pointer; gap: 5px;"
-        onclick="openAuthModal()"><img src="/img/login_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">Войти</button>
+          onclick="openAuthModal()"><img src="/img/login_30dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg">Войти</button>
 
-      <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
-      <!-- <button id="profile-btn"
+        <!-- Кнопка "Профиль" (по умолчанию скрыта) -->
+        <!-- <button id="profile-btn"
       style="display: none; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><a
         href="profile.html" style="color: #000000; text-decoration: none;  background-color: #41d0ff00;"
         onclick="goToProfile()">Профиль</button> -->
 
 
-      <li class="profile-menu" id="profile-btn"
-        style="margin-left: auto !important; position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: block; padding: 9px;">
-        <a href="#" id="profile-trigger"
-          style="text-decoration: none; font-weight: bold;  display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;"><span
-            id="username-display"
-            style="margin-left: auto !important; font-size: 21px; letter-spacing: normal !important;">Загрузка...</span></a>
+        <li class="profile-menu" id="profile-btn"
+          style=" position: relative; list-style: none; background:#41cfff !important; box-shadow: 0 4px 15px rgba(65, 207, 255, 0.4),0 0 5px rgba(0, 255, 65, 0.2);  border-radius: 10px; display: block; padding: 9px;">
+          <a href="#" id="profile-trigger"
+            style="text-decoration: none; font-weight: bold;  display: block; color: rgb(255, 251, 232); margin-left: auto !important; right: 0 !important;"><span
+              id="username-display"
+              style="margin-left: auto !important; font-size: 21px; letter-spacing: normal !important;">Загрузка...</span></a>
 
-        <!-- Выпадающее меню -->
-        <ul id="profile-menu" style="display: none; ">
-          <li style="margin-bottom: 1px;">
-            <button
-              style="display: flex;   width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left; align-items: center;"><a
-                href="profile.html"
-                style="display: flex; gap: 5px; color: #000000; text-decoration: none;  background-color: #41d0ff00; align-items: center;"><img
-                  src="/img/account_circle_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Профиль</a></button>
-          </li>
-          <hr>
-          <li style="margin-bottom: 1px;">
-            <button onclick="logoutUser()"
-              style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><img
-                src="/img/logout_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Выйти</button>
-          </li>
-          <hr>
-          <li>
-            <button onclick="deleteMyAccount()"
+          <!-- Выпадающее меню -->
+          <ul id="profile-menu" style="display: none; ">
+            <li style="margin-bottom: 1px;">
+              <button
+                style="display: flex;   width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left; align-items: center;"><a
+                  href="profile.html"
+                  style="display: flex; gap: 5px; color: #000000; text-decoration: none;  background-color: #41d0ff00; align-items: center;"><img
+                    src="/img/account_circle_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Профиль</a></button>
+            </li>
+            <hr>
+            <button onclick="window.openSwalSettings()"
               style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;"><img
-                src="/img/delete_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Удалить
-              аккаунт</button>
-          </li>
-        </ul>
-      </li>
+                src="/img/delete_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Настройки</button>
+            <li style="margin-bottom: 1px;">
+              <hr>
+              <button onclick="logoutUser()"
+                style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ff4d4d00; color: rgb(0, 0, 0); border: none; padding: 8px;  font-size: 17px; border-radius: 4px; cursor: pointer; text-align: left;"><img
+                  src="/img/logout_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Выйти</button>
+            </li>
+            <hr>
+            <li>
+              <button onclick="deleteMyAccount()"
+                style="display: flex; align-items: center; gap: 5px; width: 90%; background: #ffffff00; color: rgb(0, 0, 0); border: none; padding: 8px;  text-align: left;  border-radius: 4px; cursor: pointer; font-size: 17px;"><img
+                  src="/img/delete_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg">Удалить
+                аккаунт</button>
+            </li>
+          </ul>
+        </li>
+      </div>
 
     </div>
 
   </header>
 
-    <main class="prof" id="prof">
-        <h1 id="akk" style="color: #000000;"> | Профиль</h1>
-        <!-- КОЛОНКА 1: Создание статьи -->
-        <!-- <div class="glass-card admin-zone" style="height: 300px;">
+  <main class="prof" id="prof">
+    <h1 id="akk" style="color: #000000;"> | Профиль</h1>
+    <!-- КОЛОНКА 1: Создание статьи -->
+    <!-- <div class="glass-card admin-zone" style="height: 300px;">
             <h2 style="margin: 0;">Напишите свою статью на iPosters!</h2>
             <input type="text" id="postImage" placeholder="Ссылка на картинку статьи (URL)...">
             <input type="text" id="postTitle" placeholder="Заголовок статьи...">
@@ -168,78 +209,91 @@
             <button class="publish-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
         </div> -->
 
-        <!-- КОЛОНКА 2: Список моих статей -->
-<!-- Секретный омни-пульт модерации Капибары (по умолчанию скрыт) -->
-<div id="admin-moderation-panel" style="display: none; margin-top: 30px; padding: 25px; border: 1px solid rgba(0, 0, 0, 0.09); border-radius: 12px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-    <h3 style="color: #222; margin-top: 0; font-size: 22px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f5f5f5; padding-bottom: 15px; margin-bottom: 20px;">
-        🦫 Главный диспетчер Капибары 
-        <span id="global-mod-badge" style="background: #ff4d4d; color: white; font-size: 12px; padding: 2px 8px; border-radius: 20px; display: none;">0</span>
-    </h3>
+    <!-- КОЛОНКА 2: Список моих статей -->
+    <!-- Секретный омни-пульт модерации Капибары (по умолчанию скрыт) -->
+    <div id="admin-moderation-panel"
+      style="display: none; margin-top: 30px; padding: 25px; border: 1px solid rgba(0, 0, 0, 0.09); border-radius: 12px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+      <h3
+        style="color: #222; margin-top: 0; font-size: 22px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f5f5f5; padding-bottom: 15px; margin-bottom: 20px;">
+        🦫 Главный диспетчер Капибары
+        <span id="global-mod-badge"
+          style="background: #ff4d4d; color: white; font-size: 12px; padding: 2px 8px; border-radius: 20px; display: none;">0</span>
+      </h3>
 
-    <!-- ========================================== -->
-    <!-- СЕКЦИЯ А. МОДЕРНИЗАЦИЯ НОВЫХ СТАТЕЙ (АРТИКЛОВ) -->
-    <!-- ========================================== -->
-    <div style="margin-bottom: 30px;">
+      <!-- ========================================== -->
+      <!-- СЕКЦИЯ А. МОДЕРНИЗАЦИЯ НОВЫХ СТАТЕЙ (АРТИКЛОВ) -->
+      <!-- ========================================== -->
+      <div style="margin-bottom: 30px;">
         <h4 style="color: #333; font-size: 17px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            📄 Новые статьи на проверку
-            <span id="articles-badge-count" style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
+          📄 Новые статьи на проверку
+          <span id="articles-badge-count"
+            style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
         </h4>
         <div id="admin-articles-queue-list"></div>
-    </div>
+      </div>
 
-    <!-- ========================================== -->
-    <!-- СЕКЦИЯ Б. МОДЕРНИЗАЦИЯ НОВЫХ КОММЕНТАРИЕВ -->
-    <!-- ========================================== -->
-    <div style="padding-top: 20px; border-top: 2px dashed #f5f5f5;">
+      <!-- ========================================== -->
+      <!-- СЕКЦИЯ Б. МОДЕРНИЗАЦИЯ НОВЫХ КОММЕНТАРИЕВ -->
+      <!-- ========================================== -->
+      <div style="padding-top: 20px; border-top: 2px dashed #f5f5f5;">
         <h4 style="color: #333; font-size: 17px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            💬 Очередь комментариев по постам
-            <span id="comments-badge-count" style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
+          💬 Очередь комментариев по постам
+          <span id="comments-badge-count"
+            style="background: #41cfff; color: white; font-size: 11px; padding: 2px 7px; border-radius: 20px; display: none;">0</span>
         </h4>
         <div id="admin-posts-queue"></div>
+      </div>
     </div>
-</div>
 
-<!-- ВСПЫШКА: ВСПЛЫВАЮЩЕЕ ОКНО ДЛЯ ПРОВЕРКИ КОММЕНТОВ -->
-<div id="mod-comment-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
-    <div style="background: #ffffff; width: 90%; max-width: 600px; max-height: 80vh; border-radius: 8px; padding: 20px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-            <h4 id="modal-post-title" style="margin: 0; font-size: 18px; color: #333; padding-right: 30px; line-height: 1.3;">Проверка комментариев</h4>
-            <span onclick="window.closeModModal()" style="font-size: 24px; color: #aaa; cursor: pointer; position: absolute; top: 15px; right: 20px; font-weight: bold; transition: 0.2s;" onmouseover="this.style.color='#ff4d4d'" onmouseout="this.style.color='#aaa'">&times;</span>
+    <!-- ВСПЫШКА: ВСПЛЫВАЮЩЕЕ ОКНО ДЛЯ ПРОВЕРКИ КОММЕНТОВ -->
+    <div id="mod-comment-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+      <div
+        style="background: #ffffff; width: 90%; max-width: 600px; max-height: 80vh; border-radius: 8px; padding: 20px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+          <h4 id="modal-post-title"
+            style="margin: 0; font-size: 18px; color: #333; padding-right: 30px; line-height: 1.3;">Проверка
+            комментариев</h4>
+          <span onclick="window.closeModModal()"
+            style="font-size: 24px; color: #aaa; cursor: pointer; position: absolute; top: 15px; right: 20px; font-weight: bold; transition: 0.2s;"
+            onmouseover="this.style.color='#ff4d4d'" onmouseout="this.style.color='#aaa'">&times;</span>
         </div>
         <div id="modal-comments-stream" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;"></div>
+      </div>
     </div>
-</div>
 
 
-        <section>
-            <h1 id="result">Мои статьи</h1>
-          
-            <div class="tag-filters glass-card">
-                <span
-                    style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
-                <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
-                <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
-                <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
-                <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
-                <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
+    <section>
+      <h1 id="result">Мои посты</h1>
 
-            </div>
-            <div id="dynamic-cards">
-                <!-- Сюда будут рендериться статьи из базы -->
-                <p id="empty-state" style="color: #999;">Вы еще не написали ни одной статьи...</p>
-            </div>
-        </section>
+      <!-- <div class="tag-filters glass-card">
+        <span
+          style="font-size: 11px; font-weight: 900; opacity: 0.4; margin-right: 10px; align-self: center;">ФИЛЬТР:</span>
+        <button class="filter-btn active" onclick="filterByTag('Все', this)">Все</button>
+        <button class="filter-btn" onclick="filterByTag('Природа', this)">Природа</button>
+        <button class="filter-btn" onclick="filterByTag('Еда', this)">Еда</button>
+        <button class="filter-btn" onclick="filterByTag('Интернет', this)">Интернет</button>
+        <button class="filter-btn" onclick="filterByTag('Технологии', this)">Технологии</button>
 
-    </main>
+      </div> -->
+      <div id="dynamic-cards">
+        <!-- Сюда будут рендериться статьи из базы -->
+        <p id="empty-state" style="color: #999;">Вы еще не написали ни одной статьи...</p>
+      </div>
+    </section>
+
+  </main>
 
 
-    <!-- Подключаем твою логику (модуль) -->
+  <!-- Подключаем твою логику (модуль) -->
 
-    <script src="/scripts/sweetalert2.all.min.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script type="module" src="scripts/render.js"></script>
-    <script src="scripts/header.js"></script>
-    <script src="scripts/main.js"></script>
+  <script src="/scripts/sweetalert2.all.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script type="module" src="scripts/render.js"></script>
+  <script src="scripts/header.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/settings.js" type="module"></script>
 </body>
 
 </html>

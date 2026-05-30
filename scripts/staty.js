@@ -1052,10 +1052,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.uploadFile = async function (files) {
     if (!files || files.length === 0) return;
-    const file = files[0];
+    
 
-    // 🔥 ВСТАВЬ СЮДА СВОЙ КЛЮЧ, КОТОРЫЙ СКОПИРОВАЛ НА САЙТЕ IMGBB
-    const IMGBB_API_KEY = 'e3025b531a8c99f617acd0ca0a5b3d10';
 
     const inputField = document.getElementById('postInput');
     Swal.showLoading(); // Включаем красивый лоадер SweetAlert
@@ -1063,24 +1061,40 @@ window.uploadFile = async function (files) {
     // Упаковываем файл в специальный формат для отправки по сети
 
 
-
+         // 🔥 НАДО СТРОГО ТАК (Метод .pop() забирает из массива СТРОГО чистую base64 строку без префикса!):
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',').pop()); // <-- ДОБАВИЛИ .pop() НА КОНЦЕ!
+        reader.onerror = error => reject(error);
+    })
     try {
         for (let i = 0; i < files.length; i++) {
-            const formData = new FormData();
-            formData.append('image', files[i]);
-            // Отправляем картинку в стабильное облако Imgbb вместо заблокированного Supabase
-            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+              const currentFile = files[i];
+            const base64Data = await toBase64(currentFile);
+
+            // Штурмуем твой собственный бэкенд на Рендере (Тут CORS и 50-мегабайтные лимиты в идеале!)
+            const response = await fetch('https://pro-info-api.onrender.com/api/upload-image', {
                 method: 'POST',
-                body: formData
+                headers: { 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ imageBase64: base64Data })
             });
+
             if (!response.ok) {
-                throw new Error(`Ошибка сети на файле №${i + 1}`);
+                const errData = await response.json().catch(() => ({}));
+                console.error("Детали ошибки твоего сервера Express:", errData);
+                throw new Error(`Ошибка на файле №${i + 1}`);
             }
+
             const result = await response.json();
-            if (result.success) {
-                imageUrls.push(result.data.url); // Собираем ссылки в массив
+            
+            // Твой сервер возвращает готовую прокси-ссылку в поле result.url
+            if (result && result.url) {
+                imageUrls.push(result.url); // Ссылка на твой собственный image-proxy встает в массив карусели!
             } else {
-                throw new Error(result.error ? result.error.message : 'Ошибка загрузки одного из файлов');
+                throw new Error('Ошибка парсинга ответа бэкенда');
             }
         }
 
@@ -1143,7 +1157,7 @@ window.uploadFile = async function (files) {
 
         Swal.hideLoading();
     } catch (err) {
-        console.error("Ошибка загрузки файла на Imgbb:", err.message);
+        console.error("Ошибка загрузки файла", err.message);
         Swal.fire("Ошибка сети", "Не удалось загрузить картинку. Попробуй другой файл.", "error");
     }
 };
