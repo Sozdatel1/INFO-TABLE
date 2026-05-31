@@ -249,56 +249,151 @@ window.closeAuthModal = function () {
     document.getElementById('auth-modal').style.display = 'none';
 };
 // --- ВХОД ---
+// =========================================================================
+// 🦫 СУВЕРЕННЫЙ И НЕУЯЗВИМЫЙ МОДУЛЬ ВХОДА С СИНХРОННЫМ ХЭШИРОВАНИЕМ РЕГИСТРА
+// =========================================================================
 export async function loginUser(username, password) {
     const errorDisplay = document.getElementById('auth-error-msg');
     if (errorDisplay) errorDisplay.innerText = "";
 
-    // Сначала проверяем поля, чтобы не слать пустой запрос (избегаем ошибки 400)
+    // 1. Сначала проверяем поля, чтобы не слать пустой запрос (избегаем ошибки 400)
     if (!username.trim() || !password.trim()) {
         if (errorDisplay) errorDisplay.innerText = "⚠️ Заполни все поля!";
         return;
     }
 
-    const email = `${username.toLowerCase()}@app.local`;
+    // 2. 🔥 АБСОЛЮТНЫЙ UI-СИНХРОН СИНИОРА: Повторяем логику хэша больших букв один в один с SignUp!
+    // Считаем количество больших заглавных букв в инпуте входа
+    let casingHash = "malo";
+    if (username !== username.toLowerCase()) {
+        // Если есть большие буквы - считаем их точное количество и шьем метку bolsh!
+        casingHash = "bolsh" + username.replace(/[^A-Z]/g, '').length;
+    }
+
+    // Очищаем имя для сборки левой части почты строго в нижнем регистре
+    const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, ''); 
+    
+    // На выходе для "kapibara" -> соберется kapibara-malo@app.local
+    // На выходе для "Kapibara" -> соберется kapibara-bolsh1@app.local — ТОЧНОЕ ПОПАДАНИЕ В СВОЙ АККАУНТ КЛОНА!
+    const email = `${cleanNickForEmail}-${casingHash}@app.local`;
+
+    // 3. ШТУРМ ОБЛАКА SUPABASE AUTH: Входим строго в целевой изолированный профиль!
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-        if (errorDisplay) errorDisplay.innerText = "❌ Неверный ник или пароль";
-        return;
+        console.warn("Новый хэш-профиль не найден, проверяем старую базу .local...");
+        
+        // Сборка старой классической почты, которая была у тебя изначально!
+        const legacyEmail = `${username.toLowerCase()}@app.local`;
+
+        // ПОПЫТКА №2: Бесшовно штурмуем базу по старому адресу!
+        const legacyAuth = await supabase.auth.signInWithPassword({ email: legacyEmail, password });
+        
+        if (legacyAuth.error) {
+            // Если и старый акк не нашелся - только тогда выводим ошибку на экран!
+            if (errorDisplay) errorDisplay.innerText = "❌ Неверный ник или пароль";
+            return;
+        }
     }
 
+    // 4. Бесшовная перезагрузка сессии фронтенда напрямую без ВПН
     location.reload();
 }
 
+
+
 // --- РЕГИСТРАЦИЯ ---
+// =========================================================================
+// 🦫 СУВЕРЕННЫЙ И НЕУЯЗВИМЫЙ МОДУЛЬ РЕГИСТРАЦИИ С ХЭШИРОВАНИЕМ РЕГИСТРА ПОЧТЫ
+// =========================================================================
 export async function registerUser(username, password) {
-    const regErrorDisplay = document.getElementById('reg-error-msg'); // Сделай отдельный ID для модалки регистрации
+    const regErrorDisplay = document.getElementById('reg-error-msg'); 
     if (regErrorDisplay) regErrorDisplay.innerText = "";
 
+    // 1. Проверяем заполнение обязательных полей формы
     if (!username.trim() || !password.trim()) {
         if (regErrorDisplay) regErrorDisplay.innerText = "⚠️ Заполни все поля!";
         return;
     }
 
-    const email = `${username.toLowerCase()}@app.local`;
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    try {
+        Swal.showLoading(); // Включаем сочный лоадер ожидания
 
-    if (error) {
-        if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${error.message}`;
-        return;
+        // 🚨 ШАГ 2. СТРОГИЙ СЕРВЕРНЫЙ ИНТЕРЦЕПТ: Проверяем ник на бэкенде Рендера!
+        // Запрос идет регистрозависимо, символ в символ (kapibara !== Kapibara)!
+        const checkResponse = await fetch('https://pro-info-api.onrender.com/api/check-username', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username })
+        });
+
+        if (!checkResponse.ok) throw new Error("Ошибка проверки никнейма на сервере");
+        
+        const checkResult = await checkResponse.json();
+        
+        // Если сервер нашел точное совпадение имени в базе с учетом больших букв - стопаем код!
+        if (checkResult.exists) {
+            if (regErrorDisplay) regErrorDisplay.innerText = checkResult.message;
+            Swal.close();
+            return;
+        }
+
+        // 🚨 ШАГ 3. КИБЕР-ГЕНЕРАЦИЯ УНИКАЛЬНОГО ХЭШ-EMAIL: Обходим citext-фильтр Supabase!
+        // Высчитываем количество больших букв в инпуте юзера
+        let casingHash = "malo";
+        if (username !== username.toLowerCase()) {
+            // Если есть заглавные буквы - считаем их количество и шьем метку bolsh!
+            casingHash = "bolsh" + username.replace(/[^A-Z]/g, '').length;
+        }
+
+        // Очищаем имя для безопасной отправки в левую часть email
+        const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, ''); 
+        
+        // На выходе для "kapibara" -> kapibara-malo@app.local
+        // На выходе для "Kapibara" -> kapibara-bolsh1@app.local — СТРОКИ СТАЛИ РАЗНЫМИ ДЛЯ БД!
+        const validEmail = `${cleanNickForEmail}-${casingHash}@app.local`; 
+
+        // 4. ШТУРМ ОБЛАКА: Регистрируем уникальный аккаунт в Supabase Auth
+        // Намертво сохраняем оригинальный красивый регистр со всеми большими буквами в метаданные!
+        const { data, error } = await supabase.auth.signUp({ 
+            email: validEmail, 
+            password: password,
+            options: {
+                data: { 
+                    display_name: username, // Сохранит строго: "Kapibara" или "Yaa"
+                    name: username 
+                }
+            }
+        });
+
+        if (error) {
+            if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${error.message}`;
+            Swal.close();
+            return;
+        }
+        
+        // Закрываем модалку фронтенда после триумфа
+        if (typeof closeAuthModal === 'function') {
+            closeAuthModal();
+        }
+        
+        // Сочный вывод салюта успеха
+        await Swal.fire({
+            title: "Готово! 🎉",
+            text: `Аккаунт ${username} успешно создан!`,
+            icon: "success",
+            confirmButtonColor: "#00d4ff"
+        });
+
+        // Перезагружаем сессию для мгновенного вступления в силу без ВПН
+        location.reload();
+
+    } catch (err) {
+        console.error("Критический сбой регистрационного конвейера:", err.message);
+        if (regErrorDisplay) regErrorDisplay.innerText = `❌ ${err.message}`;
+        Swal.close();
     }
-    closeAuthModal()
-    // Если всё ок, можно оставить SweetAlert для красоты
-    await Swal.fire({
-        title: "Готово!",
-        text: `Аккаунт ${username} создан`,
-        icon: "success",
-        confirmButtonColor: "#00d4ff"
-    });
-
-    location.reload();
 }
-
 
 
 // ПРОСМОТРЫ
@@ -700,33 +795,38 @@ window.addEventListener('click', (e) => {
 });
 
 // Функция, которая проверяет статус входа и меняет кнопки (ДЛЯ ГЛАВНОЙ)
+// =========================================================================
+// 🦫 СУВЕРЕННЫЙ И СИНХРОННЫЙ UI-МОДУЛЬ ШАПКИ ДЛЯ ГЛАВНОЙ СТРАНИЦЫ (INDEX)
+// =========================================================================
 async function updateAuthUI() {
     const loginBtn = document.getElementById('login-btn');
     const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
-    const plus = document.getElementById('plus')
-    // Если кнопок нет на текущей странице, прерываем функцию
-    // if (!loginBtn && !profileBtn) return;
+    const plus = document.getElementById('plus');
 
     const { data: { session } } = await supabase.auth.getSession();
     const user = session?.user;
+
     if (user) {
+        // 🔥 АБСОЛЮТНЫЙ ФИКС СИНИОРА: Достаем красивый регистр никнейма напрямую из метаданных базы!
+        // Никакого жесткого затирания маленькими буквами из email!
+        const username = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
 
         if (usernameDisplay) {
-            usernameDisplay.innerText = user.email.split('@')[0];
+            usernameDisplay.innerText = username; // Выведет строго красивый: "Kapibara" или "Yaa"
         }
         if (plus) {
             plus.style.display = 'flex';
         }
-        loginBtn.style.display = 'none';
-        profileBtn.style.display = 'block';
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (profileBtn) profileBtn.style.display = 'block';
     } else {
-        loginBtn.style.display = 'flex';
-        profileBtn.style.display = 'none';
-        plus.style.display = 'none';
-
+        if (loginBtn) loginBtn.style.display = 'flex';
+        if (profileBtn) profileBtn.style.display = 'none';
+        if (plus) plus.style.display = 'none';
     }
 }
+
 window.updateAuthUI = updateAuthUI
 
 
@@ -741,7 +841,7 @@ export async function checkUserProfile() {
     }
 
     // Показываем ник в шапке (отрезаем домен)
-    const username = user.email.split('@')[0];
+      const username = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
     const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
     const akk = document.getElementById('akk')
@@ -754,12 +854,12 @@ export async function checkUserProfile() {
         usernameDisplay.innerText = username;
     }
     if (akk) {
-        const name = user.email.split('@')[0];
-        akk.innerText = `${name} | Профиль`; // Получится: "ivan | Профиль"
+        
+        akk.innerText = `${username} | Профиль`; // Получится: "ivan | Профиль"
     }
     if (prof) {
-        const us = user.email.split('@')[0];
-        prof.innerText = `${us} • Профиль | iPosters`; // Получится: "ivan | Профиль"
+        
+        prof.innerText = `${username} • Профиль | iPosters`; // Получится: "ivan | Профиль"
     }
     // Загружаем только статьи этого пользователя
     if (typeof loadMyArticles === 'function') {
@@ -803,7 +903,7 @@ window.deleteMyAccount = async function () {
     // 1. Показываем всплывающее окно с предупреждением
     const { data: { session }, error } = await supabase.auth.getSession();
     const user = session?.user;
-    const username = user.email.split('@')[0];
+    const username = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
     const result = await Swal.fire({
         title: `Удалить аккаунт ${username}?`,
         text: "Ваш профиль и ВСЕ ваши статьи будут безвозвратно удалены!",

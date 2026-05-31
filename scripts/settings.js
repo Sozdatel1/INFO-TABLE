@@ -41,16 +41,17 @@ window.openSwalSettings = async function () {
         showCloseButton: true, // Красивый крестик закрытия в правом верхнем углу
         focusConfirm: false,
         background: '#ffffff',
-        borderRadius: '12px'
-    });
-};
+        borderRadius: '12px',
+   
 
- // 🔥 СИНЬОРСКАЯ МАГИЯ INTERCEPT: Навешиваем слушатели кликов строго ПОСЛЕ отрисовки модалки в DOM!
+
+        // 🔥 СИНЬОРСКАЯ МАГИЯ INTERCEPT: Навешиваем слушатели кликов строго ПОСЛЕ отрисовки модалки в DOM!
         didOpen: () => {
             const btnName = document.getElementById('swal-btn-name-update');
             const btnPassword = document.getElementById('swal-btn-password-update');
 
-            if (btnName) {
+            // === КОНТУР А: ИСПОЛНИТЕЛЬ ОБНОВЛЕНИЯ ИМЕНИ ЧЕРЕЗ ЯДРО EMAIL ===
+                if (btnName) {
                 btnName.addEventListener('click', async () => {
                     const input = document.getElementById('swal-update-name');
                     if (!input) return;
@@ -59,22 +60,48 @@ window.openSwalSettings = async function () {
                     if (!newName) return Swal.showValidationMessage("Имя не может быть пустым! 📝");
 
                     try {
-                        // Жестко ждем ответа от Supabase
+                        // 🚨 ШАГ 1. СТРОГИЙ СЕРВЕРНЫЙ ИНТЕРЦЕПТ: Проверяем уникальность имени перед обновлением!
+                        // Запрос летит на твой Express бэкенд на Рендере и сверяет ники символ в символ (kapi !== Kapi)
+                        const checkResponse = await fetch('https://pro-info-api.onrender.com/api/check-username', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: newName })
+                        });
+
+                        if (!checkResponse.ok) throw new Error("Ошибка проверки никнейма на сервере");
+                        
+                        const checkResult = await checkResponse.json();
+                        
+                        // Если сервер выдал, что точно такое же имя с учетом больших букв уже есть в базе - стопаем апдейт!
+                        if (checkResult.exists) {
+                            return Swal.showValidationMessage(checkResult.message);
+                        }
+
+                        // 🚨 ШАГ 2. ЧИСТЫЙ СИНЬОРСКИЙ ОБНОВЛЕНИЕ: Если имя свободно - пишем его в метаданные!
+                        // Email не трогаем, костыли 400 ошибок стерты навсегда!
                         const { error } = await supabase.auth.updateUser({
                             data: { display_name: newName, name: newName }
                         });
+                        
                         if (error) throw error;
 
-                        const userHeaderName = document.getElementById('profile-user-name');
-                        if (userHeaderName) userHeaderName.innerText = newName;
+                        Swal.fire({ 
+                            title: "Имя обновлено! 🎉", 
+                            text: `Никнейм успешно изменен на "${newName}"!`, 
+                            icon: "success", 
+                            confirmButtonColor: "#41cfff" 
+                        }).then(() => {
+                            // Бесшовная перезагрузка сессии напрямую без ВПН
+                            window.location.reload(); 
+                        });
 
-                        Swal.fire({ title: "Имя обновлено! 🎉", text: `Никнейм успешно изменен на "${newName}"!`, icon: "success", confirmButtonColor: "#41cfff" });
                     } catch (err) {
                         Swal.showValidationMessage(`Ошибка Supabase: ${err.message}`);
                     }
                 });
             }
 
+            // === КОНТУР Б: ИСПОЛНИТЕЛЬ ОБНОВЛЕНИЯ ПAРOЛЯ БЕЗ ИЗМЕНЕНИЙ ===
             if (btnPassword) {
                 btnPassword.addEventListener('click', async () => {
                     const passInput = document.getElementById('swal-update-password');
@@ -97,10 +124,17 @@ window.openSwalSettings = async function () {
                         const { error } = await supabase.auth.updateUser({ password: newPassword });
                         if (error) throw error;
 
-                        Swal.fire({ title: "Пароль изменен! 🔒⚔️", text: "Новый зашифрованный ключ успешно прописан в ядро Supabase Auth!", icon: "success", confirmButtonColor: "#ff4d4d" });
+                        Swal.fire({ 
+                            title: "Пароль изменен! 🔒⚔️", 
+                            text: "Новый зашифрованный ключ успешно прописан в ядро Supabase Auth!", 
+                            icon: "success", 
+                            confirmButtonColor: "#ff4d4d" 
+                        });
                     } catch (err) {
                         Swal.showValidationMessage(`Ошибка пароля: ${err.message}`);
                     }
                 });
             }
         }
+    });
+};

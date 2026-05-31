@@ -234,14 +234,14 @@ window.loadComments = async function (postId, isLoadMore = false) {
     const list = document.getElementById(`comments-list-${postId}`);
     if (!list || !postId) return;
 
-    // 1. Инициализируем и управляем лимитом именно КОРНЕВЫХ (родительских) комментов
+    // 1. Инициализируем и управляем лимитом КОРНЕВЫХ комментов
     if (!window.commentsLimit) {
         window.commentsLimit = {};
     }
     if (!window.commentsLimit[postId] || !isLoadMore) {
-        window.commentsLimit[postId] = 3; // Стартуем ровно с 3 главных веток
+        window.commentsLimit[postId] = 3; // Старт с 3 главных веток
     } else if (isLoadMore) {
-        window.commentsLimit[postId] += 3; // Прибавляем еще 3 главные ветки по клику
+        window.commentsLimit[postId] += 3; // Добавляем по 3 ветки по клику
     }
 
     const currentLimit = window.commentsLimit[postId];
@@ -264,21 +264,18 @@ window.loadComments = async function (postId, isLoadMore = false) {
             return;
         }
 
-        // 🔥 ШАГ 2. АБСОЛЮТНЫЙ ФИКС СИНИОРА: Разделяем родителей и ответы на плоском уровне!
+        // Разделяем родителей и ответы на плоском уровне
         const rootComments = allComments.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === 'null' || c.parent_id === '0' || c.parent_id === '');
         const replyComments = allComments.filter(c => c.parent_id && c.parent_id !== 'null' && c.parent_id !== '0');
 
-        // Обрезаем строго РОДИТЕЛЬСКИЕ комменты по нашему лимиту
+        // Обрезаем родительские комменты по лимиту
         const limitedRoots = rootComments.slice(0, currentLimit);
 
-        // Объединяем обратно: берем 3 родителя и ВСЕ существующие ответы из базы,
-        // чтобы рекурсивная функция buildCommentTree смогла найти детей для этих 3 родителей!
+        // Объединяем обратно для сборки рекурсивного дерева
         const filteredFlatList = [...limitedRoots, ...replyComments];
-
-        // Строим дерево только на основе отфильтрованного списка
         const commentTree = buildCommentTree(filteredFlatList, null);
 
-        // Рекурсивный генератор HTML (Остался твоим каноничным и сочным)
+        // Рекурсивный генератор HTML (Вычищен до идеального блеска!)
         function generateCommentHtml(c, level = 0) {
             const isOwner = user && user.id === c.user_id;
             const marginShift = Math.min(level * 30, 90);
@@ -291,13 +288,19 @@ window.loadComments = async function (postId, isLoadMore = false) {
                 `<span class="mention-tag" style="color: #41cfff; font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-color: transparent; transition: 0.2s;">$1</span>`
             );
 
+            // 🔥 ФИКС СИНИОРА: Если коммент твой - берем красивый регистр Yaa / Kapibara из живых метаданных сессии!
+            // Никаких split почты, которые выкатывали дефисы и хэши (kapibara-malo)!
+            // Если коммент чужого автора - выводим c.user_name, присланный сервером Express!
+            const currentAuthorName = isOwner 
+                ? (user.user_metadata?.display_name || user.user_metadata?.name || "Автор") 
+                : (c.user_name || 'Аноним');
             return `
             <div style="margin-left: ${marginShift}px; ${backgroundStyle} ${borderStyle} padding: 12px; border-radius: 6px; margin-bottom: 12px; position: relative; transition: 0.2s;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <b onclick="window.prepareReply('${postId}', '${c.id}', '${c.user_name || 'Аноним'}')" 
+                    <b onclick="window.prepareReply('${postId}', '${c.id}', '${currentAuthorName}')" 
                        class="comment-author"
                        style="color: #333; font-size: 15px; cursor: pointer; text-decoration: underline; text-decoration-color: transparent; transition: 0.2s;">
-                       ${c.user_name || 'Аноним'}
+                       ${currentAuthorName}
                     </b>
                     <small style="color: #000000; font-size: 11px; margin: 0 auto;">
                         ${new Date(c.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
@@ -307,7 +310,7 @@ window.loadComments = async function (postId, isLoadMore = false) {
                 <p style="margin: 0; color: #222; font-size: 16px; line-height: 1.4; padding-right: 20px;">${formattedText}</p>
                 
                 <div style="margin-top: 6px;">
-                    <span onclick="window.prepareReply('${postId}', '${c.id}', '${c.user_name || 'Аноним'}')" 
+                    <span onclick="window.prepareReply('${postId}', '${c.id}', '${currentAuthorName}')" 
                           style="color: #007bff; font-size: 12px; cursor: pointer; font-weight: bold; transition: 0.2s;"
                           onmouseover="this.style.color='#41cfff'" onmouseout="this.style.color='#007bff'">
                           Ответить
@@ -532,7 +535,7 @@ window.deleteComment = async function (commentId, postId) {
 window.openCreateModal = async function () {
     const { data: { session } } = await supabase.auth.getSession();
     const user = session?.user;
-    const ak = user.email.split('@')[0];
+   const ak = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
     await Swal.fire({
         title: `Напишите статью, ${ak}!`,
         // Вставляем твою верстку прямо сюда
@@ -678,8 +681,9 @@ window.openEditModal = async function (id) {
 
     // 2. Получаем ник для заголовка
     const { data: { session } } = await supabase.auth.getSession();
-    const ak = session?.user?.email.split('@')[0] || 'Автор';
-
+    const user = session?.user; 
+    // const ak = session?.user?.email.split('@')[0] || 'Автор';
+const ak = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
     // 3. Открываем твой стеклянный интерфейс
     const { value: formValues } = await Swal.fire({
         title: `Отредактируйте статью, ${ak}`,
@@ -1282,15 +1286,19 @@ window.checkAdminProfile = async function () {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    // Жесткий файрвол: пускаем только kapibara
-    const username = session.user.email.split('@')[0];
-    if (username !== 'kapibara') {
+        // 🔥 СУВЕРЕННЫЙ ЖЕСТКИЙ ФАЙРВОЛ: Считываем имя из метаданных базы данных
+    const currentAdminName = session.user.user_metadata?.display_name || session.user.user_metadata?.name || session.user.email.split('@')[0] || 'Аноним';
+
+    // 🔥 ФИКС СИНИОРА: Убрали .toLowerCase()! Врубили точное регистрозависимое совпадение!
+    // Теперь пустит ТОЛЬКО маленькую "kapibara". Любые большие буквы вызовут блок панели!
+    if (currentAdminName !== 'kapibara') {
         panel.style.display = 'none';
         return;
     }
 
-    // Открываем пульт админа!
+    // Открываем пульт админа! Проверка пройдена символ в символ!
     panel.style.display = 'block';
+
 
     try {
         // 2. ВЫСОКОНАГРУЖЕННЫЙ ПАРАЛЛЕЛЬНЫЙ ЗАПРОС К ДВУМ КАНТУРАМ КАРАНТИНА
