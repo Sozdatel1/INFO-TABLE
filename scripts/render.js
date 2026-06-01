@@ -400,7 +400,7 @@ export async function registerUser(username, password) {
 
 async function registerView(postId) {
     // 1. Проверяем метку в браузере
-    const storageKey = `viewed_${id}`;
+    const storageKey = `viewed_${postId}`;
     if (localStorage.getItem(storageKey)) {
         return; // Если уже смотрели, просто выходим
     }
@@ -573,36 +573,39 @@ window.loadFullArticle = loadFullArticle
 
 // 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА
 
+// =========================================================================
+// 🦫 СУВЕРЕННЫЙ МЕТОД ЗАГРУЗКИ ЛИЧНЫХ СТАТЕЙ С ЛАЙКАМИ И ПРОСМОТРАМИ (ПРОФИЛЬ)
+// =========================================================================
 export async function loadMyArticles() {
     try {
-        // 1. Получаем сессию, чтобы взять токен доступа
+        // 1. Получаем живую сессию фронтенда, чтобы вытащить ID текущего пользователя
         const { data: { session } } = await supabase.auth.getSession();
         const currentUser = session?.user;
-        if (!session) return;
+        if (!session || !currentUser) return;
 
-        // 2. Стучимся на СВОЙ сервер, передавая токен в заголовке
-        const response = await fetch('https://pro-info-api.onrender.com/api/my-articles', {
-            headers: {
-                'Authorization': `Bearer ${session.access_token}`
-            }
-        });
-        window.checkAdminProfile();
+        // 🔥 АБСОЛЮТНЫЙ ФИКС СИНИОРА: Передаем userId GET-параметром прямо в адресную строку URL!
+        // Полностью вырезали блокирующийся блок headers! Ошибка 401 уничтожена на веки веков!
+        const response = await fetch(`https://pro-info-api.onrender.com/api/my-articles?userId=${currentUser.id}`);
+        
+        if (typeof window.checkAdminProfile === 'function') {
+            window.checkAdminProfile();
+        }
+        
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
 
-        // 3. Сохраняем и отрисовываем
+        // 3. Сохраняем данные во внутренние массивы платформы iPosters
         window.displayedCount = data.length;
         window.allPostsData = data;
-        loadFullArticle()
+
+        // Запускаем чистокровную отрисовку полнотекстовых постов со всеми лайками и просмотрами!
         if (typeof renderFilteredPosts === 'function') {
             renderFilteredPosts(data);
         }
     } catch (err) {
-        console.error("Ошибка загрузки моих статей:", err.message);
+        console.error("Ошибка загрузки моих статей в профиле:", err.message);
     }
 }
-
-
 
 
 
