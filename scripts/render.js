@@ -47,16 +47,16 @@ export async function renderFilteredPosts(postsToRender, append = false) {
 
 
         const timeAgo = formatTime(post.created_at); // Вот тут магия
-//  ${(post.image || post.image_url) ? `<img src="${post.image || post.image_url}" style="width: calc(100% + 50px)! important; 
-//            /* Добавь фиксированную высоту, чтобы object-fit сработал */
-//             margin: 0 -25px 15px -25px !important; 
-//             display: block; 
-//             aspect-ratio: 2 / 1;
-//             object-fit: cover; 
-//             border-radius: 0px; 
-//             flex-shrink: 0; 
-//             overflow: hidden; 
-//             background-color: #eee;">` : ''}
+        //  ${(post.image || post.image_url) ? `<img src="${post.image || post.image_url}" style="width: calc(100% + 50px)! important; 
+        //            /* Добавь фиксированную высоту, чтобы object-fit сработал */
+        //             margin: 0 -25px 15px -25px !important; 
+        //             display: block; 
+        //             aspect-ratio: 2 / 1;
+        //             object-fit: cover; 
+        //             border-radius: 0px; 
+        //             flex-shrink: 0; 
+        //             overflow: hidden; 
+        //             background-color: #eee;">` : ''}
 
         const category = getAutoCategory(post.title, post.text); // ТЕПЕРЬ ПЕРЕДАЕМ И ТЕКСТ!
 
@@ -205,7 +205,7 @@ window.togglePost = async function (postId) {
         btn.innerText = "Развернуть пост ↓";
         if (commentSection) commentSection.style.display = 'none';
 
-         const card = document.getElementById(`post-card-${postId}`);
+        const card = document.getElementById(`post-card-${postId}`);
         if (card) {
             const startTime = performance.now();
             const duration = 500; // Длительность твоей CSS анимации (0.5s)
@@ -271,8 +271,8 @@ export async function loginUser(username, password) {
     }
 
     // Очищаем имя для сборки левой части почты строго в нижнем регистре
-    const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, ''); 
-    
+    const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+
     // На выходе для "kapibara" -> соберется kapibara-malo@app.local
     // На выходе для "Kapibara" -> соберется kapibara-bolsh1@app.local — ТОЧНОЕ ПОПАДАНИЕ В СВОЙ АККАУНТ КЛОНА!
     const email = `${cleanNickForEmail}-${casingHash}@app.local`;
@@ -282,13 +282,13 @@ export async function loginUser(username, password) {
 
     if (error) {
         console.warn("Новый хэш-профиль не найден, проверяем старую базу .local...");
-        
+
         // Сборка старой классической почты, которая была у тебя изначально!
         const legacyEmail = `${username.toLowerCase()}@app.local`;
 
         // ПОПЫТКА №2: Бесшовно штурмуем базу по старому адресу!
         const legacyAuth = await supabase.auth.signInWithPassword({ email: legacyEmail, password });
-        
+
         if (legacyAuth.error) {
             // Если и старый акк не нашелся - только тогда выводим ошибку на экран!
             if (errorDisplay) errorDisplay.innerText = "❌ Неверный ник или пароль";
@@ -307,7 +307,7 @@ export async function loginUser(username, password) {
 // 🦫 СУВЕРЕННЫЙ И НЕУЯЗВИМЫЙ МОДУЛЬ РЕГИСТРАЦИИ С ХЭШИРОВАНИЕМ РЕГИСТРА ПОЧТЫ
 // =========================================================================
 export async function registerUser(username, password) {
-    const regErrorDisplay = document.getElementById('reg-error-msg'); 
+    const regErrorDisplay = document.getElementById('reg-error-msg');
     if (regErrorDisplay) regErrorDisplay.innerText = "";
 
     // 1. Проверяем заполнение обязательных полей формы
@@ -328,9 +328,9 @@ export async function registerUser(username, password) {
         });
 
         if (!checkResponse.ok) throw new Error("Ошибка проверки никнейма на сервере");
-        
+
         const checkResult = await checkResponse.json();
-        
+
         // Если сервер нашел точное совпадение имени в базе с учетом больших букв - стопаем код!
         if (checkResult.exists) {
             if (regErrorDisplay) regErrorDisplay.innerText = checkResult.message;
@@ -347,21 +347,21 @@ export async function registerUser(username, password) {
         }
 
         // Очищаем имя для безопасной отправки в левую часть email
-        const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, ''); 
-        
+        const cleanNickForEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+
         // На выходе для "kapibara" -> kapibara-malo@app.local
         // На выходе для "Kapibara" -> kapibara-bolsh1@app.local — СТРОКИ СТАЛИ РАЗНЫМИ ДЛЯ БД!
-        const validEmail = `${cleanNickForEmail}-${casingHash}@app.local`; 
+        const validEmail = `${cleanNickForEmail}-${casingHash}@app.local`;
 
         // 4. ШТУРМ ОБЛАКА: Регистрируем уникальный аккаунт в Supabase Auth
         // Намертво сохраняем оригинальный красивый регистр со всеми большими буквами в метаданные!
-        const { data, error } = await supabase.auth.signUp({ 
-            email: validEmail, 
+        const { data, error } = await supabase.auth.signUp({
+            email: validEmail,
             password: password,
             options: {
-                data: { 
+                data: {
                     display_name: username, // Сохранит строго: "Kapibara" или "Yaa"
-                    name: username 
+                    name: username
                 }
             }
         });
@@ -371,12 +371,12 @@ export async function registerUser(username, password) {
             Swal.close();
             return;
         }
-        
-        // Закрываем модалку фронтенда после триумфа
         if (typeof closeAuthModal === 'function') {
             closeAuthModal();
         }
-        
+        // Закрываем модалку фронтенда после триумфа
+
+
         // Сочный вывод салюта успеха
         await Swal.fire({
             title: "Готово! 🎉",
@@ -400,7 +400,7 @@ export async function registerUser(username, password) {
 
 async function registerView(postId) {
     // 1. Проверяем метку в браузере
-    const storageKey = `viewed_${postId}`;
+    const storageKey = `viewed_${id}`;
     if (localStorage.getItem(storageKey)) {
         return; // Если уже смотрели, просто выходим
     }
@@ -461,13 +461,13 @@ export async function loadPosts() {
     try {
         const response = await fetch('https://pro-info-api.onrender.com/api/posts');
         const data = await response.json();
-
+        const trend = document.getElementById ('.trending-box')
         window.allPostsData = data;
         renderFilteredPosts(data);
         renderTrending(data);
-        updateHubStats(data);
-         // 🔥 ФИНАЛЬНЫЙ ШТРИХ: посты на экране, проверяем ссылку!
-    window.checkUrlHash();
+        if (trend) updateHubStats(data);
+        // 🔥 ФИНАЛЬНЫЙ ШТРИХ: посты на экране, проверяем ссылку!
+        window.checkUrlHash();
     } catch (err) {
         console.error("Ошибка фронтенда:", err.message);
     }
@@ -475,39 +475,7 @@ export async function loadPosts() {
         window.renderLoader.stop(); // 2. 🔥 ТУШИМ ЛОАДЕР сразу после ответа сервера!
     }
 }
-
-
-// 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА
-
-export async function loadMyArticles() {
-    try {
-        // 1. Получаем сессию, чтобы взять токен доступа
-        const { data: { session } } = await supabase.auth.getSession();
-        const currentUser = session?.user;
-        if (!session) return;
-
-        // 2. Стучимся на СВОЙ сервер, передавая токен в заголовке
-        const response = await fetch('https://pro-info-api.onrender.com/api/my-articles', {
-            headers: {
-                'Authorization': `Bearer ${session.access_token}`
-            }
-        });
-window.checkAdminProfile();
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-
-        // 3. Сохраняем и отрисовываем
-        window.displayedCount = data.length;
-        window.allPostsData = data;
-
-        if (typeof renderFilteredPosts === 'function') {
-            renderFilteredPosts(data);
-        }
-    } catch (err) {
-        console.error("Ошибка загрузки моих статей:", err.message);
-    }
-}
-
+window.loadPosts = loadPosts
 
 export async function loadFullArticle() {
     const params = new URLSearchParams(window.location.search);
@@ -515,7 +483,7 @@ export async function loadFullArticle() {
     if (!id) return;
 
     // Вызываем твою функцию регистрации просмотра (её тоже можно будет потом перенести)
-    if (typeof registerView === 'function') registerView(id);
+    if (typeof registerView === 'function') registerView(postId);
 
     try {
         // 1. Получаем данные от нашего сервера
@@ -600,6 +568,40 @@ box-shadow: 0 4px 15px rgba(65, 106, 255, 0.4),
 
     loadComments();
 }
+window.loadFullArticle = loadFullArticle
+
+
+// 2. ЗАГРУЗКА ДЛЯ ЛИЧНОГО АККАУНТА
+
+export async function loadMyArticles() {
+    try {
+        // 1. Получаем сессию, чтобы взять токен доступа
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user;
+        if (!session) return;
+
+        // 2. Стучимся на СВОЙ сервер, передавая токен в заголовке
+        const response = await fetch('https://pro-info-api.onrender.com/api/my-articles', {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+        window.checkAdminProfile();
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+
+        // 3. Сохраняем и отрисовываем
+        window.displayedCount = data.length;
+        window.allPostsData = data;
+        loadFullArticle()
+        if (typeof renderFilteredPosts === 'function') {
+            renderFilteredPosts(data);
+        }
+    } catch (err) {
+        console.error("Ошибка загрузки моих статей:", err.message);
+    }
+}
+
 
 
 
@@ -731,7 +733,7 @@ export async function publishPost(data) {
                 confirmButtonColor: "#41cfff" // Твой фирменный неон!
             });
             // Перенаправляем человека, например, в личный кабинет профиля, чтобы он видел свои статьи на проверке
-            window.location.href = "profile.html"; 
+            window.location.href = "profile.html";
         }
 
     } catch (err) {
@@ -841,7 +843,7 @@ export async function checkUserProfile() {
     }
 
     // Показываем ник в шапке (отрезаем домен)
-      const username = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
+    const username = user.user_metadata?.display_name || user.user_metadata?.name || user.email.split('@')[0] || 'Аноним';
     const profileBtn = document.getElementById('profile-btn');
     const usernameDisplay = document.getElementById('username-display');
     const akk = document.getElementById('akk')
@@ -854,11 +856,11 @@ export async function checkUserProfile() {
         usernameDisplay.innerText = username;
     }
     if (akk) {
-        
+
         akk.innerText = `${username} | Профиль`; // Получится: "ivan | Профиль"
     }
     if (prof) {
-        
+
         prof.innerText = `${username} • Профиль | iPosters`; // Получится: "ivan | Профиль"
     }
     // Загружаем только статьи этого пользователя

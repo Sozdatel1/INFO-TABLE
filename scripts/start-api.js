@@ -18,6 +18,7 @@ if (document.getElementById('artText')) {
 
     await loadFullArticle();
     calculateReadingTimeStat()
+    await loadPosts();
 
 }
 if (document.getElementById('prof')) {
@@ -27,6 +28,7 @@ checkUserProfile()
 if (document.getElementById('dynamic-cards')) {
     console.log("Загружаем ленту постов...");
     await loadPosts();
+    await loadFullArticle();
 
 
 }
